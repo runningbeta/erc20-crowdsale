@@ -1,0 +1,64 @@
+{
+  "name": "@runningbeta/erc20-crowdsale",
+  "version": "0.0.1",
+  "description": "The Particle token used as currency in Kittyland",
+  "directories": {
+    "test": "test"
+  },
+  "files": [
+    "contracts",
+    "test"
+  ],
+  "scripts": {
+    "compile": "node_modules/.bin/truffle compile",
+    "test": "node_modules/.bin/truffle test",
+    "console": "node_modules/.bin/truffle console",
+    "lint:sol": "./node_modules/solium/bin/solium.js -d .",
+    "lint:sol:fix": "./node_modules/solium/bin/solium.js -d . --fix"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/runningbeta/erc20-crowdsale.git"
+  },
+  "keywords": [
+    "erc20",
+    "fungible",
+    "token",
+    "coin",
+    "currency",
+    "crowdsale",
+    "tge",
+    "ico",
+    "solidity",
+    "ethereum",
+    "smart",
+    "contracts",
+    "r8",
+    "runningbeta",
+    "security",
+    "zeppelin"
+  ],
+  "author": "Kristijan Rebernisak <kristijan@runningbeta.com>",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/runningbeta/erc20-crowdsale/issues"
+  },
+  "homepage": "https://github.com/runningbeta/erc20-crowdsale#readme",
+  "dependencies": {
+    "openzeppelin-solidity": "^1.9.0"
+  },
+  "devDependencies": {
+    "babel-polyfill": "^6.26.0",
+    "babel-preset-es2015": "^6.24.1",
+    "babel-preset-stage-2": "^6.24.1",
+    "babel-preset-stage-3": "^6.24.1",
+    "babel-register": "^6.26.0",
+    "chai": "^4.1.2",
+    "chai-as-promised": "^7.1.1",
+    "chai-bignumber": "^2.0.2",
+    "ethjs-abi": "^0.2.1",
+    "solium": "^1.1.7",
+    "truffle": "^4.1.7",
+    "web3": "^1.0.0-beta.34"
+  }
+}
