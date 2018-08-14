@@ -1,7 +1,7 @@
 {
   "name": "@runningbeta/erc20-crowdsale",
   "version": "0.0.1",
-  "description": "The Particle token used as currency in Kittyland",
+  "description": "ERC20 token used as currency",
   "directories": {
     "test": "test"
   },
@@ -10,11 +10,16 @@
     "test"
   ],
   "scripts": {
-    "compile": "node_modules/.bin/truffle compile",
-    "test": "node_modules/.bin/truffle test",
-    "console": "node_modules/.bin/truffle console",
-    "lint:sol": "./node_modules/solium/bin/solium.js -d .",
-    "lint:sol:fix": "./node_modules/solium/bin/solium.js -d . --fix"
+    "compile": "truffle compile",
+    "test": "truffle test",
+    "console": "truffle console",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "lint:sol": "solium -d .",
+    "lint:sol:fix": "solium -d . --fix",
+    "lint:all": "npm run lint && npm run lint:sol",
+    "lint:all:fix": "npm run lint:fix && npm run lint:sol:fix",
+    "coverage": "./node_modules/.bin/solidity-coverage"
   },
   "repository": {
     "type": "git",
@@ -45,7 +50,7 @@
   },
   "homepage": "https://github.com/runningbeta/erc20-crowdsale#readme",
   "dependencies": {
-    "openzeppelin-solidity": "^1.10.0"
+    "openzeppelin-solidity": "^1.12.0"
   },
   "devDependencies": {
     "babel-polyfill": "^6.26.0",
@@ -56,9 +61,11 @@
     "chai": "^4.1.2",
     "chai-as-promised": "^7.1.1",
     "chai-bignumber": "^2.0.2",
+    "eslint": "^5.3.0",
     "ethjs-abi": "^0.2.1",
-    "solium": "^1.1.7",
-    "truffle": "^4.1.13",
-    "web3": "^1.0.0-beta.34"
+    "solidity-coverage": "^0.5.7",
+    "solium": "^1.1.8",
+    "truffle": "^4.1.14",
+    "web3": "^1.0.0-beta.35"
   }
 }

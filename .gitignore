@@ -3,3 +3,9 @@ node_modules/
 
 # Truffle build folder
 build/
+
+# Mac
+.DS_Store/
+
+# local env variables
+.env

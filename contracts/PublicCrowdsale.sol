@@ -21,11 +21,11 @@ contract PublicCrowdsale is WhitelistedCrowdsale, CappedCrowdsale, MintedCrowdsa
    * @param _cap Max amount of wei to be contributed
    * @param _goal Funding goal
    */
-  constructor(uint256 _openingTime, uint256 _closingTime, uint256 _cap, uint256 _goal) 
+  constructor(uint256 _openingTime, uint256 _closingTime, uint256 _cap, uint256 _goal)
     TimedCrowdsale(_openingTime, _closingTime)
     CappedCrowdsale(_cap)
     RefundableCrowdsale(_goal)
-    public 
+    public
     {}
 
 }
