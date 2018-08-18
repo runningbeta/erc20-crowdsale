@@ -25,7 +25,8 @@ module.exports = {
     development: {
       host: 'localhost',
       network_id: '*', // Match any network id
-      port: 8545,
+      port: 7545,
+      gasPrice: web3.utils.toWei('1', 'gwei'),
     },
     coverage: {
       host: 'localhost',
