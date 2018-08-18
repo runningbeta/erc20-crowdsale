@@ -16,7 +16,10 @@ contract('Token', function ([
   owner,
   wallet,
   whitelisted,
+  also_whitelisted_one,
+  also_whitelisted_two,
   not_whitelisted,
+  whitelist_revert,
   ...other
 ]) {
   before(async function () {
@@ -53,22 +56,75 @@ contract('Token', function ([
 
       it('Token is owned by crowdsale', async function () {
         await this.token.owner().should.eventually.equal(this.publicCrowdsale.address);
-      })
+      });
 
       it('allows whitelisting of addresses', async function () {
         await this.publicCrowdsale.addAddressToWhitelist(whitelisted);
         await this.publicCrowdsale.whitelist(whitelisted).should.eventually.equal(true);
       });
 
-      it('disallows purchase of tokens', async function () {
-        await this.publicCrowdsale.buyTokens(
-          whitelisted,
-          {
-            from: whitelisted,
-            value: utils.ether(1)
-          }
-        ).should.be.rejectedWith('revert');
+      it('allows whitelisting of multiple addresses', async function () {
+        await this.publicCrowdsale.addAddressesToWhitelist([also_whitelisted_one, also_whitelisted_two, whitelist_revert]);
+        await this.publicCrowdsale.whitelist(also_whitelisted_one).should.eventually.equal(true);
+        await this.publicCrowdsale.whitelist(also_whitelisted_two).should.eventually.equal(true);
+        await this.publicCrowdsale.whitelist(whitelist_revert).should.eventually.equal(true);
       });
+
+      it('allows the owner to revert whitelisted status', async function () {
+        await this.publicCrowdsale.removeAddressFromWhitelist(whitelist_revert);
+        await this.publicCrowdsale.whitelist(whitelist_revert).should.eventually.equal(false);
+
+      })
+
+      describe('disallows purchase of tokens', function () {
+        it('whitelisted for himself', async function () {
+          const beneficiary = whitelisted;
+          const payee = whitelisted;
+          await this.publicCrowdsale.buyTokens(
+            beneficiary,
+            {
+              from: payee,
+              value: utils.ether(1)
+            }
+          ).should.be.rejectedWith('revert');
+        });
+
+        it('whitelisted for non whitelisted', async function () {
+          const beneficiary = not_whitelisted;
+          const payee = whitelisted;
+          await this.publicCrowdsale.buyTokens(
+            beneficiary,
+            {
+              from: payee,
+              value: utils.ether(1)
+            }
+          ).should.be.rejectedWith('revert');
+        });
+        
+        it('non whitelisted for himself', async function () {
+          const beneficiary = not_whitelisted;
+          const payee = not_whitelisted;
+          await this.publicCrowdsale.buyTokens(
+            beneficiary,
+            {
+              from: payee,
+              value: utils.ether(1)
+            }
+          ).should.be.rejectedWith('revert');
+        });
+        
+        it('non whitelisted for whitelisted', async function () {
+          const beneficiary = whitelisted;
+          const payee = not_whitelisted;
+          await this.publicCrowdsale.buyTokens(
+            beneficiary,
+            {
+              from: payee,
+              value: utils.ether(1)
+            }
+          ).should.be.rejectedWith('revert');
+        });
+      })
     });
 
     describe('During Crowdsale', function() {
@@ -76,26 +132,60 @@ contract('Token', function ([
         await utils.increaseTimeTo(openingTime + 1);
       });
 
-      it('disallows purchase of tokens to nonwhitelisted accounts', async function () {
-        await this.publicCrowdsale.buyTokens(
-          not_whitelisted,
-          {
-            from: not_whitelisted,
-            value: utils.ether(0.000145055),
-          }
-        ).should.be.rejectedWith('revert');
+      describe('disallows purchase of tokens', function () {
+        it('non whitelisted for himself', async function () {
+          const beneficiary = not_whitelisted;
+          const payee = not_whitelisted;
+          await this.publicCrowdsale.buyTokens(
+            beneficiary,
+            {
+              from: payee,
+              value: utils.ether(1),
+            }
+          ).should.be.rejectedWith('revert');
+        });
+
+        it('whitelisted for non whitelisted', async function () {
+          const beneficiary = whitelist_revert;
+          const payee = also_whitelisted_one;
+          await this.publicCrowdsale.buyTokens(
+            beneficiary,
+            {
+              from: payee,
+              value: utils.ether(1),
+            }
+          ).should.be.rejectedWith('revert');
+        });
       })
 
-      it('allows purchase of tokens to whitelisted accounts', async function () {
-        await this.publicCrowdsale.buyTokens(
-          whitelisted,
-          {
-            from: whitelisted,
-            value: utils.ether(0.000145054),
-          }
-        );
-        await this.token.balanceOf(whitelisted)
-        .should.eventually.bignumber.equal(1.000002276 * (10 ** 18));
+      describe('allows purchase of tokens', function () {
+        it('whitelisted for himself', async function () {
+          const beneficiary = whitelisted;
+          const payee = whitelisted;
+          await this.publicCrowdsale.buyTokens(
+            beneficiary,
+            {
+              from: payee,
+              value: utils.ether(0.000145054),
+            }
+          );
+          await this.token.balanceOf(beneficiary)
+          .should.eventually.bignumber.equal(1.000002276 * (10 ** 18));
+        });
+
+        it('non whitelisted for whitelisted', async function () {
+          const beneficiary = also_whitelisted_one;
+          const payee = not_whitelisted;
+          await this.publicCrowdsale.buyTokens(
+            beneficiary,
+            {
+              from: payee,
+              value: utils.ether(0.000145054),
+            }
+          );
+          await this.token.balanceOf(beneficiary)
+          .should.eventually.bignumber.equal(1.000002276 * (10 ** 18));
+        });
       });
     });
   });
