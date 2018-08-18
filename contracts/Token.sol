@@ -1,7 +1,6 @@
 pragma solidity ^0.4.24;
 
 import "openzeppelin-solidity/contracts/ownership/NoOwner.sol";
-import "openzeppelin-solidity/contracts/token/ERC827/ERC827Token.sol";
 import "openzeppelin-solidity/contracts/token/ERC20/DetailedERC20.sol";
 import "openzeppelin-solidity/contracts/token/ERC20/MintableToken.sol";
 import "openzeppelin-solidity/contracts/token/ERC20/BurnableToken.sol";
@@ -13,7 +12,7 @@ import "openzeppelin-solidity/contracts/token/ERC20/BurnableToken.sol";
  * Note they can later distribute these tokens as they wish using `transfer` and other
  * `StandardToken` functions.
  */
-contract ParticleToken is NoOwner, ERC827Token, DetailedERC20, MintableToken, BurnableToken {
+contract ParticleToken is NoOwner, DetailedERC20, MintableToken, BurnableToken {
 
   string constant NAME = "Token";
   string constant SYMBOL = "TKN";
