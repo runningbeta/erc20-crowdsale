@@ -26,6 +26,7 @@ module.exports = {
       host: 'localhost',
       network_id: '*', // Match any network id
       port: 7545,
+      gas: 4700000,
       gasPrice: web3.utils.toWei('1', 'gwei'),
     },
     coverage: {
@@ -38,7 +39,9 @@ module.exports = {
     ganache: {
       host: '127.0.0.1',
       network_id: 5777,
-      port: 7545
+      port: 7545,
+      gas: 4700000,
+      gasPrice: web3.utils.toWei('1', 'gwei'),
     },
     rinkeby: {
       provider: () => infuraProvider('rinkeby'),
