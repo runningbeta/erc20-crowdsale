@@ -43,19 +43,19 @@ module.exports = {
       provider: () => infuraProvider('rinkeby'),
       network_id: 4,
       gas: 4700000,
-      gasPrice: web3.toWei('50', 'gwei'),
+      gasPrice: web3.utils.toWei('50', 'gwei'),
     },
     ropsten: {
       provider: () => infuraProvider('ropsten'),
       network_id: 3,
       gas: 4700000,
-      gasPrice: web3.toWei('20', 'gwei'),
+      gasPrice: web3.utils.toWei('20', 'gwei'),
     },
     mainnet: {
       provider: () => infuraProvider('mainnet'),
       network_id: 1,
       gas: 4712388,
-      gasPrice: GAS_PRICE,
+      gasPrice: web3.utils.toWei('10', 'gwei'),
     },
   },
   solc: {
