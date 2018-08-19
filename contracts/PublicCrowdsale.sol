@@ -25,5 +25,18 @@ contract PublicCrowdsale is WhitelistedCrowdsale, CappedCrowdsale, TimedCrowdsal
     CappedCrowdsale(_cap)
     TimedCrowdsale(_openingTime, _closingTime)
   {
+    // constructor
   }
+
+  uint256 public constant minInvestment = 1 ether;
+  uint256 public constant maxInvestment = 10 ether;
+  
+  function buyTokens(address _beneficiary) public payable {
+    uint256 weiAmount = msg.value;
+    require(weiAmount >= minInvestment, "Minimal allowed amount to participate in ICO is >= 1 Ether.");
+    require(weiAmount < maxInvestment, "Maximum allowed amount to participate in ICO is < 10 Ether.");
+
+    super.buyTokens(_beneficiary);
+  }
+
 }
