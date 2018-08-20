@@ -125,7 +125,7 @@ contract('Token', function ([
             beneficiary, { from: payee, value: utils.ether(1) }
           ).should.be.rejectedWith('revert');
         });
-        
+
         it('non whitelisted for himself', async function () {
           const beneficiary = not_whitelisted;
           const payee = not_whitelisted;
@@ -134,11 +134,11 @@ contract('Token', function ([
             beneficiary, { from: payee, value: utils.ether(1) }
           ).should.be.rejectedWith('revert');
         });
-        
+
         it('non whitelisted for whitelisted', async function () {
           const beneficiary = whitelisted;
           const payee = not_whitelisted;
-          
+
           await this.publicCrowdsale.buyTokens(
             beneficiary, { from: payee, value: utils.ether(1) }
           ).should.be.rejectedWith('revert');
@@ -155,7 +155,7 @@ contract('Token', function ([
         it('non whitelisted for himself', async function () {
           const beneficiary = not_whitelisted;
           const payee = not_whitelisted;
-          
+
           await this.publicCrowdsale.buyTokens(
             beneficiary, { from: payee, value: utils.ether(1) }
           ).should.be.rejectedWith('revert');
@@ -164,7 +164,7 @@ contract('Token', function ([
         it('whitelisted for non whitelisted', async function () {
           const beneficiary = whitelist_revert;
           const payee = also_whitelisted_one;
-          
+
           await this.publicCrowdsale.buyTokens(
             beneficiary, { from: payee, value: utils.ether(1) }
           ).should.be.rejectedWith('revert');
@@ -173,7 +173,7 @@ contract('Token', function ([
         it('if investment is too small', async function () {
           const beneficiary = invests_too_small;
           const payee = invests_too_small;
-          
+
           await this.publicCrowdsale.buyTokens(
             beneficiary, { from: payee, value: utils.ether(0.99) }
           ).should.be.rejectedWith('revert');
@@ -182,7 +182,7 @@ contract('Token', function ([
         it('if investment is too big', async function () {
           const beneficiary = invests_too_big;
           const payee = invests_too_big;
-          
+
           await this.publicCrowdsale.buyTokens(
             beneficiary, { from: payee, value: utils.ether(10) }
           ).should.be.rejectedWith('revert');
@@ -193,7 +193,7 @@ contract('Token', function ([
         it('whitelisted for himself', async function () {
           const beneficiary = whitelisted;
           const payee = whitelisted;
-          
+
           await this.publicCrowdsale.buyTokens(
             beneficiary, { from: payee, value: utils.ether(1) }
           );
@@ -205,7 +205,7 @@ contract('Token', function ([
         it('non whitelisted for whitelisted', async function () {
           const beneficiary = also_whitelisted_one;
           const payee = not_whitelisted;
-          
+
           await this.publicCrowdsale.buyTokens(
             beneficiary, { from: payee, value: utils.ether(1) }
           );
