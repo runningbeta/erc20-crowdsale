@@ -1,6 +1,7 @@
 pragma solidity ^0.4.24;
 
 import "openzeppelin-solidity/contracts/ownership/NoOwner.sol";
+import "openzeppelin-solidity/contracts/ownership/Claimable.sol";
 import "openzeppelin-solidity/contracts/token/ERC20/DetailedERC20.sol";
 import "openzeppelin-solidity/contracts/token/ERC20/MintableToken.sol";
 import "openzeppelin-solidity/contracts/token/ERC20/BurnableToken.sol";
@@ -8,20 +9,20 @@ import "openzeppelin-solidity/contracts/token/ERC20/BurnableToken.sol";
 
 /**
  * @title SimpleToken
- * @dev Very simple ERC20 Token example, where all tokens are pre-assigned to the creator.
- * Note they can later distribute these tokens as they wish using `transfer` and other
- * `StandardToken` functions.
+ * @dev Very simple ERC20 Token example, where all tokens minted by the contract owner,
+ * or burned by the token holder.
  */
-contract Token is NoOwner, DetailedERC20, MintableToken, BurnableToken {
+contract Token is NoOwner, Claimable, DetailedERC20, MintableToken, BurnableToken {
 
-  string constant NAME = "Token";
-  string constant SYMBOL = "TKN";
-  uint8 constant DECIMALS = 18;
+  string public constant NAME = "Token";
+  string public constant SYMBOL = "TKN";
+  uint8 public constant DECIMALS = 18;
 
   /**
-   * @dev Constructor that gives msg.sender all of existing tokens.
+   * @dev Constructor that initializes the contract details.
    */
   constructor() DetailedERC20(NAME, SYMBOL, DECIMALS) public {
+    // noop
   }
 
 }
