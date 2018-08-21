@@ -9,13 +9,8 @@ import "./TokenEscrow.sol";
  */
 contract TokenConditionalEscrow is TokenEscrow {
 
-
-  constructor(
-    ERC20Basic _token
-  )
-    public
-    TokenEscrow(_token)
-  {
+  constructor(ERC20Basic _token) public TokenEscrow(_token) {
+    // constructor
   }
 
   /**

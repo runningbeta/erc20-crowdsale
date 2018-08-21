@@ -1,9 +1,8 @@
 const { shouldBehaveLikeTokenEscrow } = require('./TokenEscrow.behaviour');
-const { expectThrow } = require('./helpers/expectThrow');
-const { EVMRevert } = require('./helpers/EVMRevert');
-const { latestTime } = require('./helpers/latestTime');
-const { increaseTimeTo, duration } = require('./helpers/increaseTime');
-const { advanceBlock } = require('./helpers/advanceToBlock');
+const { expectThrow } = require('../helpers/expectThrow');
+const { EVMRevert } = require('../helpers/EVMRevert');
+const { latestTime } = require('../helpers/latestTime');
+const { increaseTimeTo, duration } = require('../helpers/increaseTime');
 
 const BigNumber = web3.BigNumber;
 

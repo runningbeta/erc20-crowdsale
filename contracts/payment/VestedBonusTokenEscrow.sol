@@ -15,13 +15,7 @@ contract VestedBonusTokenEscrow is TokenConditionalEscrow {
   // timestamp when token release is enabled
   uint256 public releaseTime;
 
-  constructor(
-    ERC20Basic _token,
-    uint256 _releaseTime
-  )
-    public
-    TokenConditionalEscrow(_token)
-  {
+  constructor(ERC20Basic _token, uint256 _releaseTime) public TokenConditionalEscrow(_token) {
     require(_releaseTime > block.timestamp);
     releaseTime = _releaseTime;
   }

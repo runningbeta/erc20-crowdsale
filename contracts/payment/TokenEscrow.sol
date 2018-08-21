@@ -27,11 +27,7 @@ contract TokenEscrow is Ownable {
   // ERC20 basic token contract being held
   ERC20Basic private token;
 
-  constructor(
-    ERC20Basic _token
-  )
-    public
-  {
+  constructor(ERC20Basic _token) public {
     token = _token;
   }
 
