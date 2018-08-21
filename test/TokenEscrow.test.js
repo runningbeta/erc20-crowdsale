@@ -1,6 +1,6 @@
-const { shouldBehaveLikeTokenEscrow } = require('./TokenEscrow.behavior');
+const { shouldBehaveLikeTokenEscrow } = require('./TokenEscrow.behaviour');
 
-const Token = artifacts.require('Token');
+const Token = artifacts.require('FixedSupplyBurnableToken');
 const TokenEscrow = artifacts.require('TokenEscrow');
 
 contract('TokenEscrow', function ([_, owner, ...otherAccounts]) {

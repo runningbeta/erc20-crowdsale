@@ -67,8 +67,8 @@ contract('Token', function ([
         await this.crowdsale.owner().should.eventually.equal(owner);
       });
 
-      it('Token is owned by crowdsale', async function () {
-        await this.token.owner().should.eventually.equal(this.crowdsale.address);
+      it('Token is owned by owner', async function () {
+        await this.token.owner().should.eventually.equal(owner);
       });
 
       it('allows whitelisting of addresses', async function () {

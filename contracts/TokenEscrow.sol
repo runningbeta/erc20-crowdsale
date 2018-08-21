@@ -18,8 +18,13 @@ contract TokenEscrow is Ownable {
   event Deposited(address indexed payee, uint256 amount);
   event Withdrawn(address indexed payee, uint256 amount);
 
+  // deposits of the beneficiaries of tokens
   mapping(address => uint256) private deposits;
+
+  // total sum of current deposits
   uint256 private totalDeposits;
+
+  // ERC20 basic token contract being held
   ERC20Basic private token;
 
   constructor(
@@ -51,7 +56,7 @@ contract TokenEscrow is Ownable {
 
   /**
   * @dev Withdraw accumulated balance for a payee.
-  * @param _payee The address whose funds will be withdrawn and transferred to.
+  * @param _payee The address whose tokens will be withdrawn and transferred to.
   */
   function withdraw(address _payee) public onlyOwner {
     uint256 payment = deposits[_payee];

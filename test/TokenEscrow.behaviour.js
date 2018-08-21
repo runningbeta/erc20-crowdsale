@@ -1,7 +1,6 @@
 const expectEvent = require('./helpers/expectEvent');
 const { expectThrow } = require('./helpers/expectThrow');
 const { EVMRevert } = require('./helpers/EVMRevert');
-// const { ethGetBalance } = require('../helpers/web3');
 
 const BigNumber = web3.BigNumber;
 
