@@ -1,7 +1,7 @@
 {
   "name": "@runningbeta/erc20-crowdsale",
   "version": "0.0.1",
-  "description": "ERC20 token used as currency",
+  "description": "Solidity Contracts useful for ERC20 crowdsales",
   "directories": {
     "test": "test"
   },
