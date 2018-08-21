@@ -42,8 +42,6 @@ contract FixedSupplyBurnableToken is NoOwner, Claimable, Pausable, DetailedERC20
     totalSupply_ = INITIAL_SUPPLY;
     balances[msg.sender] = INITIAL_SUPPLY;
     emit Transfer(address(0), msg.sender, INITIAL_SUPPLY);
-    // Start in a paused state. There is no burning allowed until the owner unpauses.
-    pause();
   }
 
   /**
