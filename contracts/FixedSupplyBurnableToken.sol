@@ -4,7 +4,8 @@ import "openzeppelin-solidity/contracts/ownership/NoOwner.sol";
 import "openzeppelin-solidity/contracts/ownership/Claimable.sol";
 import "openzeppelin-solidity/contracts/lifecycle/Pausable.sol";
 import "openzeppelin-solidity/contracts/token/ERC20/DetailedERC20.sol";
-import "openzeppelin-solidity/contracts/token/ERC20/BurnableToken.sol";
+import "openzeppelin-solidity/contracts/token/ERC20/StandardToken.sol";
+import "openzeppelin-solidity/contracts/token/ERC20/StandardBurnableToken.sol";
 
 
 /**
@@ -26,7 +27,7 @@ import "openzeppelin-solidity/contracts/token/ERC20/BurnableToken.sol";
  * This is a BurnableToken where users can burn tokens when burning functionality is
  * enabled (unpaused) by the owner.
  */
-contract FixedSupplyBurnableToken is NoOwner, Claimable, Pausable, DetailedERC20, BurnableToken {
+contract FixedSupplyBurnableToken is NoOwner, Claimable, Pausable, DetailedERC20, StandardToken, StandardBurnableToken {
 
   string public constant NAME = "Example Token";
   string public constant SYMBOL = "TKN";
@@ -38,7 +39,9 @@ contract FixedSupplyBurnableToken is NoOwner, Claimable, Pausable, DetailedERC20
    * @dev Constructor that gives msg.sender all of existing tokens.
    */
   constructor() DetailedERC20(NAME, SYMBOL, DECIMALS) public {
-    _mint(msg.sender, INITIAL_SUPPLY);
+    totalSupply_ = INITIAL_SUPPLY;
+    balances[msg.sender] = INITIAL_SUPPLY;
+    emit Transfer(address(0), msg.sender, INITIAL_SUPPLY);
     // Start in a paused state. There is no burning allowed until the owner unpauses.
     pause();
   }
