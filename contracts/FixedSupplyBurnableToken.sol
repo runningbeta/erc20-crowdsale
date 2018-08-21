@@ -44,12 +44,11 @@ contract FixedSupplyBurnableToken is NoOwner, Claimable, Pausable, DetailedERC20
   }
 
   /**
-   * @dev Overrides StandardToken._burn in order for burn and burnFrom to emit
-   * an additional Burn event.
+   * @dev Overrides StandardToken._burn in order for burn and burnFrom to be disabled
+   * when the contract is paused.
    */
   function _burn(address _who, uint256 _value) internal whenNotPaused {
     super._burn(_who, _value);
-    emit Burn(_who, _value);
   }
 
 }
