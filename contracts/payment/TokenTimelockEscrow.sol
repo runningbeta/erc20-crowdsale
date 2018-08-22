@@ -4,13 +4,13 @@ import "./TokenConditionalEscrow.sol";
 
 
 /**
- * @title ConditionalEscrow
+ * @title TokenTimelockEscrow
  * @dev Escrow to only allow withdrawal only if the vesting period
  * has expired. As only the owner can make deposits and withdrawals
  * this contract should be owned by the crowdsale, which can then
  * perform deposits and withdrawals for individual users.
  */
-contract VestedBonusTokenEscrow is TokenConditionalEscrow {
+contract TokenTimelockEscrow is TokenConditionalEscrow {
 
   // timestamp when token release is enabled
   uint256 public releaseTime;
@@ -27,7 +27,6 @@ contract VestedBonusTokenEscrow is TokenConditionalEscrow {
   */
   function withdrawalAllowed(address _payee) public view returns (bool) {
     // solium-disable-next-line security/no-block-members
-    require(block.timestamp >= releaseTime, "Vesting period not finished.");
-    return true;
+    return block.timestamp >= releaseTime;
   }
 }
