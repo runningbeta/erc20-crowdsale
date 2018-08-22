@@ -11,8 +11,8 @@ require('chai')
   .use(require('chai-as-promised'))
   .should();
 
-const INITTIAL_SUPPLY = 0;
-const TOTAL_SUPPLY = 1000000000;
+const INITIAL_SUPPLY = 0;
+const TOTAL_SUPPLY = 1000000000 * (10 ** 18);
 
 contract('Token', function ([
   owner,
@@ -30,8 +30,8 @@ contract('Token', function ([
     this.token = await Token.new({ from: owner });
   });
 
-  it('total suply is 0', async function () {
-    await this.token.totalSupply().should.eventually.bignumber.equal(INITTIAL_SUPPLY);
+  it(`total suply is ${INITIAL_SUPPLY}`, async function () {
+    (await this.token.totalSupply()).should.be.bignumber.equal(INITIAL_SUPPLY);
   });
 
   it('refuses ether', async function () {
@@ -160,7 +160,7 @@ contract('Token', function ([
           const payee = whitelisted;
 
           await this.crowdsale.buyTokens(beneficiary, { from: payee, value: ether(1) });
-          await this.token.balanceOf(beneficiary).should.eventually.bignumber.not.equal(0);
+          (await this.token.balanceOf(beneficiary)).should.be.bignumber.not.equal(0);
         });
 
         it('non whitelisted for whitelisted', async function () {
@@ -168,15 +168,14 @@ contract('Token', function ([
           const payee = not_whitelisted;
 
           await this.crowdsale.buyTokens(beneficiary, { from: payee, value: ether(1) });
-          await this.token.balanceOf(beneficiary).should.eventually.bignumber.not.equal(0);
+          (await this.token.balanceOf(beneficiary)).should.be.bignumber.not.equal(0);
         });
       });
     });
 
     describe('After Crowdsale', function () {
-      it('returns total balance less than max cap (1000000000)', async function () {
-        const expectedSupply = 1000000000 * (10 ** 18);
-        await this.token.totalSupply().should.eventually.bignumber.at.most(expectedSupply);
+      it(`returns total balance less than max cap (${TOTAL_SUPPLY})`, async function () {
+        (await this.token.totalSupply()).should.be.bignumber.at.most(TOTAL_SUPPLY);
       });
     });
   });

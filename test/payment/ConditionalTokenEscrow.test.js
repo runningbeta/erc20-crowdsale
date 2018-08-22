@@ -8,6 +8,7 @@ const BigNumber = web3.BigNumber;
 
 require('chai')
   .use(require('chai-bignumber')(BigNumber))
+  .use(require('chai-as-promised'))
   .should();
 
 const Token = artifacts.require('FixedSupplyBurnableToken');
