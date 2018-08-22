@@ -6,7 +6,7 @@ import "openzeppelin-solidity/contracts/token/ERC20/ERC20.sol";
 
 
 /**
- * Issuer manages token distribution after the crowdsale.
+ * Issuer manages token distribution.
  *
  * This contract is fed a CSV file with Ethereum addresses and their
  * issued token balances.
