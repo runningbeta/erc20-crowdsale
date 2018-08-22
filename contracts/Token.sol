@@ -20,7 +20,7 @@ contract Token is NoOwner, DetailedERC20, MintableToken, BurnableToken {
   /**
    * @dev Constructor that initializes the contract details.
    */
-  constructor() DetailedERC20(NAME, SYMBOL, DECIMALS) public {
+  constructor() public DetailedERC20(NAME, SYMBOL, DECIMALS) {
     // noop
   }
 

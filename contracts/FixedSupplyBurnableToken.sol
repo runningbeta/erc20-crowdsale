@@ -37,7 +37,8 @@ contract FixedSupplyBurnableToken is NoOwner, Pausable, DetailedERC20, StandardT
   /**
    * @dev Constructor that gives msg.sender all of existing tokens.
    */
-  constructor() DetailedERC20(NAME, SYMBOL, DECIMALS) public {
+  constructor() public DetailedERC20(NAME, SYMBOL, DECIMALS)
+  {
     totalSupply_ = INITIAL_SUPPLY;
     balances[msg.sender] = INITIAL_SUPPLY;
     emit Transfer(address(0), msg.sender, INITIAL_SUPPLY);
