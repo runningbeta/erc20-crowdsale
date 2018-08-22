@@ -2,7 +2,8 @@ pragma solidity ^0.4.24;
 
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
-import "openzeppelin-solidity/contracts/token/ERC20/ERC20Basic.sol";
+import "openzeppelin-solidity/contracts/token/ERC20/ERC20.sol";
+import "openzeppelin-solidity/contracts/token/ERC20/SafeERC20.sol";
 
 
 /**
@@ -13,6 +14,7 @@ import "openzeppelin-solidity/contracts/token/ERC20/ERC20Basic.sol";
  * deposit and withdraw.
  */
 contract TokenEscrow is Ownable {
+  using SafeERC20 for ERC20;
   using SafeMath for uint256;
 
   event Deposited(address indexed payee, uint256 amount);
@@ -24,10 +26,10 @@ contract TokenEscrow is Ownable {
   // total sum of current deposits
   uint256 private totalDeposits;
 
-  // ERC20 basic token contract being held
-  ERC20Basic private token;
+  // ERC20 token contract being held
+  ERC20 private token;
 
-  constructor(ERC20Basic _token) public {
+  constructor(ERC20 _token) public {
     token = _token;
   }
 
@@ -40,10 +42,8 @@ contract TokenEscrow is Ownable {
   * @param _payee The destination address of the tokens.
   * @param _amount The amount of tokens that can be pulled.
   */
-  function deposit(address _payee, uint256 _amount) public onlyOwner payable {
-    require(_amount >= 0, "You can't lower allowed credit.");
-    require(token.balanceOf(this).sub(totalDeposits) >= _amount, "Escrow balance too low, transfer tokens to this address firts.");
-
+  function deposit(address _payee, uint256 _amount) public onlyOwner {
+    token.safeTransferFrom(owner, this, _amount);
     deposits[_payee] = deposits[_payee].add(_amount);
     totalDeposits = totalDeposits.add(_amount);
 
@@ -59,7 +59,7 @@ contract TokenEscrow is Ownable {
     assert(token.balanceOf(this) >= payment);
 
     deposits[_payee] = 0;
-    token.transfer(_payee, payment);
+    token.safeTransfer(_payee, payment);
     totalDeposits = totalDeposits.sub(payment);
 
     emit Withdrawn(_payee, payment);

@@ -33,7 +33,7 @@ contract('VestedBonusTokenEscrow', function (accounts) {
     const payee = accounts[1];
 
     it('reverts on withdrawals', async function () {
-      await this.token.transfer(this.escrow.address, amount, { from: owner });
+      await this.token.approve(this.escrow.address, amount, { from: owner });
       await this.escrow.deposit(payee, amount, { from: owner });
 
       await expectThrow(this.escrow.withdraw(payee, { from: owner }), EVMRevert);

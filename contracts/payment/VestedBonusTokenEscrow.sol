@@ -15,8 +15,9 @@ contract VestedBonusTokenEscrow is TokenConditionalEscrow {
   // timestamp when token release is enabled
   uint256 public releaseTime;
 
-  constructor(ERC20Basic _token, uint256 _releaseTime) public TokenConditionalEscrow(_token) {
-    require(_releaseTime > block.timestamp);
+  constructor(ERC20 _token, uint256 _releaseTime) public TokenConditionalEscrow(_token) {
+    // solium-disable-next-line security/no-block-members
+    require(_releaseTime > block.timestamp, "Vesting period should expire in future.");
     releaseTime = _releaseTime;
   }
 
