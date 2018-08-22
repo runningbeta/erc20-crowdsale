@@ -21,7 +21,7 @@ contract TokenConditionalEscrow is TokenEscrow {
   function withdrawalAllowed(address _payee) public view returns (bool);
 
   function withdraw(address _payee) public {
-    require(withdrawalAllowed(_payee));
+    require(withdrawalAllowed(_payee), "Withdrawal is not Allowed");
     super.withdraw(_payee);
   }
 }
