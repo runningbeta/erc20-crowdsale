@@ -48,7 +48,7 @@ contract SimpleAllowanceCrowdsale is AllowanceCrowdsale, CappedCrowdsale, TimedC
   * @param _wallet address of the new wallet
   */
   function setWallet(address _wallet) public onlyOwner {
-    require(_wallet != 0x0);
+    require(_wallet != address(0), "Wallet address should not be 0x0");
     wallet = _wallet;
     emit WalletChange(_wallet);
   }
