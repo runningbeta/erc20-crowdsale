@@ -14,7 +14,7 @@ import "openzeppelin-solidity/contracts/token/ERC20/BurnableToken.sol";
 contract Token is NoOwner, DetailedERC20, MintableToken, BurnableToken {
 
   string public constant NAME = "Token";
-  string public constant SYMBOL = "TKN";
+  string public constant SYMBOL = "TOK";
   uint8 public constant DECIMALS = 18;
 
   /**

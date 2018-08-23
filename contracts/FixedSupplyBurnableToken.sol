@@ -8,16 +8,16 @@ import "openzeppelin-solidity/contracts/token/ERC20/StandardBurnableToken.sol";
 
 /**
  * @title SimpleToken
- * @dev ERC20 Example Token (TKN)
+ * @dev ERC20 Example Token (TOK)
  *
- * TKN Tokens are divisible by 1e18 (1 000 000 000 000 000 000) base.
+ * TOK Tokens are divisible by 1e18 (1 000 000 000 000 000 000) base.
  *
- * TKN are displayed using 18 decimal places of precision.
+ * TOK are displayed using 18 decimal places of precision.
  *
- * 1 TKN is equivalent to:
+ * 1 TOK is equivalent to:
  *   1 000 000 000 000 000 000 == 1 * 10**18 == 1e18
  *
- * 1 Billion TKN (total supply) is equivalent to:
+ * 1 Billion TOK (total supply) is equivalent to:
  *   1000000000 * 10**18 == 1e27
  *
  * @notice All tokens are pre-assigned to the creator. Note they can later distribute these
@@ -28,7 +28,7 @@ import "openzeppelin-solidity/contracts/token/ERC20/StandardBurnableToken.sol";
 contract FixedSupplyBurnableToken is NoOwner, Pausable, DetailedERC20, StandardBurnableToken {
 
   string public constant NAME = "Example Token";
-  string public constant SYMBOL = "TKN";
+  string public constant SYMBOL = "TOK";
   uint8 public constant DECIMALS = 18;
 
   uint256 public constant INITIAL_SUPPLY = 1000000000 * (10 ** uint256(DECIMALS));
