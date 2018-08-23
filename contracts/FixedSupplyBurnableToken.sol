@@ -3,7 +3,6 @@ pragma solidity ^0.4.24;
 import "openzeppelin-solidity/contracts/ownership/NoOwner.sol";
 import "openzeppelin-solidity/contracts/lifecycle/Pausable.sol";
 import "openzeppelin-solidity/contracts/token/ERC20/DetailedERC20.sol";
-import "openzeppelin-solidity/contracts/token/ERC20/StandardToken.sol";
 import "openzeppelin-solidity/contracts/token/ERC20/StandardBurnableToken.sol";
 
 
@@ -26,7 +25,7 @@ import "openzeppelin-solidity/contracts/token/ERC20/StandardBurnableToken.sol";
  * This is a BurnableToken where users can burn tokens when burning functionality is
  * enabled (unpaused) by the owner.
  */
-contract FixedSupplyBurnableToken is NoOwner, Pausable, DetailedERC20, StandardToken, StandardBurnableToken {
+contract FixedSupplyBurnableToken is NoOwner, Pausable, DetailedERC20, StandardBurnableToken {
 
   string public constant NAME = "Example Token";
   string public constant SYMBOL = "TKN";
