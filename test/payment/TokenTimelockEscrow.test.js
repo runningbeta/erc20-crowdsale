@@ -1,5 +1,4 @@
 const { shouldBehaveLikeTokenEscrow } = require('./TokenEscrow.behaviour');
-const { expectThrow } = require('../helpers/expectThrow');
 const { EVMRevert } = require('../helpers/EVMRevert');
 const { latestTime } = require('../helpers/latestTime');
 const { increaseTimeTo, duration } = require('../helpers/increaseTime');
@@ -36,7 +35,8 @@ contract('TokenTimelockEscrow', function (accounts) {
       await this.token.approve(this.escrow.address, amount, { from: owner });
       await this.escrow.deposit(payee, amount, { from: owner });
 
-      await expectThrow(this.escrow.withdraw(payee, { from: owner }), EVMRevert);
+      await this.escrow.withdraw(payee, { from: owner })
+      .should.be.rejectedWith(EVMRevert);
     });
   });
 

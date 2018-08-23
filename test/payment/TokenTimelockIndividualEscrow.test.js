@@ -1,8 +1,7 @@
 const { shouldBehaveLikeTokenEscrow } = require('./TokenEscrow.behaviour');
-const { expectThrow } = require('../helpers/expectThrow');
 const { EVMRevert } = require('../helpers/EVMRevert');
 const { latestTime } = require('../helpers/latestTime');
-const { increaseTimeTo, duration } = require('../helpers/increaseTime');
+const { duration } = require('../helpers/increaseTime');
 
 const BigNumber = web3.BigNumber;
 
@@ -35,7 +34,8 @@ contract('TokenTimelockIndividualEscrow', function (accounts) {
       await this.token.approve(this.escrow.address, amount, { from: owner });
       await this.escrow.depositAndLock(payee, amount, vestingTime, { from: owner });
 
-      await expectThrow(this.escrow.withdraw(payee, { from: owner }), EVMRevert);
+      await this.escrow.withdraw(payee, { from: owner })
+      .should.be.rejectedWith(EVMRevert);
     });
   });
 

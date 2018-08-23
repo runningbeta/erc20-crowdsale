@@ -1,5 +1,4 @@
 const expectEvent = require('../helpers/expectEvent');
-const { expectThrow } = require('../helpers/expectThrow');
 const { EVMRevert } = require('../helpers/EVMRevert');
 const { EVMThrow } = require('../helpers/EVMThrow');
 
@@ -29,11 +28,13 @@ function shouldBehaveLikeTokenEscrow (owner, [payee1, payee2]) {
       });
 
       it('only the owner can deposit', async function () {
-        await expectThrow(this.escrow.deposit(payee1, 1, { from: payee2 }), EVMThrow);
+        await this.escrow.deposit(payee1, 1, { from: payee2 })
+        .should.be.rejectedWith(EVMThrow);
       });
 
       it('rejects deposit if escrow balance is too low', async function () {
-        await expectThrow(this.escrow.deposit(payee1, amount, { from: owner }), EVMRevert);
+        await this.escrow.deposit(payee1, amount, { from: owner })
+        .should.be.rejectedWith(EVMRevert);
       });
 
       it('emits a deposited event', async function () {
@@ -86,7 +87,8 @@ function shouldBehaveLikeTokenEscrow (owner, [payee1, payee2]) {
       });
 
       it('only the owner can withdraw', async function () {
-        await expectThrow(this.escrow.withdraw(payee1, { from: payee1 }), EVMRevert);
+        await this.escrow.withdraw(payee1, { from: payee1 })
+        .should.be.rejectedWith(EVMRevert);
       });
 
       it('emits a withdrawn event', async function () {

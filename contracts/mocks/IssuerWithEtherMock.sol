@@ -3,9 +3,9 @@ pragma solidity ^0.4.24;
 import "../payment/IssuerWithEther.sol";
 
 /**
- * @title TokenTimelockEscrowMock
+ * @title IssuerWithEtherMock
  */
-contract TokenTimelockEscrowMock is IssuerWithEther {
+contract IssuerWithEtherMock is IssuerWithEther {
 
   // timestamp when token release is enabled
   uint256 public releaseTime;

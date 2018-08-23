@@ -26,10 +26,10 @@ contract IssuerWithEther is Issuer {
   // Issue event
   event IssueWithEther(address benefactor, uint256 amount, uint256 weiAmount);
 
-  function issue(address _benefactor, uint256 _amount, uint256 _weiAmount) public onlyOwner {
+  function issueWithEther(address _benefactor, uint256 _amount, uint256 _weiAmount) public onlyOwner {
     super.issue(_benefactor, _amount);
     weiRaised = weiRaised.add(_weiAmount);
     emit IssueWithEther(_benefactor, _amount, _weiAmount);
   }
-
+  
 }
