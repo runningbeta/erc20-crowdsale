@@ -12,6 +12,14 @@ import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 contract Finalizable is Ownable {
   using SafeMath for uint256;
 
+  /**
+   * @dev Throws if called after the contract is finalized.
+   */
+  modifier onlyNotFinalized() {
+    require(!isFinalized, "Contract already finalized");
+    _;
+  }
+
   bool public isFinalized = false;
 
   event Finalized();
@@ -20,9 +28,7 @@ contract Finalizable is Ownable {
    * @dev Called by owner to do some extra finalization
    * work. Calls the contract's finalization function.
    */
-  function finalize() public onlyOwner {
-    require(!isFinalized, "Contract already finalized");
-
+  function finalize() public onlyOwner onlyNotFinalized {
     finalization();
     emit Finalized();
 
