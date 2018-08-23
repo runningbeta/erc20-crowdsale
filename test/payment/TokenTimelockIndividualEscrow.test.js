@@ -19,10 +19,7 @@ contract('TokenTimelockIndividualEscrow', function (accounts) {
 
   beforeEach(async function () {
     this.token = await Token.new({ from: owner });
-    this.escrow = await TokenTimelockIndividualEscrow.new(
-      this.token.address,
-      { from: owner }
-    );
+    this.escrow = await TokenTimelockIndividualEscrow.new(this.token.address, { from: owner });
   });
 
   context('timelocked tokens', function () {
@@ -33,9 +30,7 @@ contract('TokenTimelockIndividualEscrow', function (accounts) {
       vestingTime = (await latestTime()) + duration.days(10);
       await this.token.approve(this.escrow.address, amount, { from: owner });
       await this.escrow.depositAndLock(payee, amount, vestingTime, { from: owner });
-
-      await this.escrow.withdraw(payee, { from: owner })
-      .should.be.rejectedWith(EVMRevert);
+      await this.escrow.withdraw(payee, { from: owner }).should.be.rejectedWith(EVMRevert);
     });
   });
 

@@ -9,17 +9,17 @@ require('chai')
   .use(require('chai-as-promised'))
   .should();
 
-function shouldBehaveLikeIssuerWithEther(owner, issuer, customer, [customer2, ...otherAccounts]) {
+function shouldBehaveLikeIssuerWithEther(owner, benefactor, customer, [customer2, ...otherAccounts]) {
   const amount = web3.toWei(500.0, 'ether');
   const weiAmount = web3.toWei(50.0, 'ether')
 
-  describe('as an issuer', function () {
+  describe('as an owner', function () {
     beforeEach(async function() {
-      await this.token.approve(this.issuer.address, amount * 4, { from: owner });
+      await this.token.approve(this.issuer.address, amount * 4, { from: benefactor });
     });
 
     it('issue some tokens', async function () {
-      await this.issuer.issueWithEther(customer, amount, weiAmount, { from: issuer });
+      await this.issuer.issueWithEther(customer, amount, weiAmount, { from: owner });
 
       (await this.issuer.issuedCount()).should.be.bignumber.equal(amount);
       (await this.issuer.weiRaised()).should.be.bignumber.equal(weiAmount);
@@ -27,8 +27,8 @@ function shouldBehaveLikeIssuerWithEther(owner, issuer, customer, [customer2, ..
     });
 
     it('issue tokens multiple times', async function () {
-      await this.issuer.issueWithEther(customer, amount, weiAmount, { from: issuer });
-      await this.issuer.issueWithEther(customer2, amount * 2, weiAmount * 2, { from: issuer });
+      await this.issuer.issueWithEther(customer, amount, weiAmount, { from: owner });
+      await this.issuer.issueWithEther(customer2, amount * 2, weiAmount * 2, { from: owner });
 
       (await this.issuer.issuedCount()).should.be.bignumber.equal(amount * 3);
       (await this.issuer.weiRaised()).should.be.bignumber.equal(weiAmount * 3);
@@ -38,20 +38,23 @@ function shouldBehaveLikeIssuerWithEther(owner, issuer, customer, [customer2, ..
     });
 
     it('only issuer can issue', async function () {
-      await this.issuer.issueWithEther(customer, amount * 3, weiAmount * 3, { from: customer })
-      .should.be.rejectedWith(EVMRevert);
+      await this.issuer
+        .issueWithEther(customer, amount * 3, weiAmount * 3, { from: customer })
+        .should.be.rejectedWith(EVMRevert);
     });
 
     it('fails to issue over allowance', async function () {
-      await this.issuer.issueWithEther(customer, amount * 10, weiAmount * 10, { from: issuer })
-      .should.be.rejectedWith(EVMRevert);
+      await this.issuer
+        .issueWithEther(customer, amount * 10, weiAmount * 10, { from: owner })
+        .should.be.rejectedWith(EVMRevert);
     });
 
     it('fails to issue twice to same address', async function () {
-      await this.issuer.issueWithEther(customer, amount, weiAmount, { from: issuer });
-      
-      await this.issuer.issueWithEther(customer, amount, weiAmount, { from: issuer })
-      .should.be.rejectedWith(EVMRevert);
+      await this.issuer.issueWithEther(customer, amount, weiAmount, { from: owner });
+
+      await this.issuer
+        .issueWithEther(customer, amount, weiAmount, { from: owner })
+        .should.be.rejectedWith(EVMRevert);
     });
   });
 }

@@ -2,6 +2,7 @@ pragma solidity ^0.4.24;
 
 import "../payment/TokenTimelockEscrow.sol";
 
+
 /**
  * @title TokenTimelockEscrowMock
  */

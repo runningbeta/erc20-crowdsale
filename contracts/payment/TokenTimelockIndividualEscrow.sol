@@ -5,7 +5,7 @@ import "./TokenConditionalEscrow.sol";
 
 /**
  * @title TokenTimelockIndividualEscrow
- * @dev Escrow to only allow withdrawal only if the vesting period
+ * @dev Escrow to only allow withdrawal only if the lock period
  * has expired. As only the owner can make deposits and withdrawals
  * this contract should be owned by the crowdsale, which can then
  * perform deposits and withdrawals for individual users.
@@ -21,6 +21,7 @@ contract TokenTimelockIndividualEscrow is TokenConditionalEscrow {
   * @dev Stores the token amount as credit to be withdrawn.
   * @param _payee The destination address of the tokens.
   * @param _amount The amount of tokens that can be pulled.
+  * @param _releaseTime The release times after which the tokens can be withdrawn.
   */
   function depositAndLock(address _payee, uint256 _amount, uint256 _releaseTime) public onlyOwner {
     deposit(_payee, _amount);
@@ -28,8 +29,9 @@ contract TokenTimelockIndividualEscrow is TokenConditionalEscrow {
   }
 
   /**
-  * @dev Wallet can be changed by the owner during the crowdsale
+  * @dev Locks the tokens for the beneficiary until some later time in the future.
   * @param _payee The destination address of the tokens.
+  * @param _releaseTime The release times after which the tokens can be withdrawn.
   */
   function lock(address _payee, uint256 _releaseTime) public onlyOwner {
     require(_payee != address(0), "The destination address of the tokens should not be 0x0");

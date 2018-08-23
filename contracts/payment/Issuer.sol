@@ -29,24 +29,27 @@ contract Issuer is Ownable {
 
   /// Party (team multisig) who is in the control of the token pool.
   /// @notice this will be different from the owner address (scripted) that calls this contract.
-  address public allower;
+  address public benefactor;
 
   // How many addresses have received their tokens.
   uint256 public issuedCount;
 
-  constructor(address _owner, address _allower, ERC20 _token) public {
-    require(address(_owner) != address(0), "Owner address should not be 0x0");
-    require(address(_allower) != address(0), "Allower address should not be 0x0");
+  constructor(address _benefactor, ERC20 _token) public {
+    require(address(_benefactor) != address(0), "Benefactor address should not be 0x0");
     require(address(_token) != address(0), "Token address should not be 0x0");
-    owner = _owner;
-    allower = _allower;
+    benefactor = _benefactor;
     token = _token;
   }
 
-  function issue(address _benefactor, uint256 _amount) public onlyOwner {
-    require(!issued[_benefactor], "Benefactor already issued");
-    token.transferFrom(allower, _benefactor, _amount);
-    issued[_benefactor] = true;
+  /**
+  * @dev Issue the tokens to the beneficiary
+  * @param _beneficiary The destination address of the tokens.
+  * @param _amount The amount of tokens that are issued.
+  */
+  function issue(address _beneficiary, uint256 _amount) public onlyOwner {
+    require(!issued[_beneficiary], "Already issued to beneficiary");
+    token.transferFrom(benefactor, _beneficiary, _amount);
+    issued[_beneficiary] = true;
     issuedCount = issuedCount.add(_amount);
   }
 
