@@ -11,7 +11,7 @@ contract TokenTimelockIndividualEscrowMock is TokenTimelockIndividualEscrow {
   // timestamp when token release is enabled
   uint256 public releaseTime;
 
-  constructor(ERC20 _token) public TokenEscrow(_token)
-  {
+  constructor(ERC20 _token) public TokenEscrow(_token) {
+    // constructor
   }
 }

@@ -27,7 +27,7 @@ contract TokenEscrow is Ownable {
   uint256 private totalDeposits;
 
   // ERC20 token contract being held
-  ERC20 private token;
+  ERC20 public token;
 
   constructor(ERC20 _token) public {
     token = _token;
