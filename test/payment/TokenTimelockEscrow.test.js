@@ -12,7 +12,7 @@ require('chai')
   .should();
 
 const Token = artifacts.require('FixedSupplyBurnableToken');
-const TokenTimelockEscrow = artifacts.require('TokenTimelockEscrow');
+const TokenTimelockEscrowMock = artifacts.require('TokenTimelockEscrowMock');
 
 contract('TokenTimelockEscrow', function (accounts) {
   const owner = accounts[0];
@@ -21,7 +21,7 @@ contract('TokenTimelockEscrow', function (accounts) {
   beforeEach(async function () {
     vestingTime = (await latestTime()) + duration.days(10);
     this.token = await Token.new({ from: owner });
-    this.escrow = await TokenTimelockEscrow.new(
+    this.escrow = await TokenTimelockEscrowMock.new(
       this.token.address,
       vestingTime,
       { from: owner }

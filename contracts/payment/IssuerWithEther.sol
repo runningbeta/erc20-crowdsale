@@ -26,13 +26,6 @@ contract IssuerWithEther is Issuer {
   // Issue event
   event IssueWithEther(address benefactor, uint256 amount, uint256 weiAmount);
 
-  constructor(address _owner, address _allower, ERC20 _token)
-    public
-    Issuer(_owner, _allower, _token)
-  {
-    // constructor
-  }
-
   function issue(address _benefactor, uint256 _amount, uint256 _weiAmount) public onlyOwner {
     super.issue(_benefactor, _amount);
     weiRaised = weiRaised.add(_weiAmount);

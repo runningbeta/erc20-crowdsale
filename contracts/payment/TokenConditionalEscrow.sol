@@ -8,11 +8,6 @@ import "./TokenEscrow.sol";
  * @dev Base abstract escrow to only allow withdrawal if a condition is met.
  */
 contract TokenConditionalEscrow is TokenEscrow {
-
-  constructor(ERC20 _token) public TokenEscrow(_token) {
-    // constructor
-  }
-
   /**
   * @dev Returns whether an address is allowed to withdraw their tokens. To be
   * implemented by derived contracts.
