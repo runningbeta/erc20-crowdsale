@@ -1,6 +1,7 @@
 const expectEvent = require('../helpers/expectEvent');
 const { EVMRevert } = require('../helpers/EVMRevert');
 const { EVMThrow } = require('../helpers/EVMThrow');
+const { ether } = require('../helpers/ether');
 
 const BigNumber = web3.BigNumber;
 
@@ -10,7 +11,7 @@ require('chai')
   .should();
 
 function shouldBehaveLikeTokenEscrow (owner, [payee1, payee2]) {
-  const amount = web3.toWei(42.0, 'ether');
+  const amount = ether(42.0);
 
   describe('as an escrow', function () {
     describe('deposits', function () {

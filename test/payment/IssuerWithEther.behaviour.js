@@ -1,4 +1,5 @@
 const { expectThrowWithArgs } = require('../helpers/expectThrow');
+const { ether } = require('../helpers/ether');
 
 const BigNumber = web3.BigNumber;
 
@@ -8,8 +9,8 @@ require('chai')
   .should();
 
 function shouldBehaveLikeIssuerWithEther(benefactor, owner, customer, [customer2, ...otherAccounts]) {
-  const amount = web3.toWei(500.0, 'ether');
-  const weiAmount = web3.toWei(50.0, 'ether');
+  const amount = ether(420.0);
+  const weiAmount = ether(42.0);
 
   describe('as an owner', function () {
     beforeEach(async function() {

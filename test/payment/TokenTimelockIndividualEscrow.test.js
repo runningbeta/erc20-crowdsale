@@ -2,6 +2,7 @@ const { shouldBehaveLikeTokenEscrow } = require('./TokenEscrow.behaviour');
 const { EVMRevert } = require('../helpers/EVMRevert');
 const { latestTime } = require('../helpers/latestTime');
 const { duration } = require('../helpers/increaseTime');
+const { ether } = require('../helpers/ether');
 
 const BigNumber = web3.BigNumber;
 
@@ -23,7 +24,7 @@ contract('TokenTimelockIndividualEscrow', function (accounts) {
   });
 
   context('timelocked tokens', function () {
-    const amount = web3.toWei(23.0, 'ether');
+    const amount = ether(23.0);
     const payee = accounts[1];
 
     it('reverts on withdrawals', async function () {

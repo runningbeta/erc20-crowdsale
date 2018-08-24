@@ -1,3 +1,5 @@
+const { ether } = require('../helpers/ether');
+
 const BigNumber = web3.BigNumber;
 
 require('chai')
@@ -9,7 +11,7 @@ const TokenPullPayment = artifacts.require('TokenPullPaymentMock');
 
 contract('TokenPullPayment', function ([_, owner, payer, payee1, payee2]) {
   // 18 decimal token just like ether
-  const amount = web3.toWei(17.0, 'ether');
+  const amount = ether(17.0);
 
   beforeEach(async function () {
     this.token = await Token.new({ from: owner });
