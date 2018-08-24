@@ -1,7 +1,8 @@
 const { shouldBehaveLikeTokenEscrow } = require('./TokenEscrow.behaviour');
-const { EVMRevert } = require('../helpers/EVMRevert');
-const { latestTime } = require('../helpers/latestTime');
 const { increaseTimeTo, duration } = require('../helpers/increaseTime');
+const { advanceBlock } = require('../helpers/advanceToBlock');
+const { latestTime } = require('../helpers/latestTime');
+const { EVMRevert } = require('../helpers/EVMRevert');
 const { ether } = require('../helpers/ether');
 
 const BigNumber = web3.BigNumber;
@@ -14,11 +15,11 @@ require('chai')
 const Token = artifacts.require('FixedSupplyBurnableToken');
 const TokenTimelockEscrowMock = artifacts.require('TokenTimelockEscrowMock');
 
-contract('TokenTimelockEscrow', function (accounts) {
-  const owner = accounts[0];
+contract('TokenTimelockEscrow', function ([owner, ...otherAccounts]) {
   let vestingTime;
 
   beforeEach(async function () {
+    await advanceBlock();
     vestingTime = (await latestTime()) + duration.days(10);
     this.token = await Token.new({ from: owner });
     this.escrow = await TokenTimelockEscrowMock.new(
@@ -30,7 +31,7 @@ contract('TokenTimelockEscrow', function (accounts) {
 
   context('before vesting is finished', function () {
     const amount = ether(23.0);
-    const payee = accounts[1];
+    const payee = otherAccounts[1];
 
     it('reverts on withdrawals', async function () {
       await this.token.approve(this.escrow.address, amount, { from: owner });
@@ -46,6 +47,6 @@ contract('TokenTimelockEscrow', function (accounts) {
       await increaseTimeTo(vestingTime + 1);
     });
 
-    shouldBehaveLikeTokenEscrow(owner, accounts.slice(1));
+    shouldBehaveLikeTokenEscrow(owner, otherAccounts);
   });
 });

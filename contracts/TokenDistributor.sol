@@ -16,7 +16,7 @@ contract TokenDistributor is Finalizable, IssuerWithEther {
   using SafeMath for uint256;
   using SafeERC20 for ERC20;
 
-  event CrowdsaleInstantiation(address sender, address instantiation, uint256 allowance);
+  event CrowdsaleInstantiated(address sender, address instantiation, uint256 allowance);
 
   // The token being sold
   ERC20 public token;
@@ -148,7 +148,7 @@ contract TokenDistributor is Finalizable, IssuerWithEther {
     uint256 allowance = token.allowance(benefactor, this);
     token.transferFrom(benefactor, this, allowance);
     token.approve(crowdsale, allowance);
-    emit CrowdsaleInstantiation(msg.sender, crowdsale, allowance);
+    emit CrowdsaleInstantiated(msg.sender, crowdsale, allowance);
   }
 
 }
