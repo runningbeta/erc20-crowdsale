@@ -15,6 +15,8 @@ import "./SimpleAllowanceCrowdsale.sol";
 contract TokenDistributor is Finalizable, IssuerWithEther {
   using SafeMath for uint256;
 
+  event CrowdsaleInstantiation(address sender, address instantiation, uint256 allowance);
+
   // The token being sold
   ERC20 public token;
 
@@ -58,12 +60,19 @@ contract TokenDistributor is Finalizable, IssuerWithEther {
     escrow = new TokenTimelockIndividualEscrowMock(_token);
   }
 
-  /**
-  * @dev Withdraw accumulated balance, called by payee.
-  */
+  /// @dev Withdraw accumulated balance, called by payee.
   function withdrawPayments() public {
     address payee = msg.sender;
     escrow.withdraw(payee);
+  }
+
+  /**
+  * @dev Issue the tokens to the beneficiary
+  * @param _beneficiary The destination address of the tokens.
+  * @param _amount The amount of tokens that are issued.
+  */
+  function issue(address _beneficiary, uint256 _amount) public onlyOwner onlyNotFinalized {
+    super.issue(_beneficiary, _amount);
   }
 
   /**
@@ -72,12 +81,16 @@ contract TokenDistributor is Finalizable, IssuerWithEther {
   * @param _amount The amount to transfer.
   * @param _releaseTime The release times after which the tokens can be withdrawn.
   */
-  function depositAndLock(address _dest, uint256 _amount, uint256 _releaseTime) public onlyOwner {
+  function depositAndLock(address _dest, uint256 _amount, uint256 _releaseTime) public onlyOwner onlyNotFinalized {
     assert(token.balanceOf(this) >= _amount);
     token.approve(escrow, _amount);
     escrow.depositAndLock(_dest, _amount, _releaseTime);
   }
 
+  /**
+   * @dev Finalization logic that will create a Crowdsale with provided parameters
+   * and calculated cap depending on the amount raised in presale.
+   */
   function finalization() internal {
     super.finalization();
     crowdsale = new SimpleAllowanceCrowdsale(
@@ -89,7 +102,9 @@ contract TokenDistributor is Finalizable, IssuerWithEther {
       openingTime,
       closingTime
     );
-    token.approve(crowdsale, token.balanceOf(this));
+    uint256 allowance = token.balanceOf(this);
+    token.approve(crowdsale, allowance);
+    emit CrowdsaleInstantiation(msg.sender, crowdsale, allowance);
   }
 
 }

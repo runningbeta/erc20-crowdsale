@@ -33,11 +33,8 @@ contract FixedSupplyBurnableToken is NoOwner, Pausable, DetailedERC20, StandardB
 
   uint256 public constant INITIAL_SUPPLY = 1000000000 * (10 ** uint256(DECIMALS));
 
-  /**
-   * @dev Constructor that gives msg.sender all of existing tokens.
-   */
-  constructor() public DetailedERC20(NAME, SYMBOL, DECIMALS)
-  {
+  /// @dev Constructor that gives msg.sender all of existing tokens.
+  constructor() public DetailedERC20(NAME, SYMBOL, DECIMALS) {
     totalSupply_ = INITIAL_SUPPLY;
     balances[msg.sender] = INITIAL_SUPPLY;
     emit Transfer(address(0), msg.sender, INITIAL_SUPPLY);

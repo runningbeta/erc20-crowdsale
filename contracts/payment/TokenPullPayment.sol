@@ -15,9 +15,7 @@ contract TokenPullPayment {
     escrow = new TokenEscrow(_token);
   }
 
-  /**
-  * @dev Withdraw accumulated balance, called by payee.
-  */
+  /// @dev Withdraw accumulated balance, called by payee.
   function withdrawPayments() public {
     address payee = msg.sender;
     escrow.withdraw(payee);

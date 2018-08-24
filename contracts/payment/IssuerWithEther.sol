@@ -16,7 +16,6 @@ import "./Issuer.sol";
  * there is a race condition or there is a fat finger error.
  *
  * Issuer contract gets allowance from the team multisig to distribute tokens.
- *
  */
 contract IssuerWithEther is Issuer {
 

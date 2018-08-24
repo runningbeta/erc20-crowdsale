@@ -17,9 +17,7 @@ contract Token is NoOwner, DetailedERC20, MintableToken, BurnableToken {
   string public constant SYMBOL = "TOK";
   uint8 public constant DECIMALS = 18;
 
-  /**
-   * @dev Constructor that initializes the contract details.
-   */
+  /// @dev Constructor that initializes the contract details.
   constructor() public DetailedERC20(NAME, SYMBOL, DECIMALS) {
     // constructor
   }
