@@ -14,6 +14,7 @@ import "./SimpleAllowanceCrowdsale.sol";
  */
 contract TokenDistributor is Finalizable, IssuerWithEther {
   using SafeMath for uint256;
+  using SafeERC20 for ERC20;
 
   event CrowdsaleInstantiation(address sender, address instantiation, uint256 allowance);
 
@@ -41,6 +42,7 @@ contract TokenDistributor is Finalizable, IssuerWithEther {
   SimpleAllowanceCrowdsale public crowdsale;
 
   constructor(
+    address _benefactor,
     uint256 _rate,
     address _wallet,
     ERC20 _token,
@@ -49,7 +51,7 @@ contract TokenDistributor is Finalizable, IssuerWithEther {
     uint256 _closingTime
   )
     public
-    Issuer(this, _token)
+    Issuer(_benefactor, _token)
   {
     rate = _rate;
     wallet = _wallet;
@@ -82,7 +84,8 @@ contract TokenDistributor is Finalizable, IssuerWithEther {
   * @param _releaseTime The release times after which the tokens can be withdrawn.
   */
   function depositAndLock(address _dest, uint256 _amount, uint256 _releaseTime) public onlyOwner onlyNotFinalized {
-    assert(token.balanceOf(this) >= _amount);
+    assert(token.allowance(benefactor, this) >= _amount);
+    token.transferFrom(benefactor, this, _amount);
     token.approve(escrow, _amount);
     escrow.depositAndLock(_dest, _amount, _releaseTime);
   }
@@ -93,18 +96,48 @@ contract TokenDistributor is Finalizable, IssuerWithEther {
    */
   function finalization() internal {
     super.finalization();
+    address tokenWallet = this;
     crowdsale = new SimpleAllowanceCrowdsale(
       rate,
       wallet,
       token,
-      this,
+      tokenWallet,
       cap.sub(weiRaised),
       openingTime,
       closingTime
     );
-    uint256 allowance = token.balanceOf(this);
+    uint256 allowance = token.allowance(benefactor, this);
+    token.transferFrom(benefactor, this, allowance);
     token.approve(crowdsale, allowance);
     emit CrowdsaleInstantiation(msg.sender, crowdsale, allowance);
+  }
+
+  /**
+   * @dev Sets a specific user's maximum contribution.
+   * @param _beneficiary Address to be capped
+   * @param _cap Wei limit for individual contribution
+   */
+  function setUserCap(address _beneficiary, uint256 _cap) external onlyOwner onlyFinalized {
+    crowdsale.setUserCap(_beneficiary, _cap);
+  }
+
+  /**
+   * @dev Sets a group of users' maximum contribution.
+   * @param _beneficiaries List of addresses to be capped
+   * @param _cap Wei limit for individual contribution
+   */
+  function setGroupCap(address[] _beneficiaries, uint256 _cap) external onlyOwner onlyFinalized {
+    crowdsale.setGroupCap(_beneficiaries, _cap);
+  }
+
+  // In case there are any unsold tokens, they are returned to the benefactor
+  function claimUnsold() public onlyFinalized {
+    require(crowdsale.hasEnded(), "Crowdsale still running");
+    uint256 unsold = token.balanceOf(this);
+
+    if (unsold > 0) {
+      token.safeTransfer(benefactor, unsold);
+    }
   }
 
 }

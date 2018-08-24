@@ -14,8 +14,8 @@ import "openzeppelin-solidity/contracts/token/ERC20/SafeERC20.sol";
  * deposit and withdraw.
  */
 contract TokenEscrow is Ownable {
-  using SafeERC20 for ERC20;
   using SafeMath for uint256;
+  using SafeERC20 for ERC20;
 
   event Deposited(address indexed payee, uint256 amount);
   event Withdrawn(address indexed payee, uint256 amount);
