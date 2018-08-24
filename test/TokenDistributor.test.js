@@ -11,7 +11,7 @@ const TokenDistributor = artifacts.require('TokenDistributor');
 contract('TokenDistributor', function ([_, benefactor, owner, customer, wallet, ...otherAccounts]) {
   const amount = ether(500.0);
   const weiAmount = ether(42.0);
-  const rate = 1000;
+  const rate = new BigNumber(1000);
   const cap = ether(42.0 * 6);
 
   beforeEach(async function () {
