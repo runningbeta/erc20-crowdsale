@@ -32,7 +32,7 @@ contract IssuerWithEther is Issuer {
   * @param _amount The amount of tokens that are issued.
   * @param _weiAmount The amount of wei exchanged for the tokens.
   */
-  function issueWithEther(address _beneficiary, uint256 _amount, uint256 _weiAmount) public onlyOwner {
+  function issue(address _beneficiary, uint256 _amount, uint256 _weiAmount) public onlyOwner {
     super.issue(_beneficiary, _amount);
     weiRaised = weiRaised.add(_weiAmount);
     emit IssueWithEther(_beneficiary, _amount, _weiAmount);

@@ -1,6 +1,4 @@
-const expectEvent = require('../helpers/expectEvent');
-const { EVMRevert } = require('../helpers/EVMRevert');
-const { EVMThrow } = require('../helpers/EVMThrow');
+const { expectThrowWithArgs } = require('../helpers/expectThrow');
 
 const BigNumber = web3.BigNumber;
 
@@ -9,9 +7,9 @@ require('chai')
   .use(require('chai-as-promised'))
   .should();
 
-function shouldBehaveLikeIssuerWithEther(owner, benefactor, customer, [customer2, ...otherAccounts]) {
+function shouldBehaveLikeIssuerWithEther(benefactor, issuer, customer, [customer2, ...otherAccounts]) {
   const amount = web3.toWei(500.0, 'ether');
-  const weiAmount = web3.toWei(50.0, 'ether')
+  const weiAmount = web3.toWei(50.0, 'ether');
 
   describe('as an owner', function () {
     beforeEach(async function() {
@@ -19,7 +17,7 @@ function shouldBehaveLikeIssuerWithEther(owner, benefactor, customer, [customer2
     });
 
     it('issue some tokens', async function () {
-      await this.issuer.issueWithEther(customer, amount, weiAmount, { from: owner });
+      await this.issuer.contract.issue['address,uint256,uint256'](customer, amount, weiAmount, { from: issuer, gas: 500000 });
 
       (await this.issuer.issuedCount()).should.be.bignumber.equal(amount);
       (await this.issuer.weiRaised()).should.be.bignumber.equal(weiAmount);
@@ -27,8 +25,8 @@ function shouldBehaveLikeIssuerWithEther(owner, benefactor, customer, [customer2
     });
 
     it('issue tokens multiple times', async function () {
-      await this.issuer.issueWithEther(customer, amount, weiAmount, { from: owner });
-      await this.issuer.issueWithEther(customer2, amount * 2, weiAmount * 2, { from: owner });
+      await this.issuer.contract.issue['address,uint256,uint256'](customer, amount, weiAmount, { from: issuer, gas: 500000 });
+      await this.issuer.contract.issue['address,uint256,uint256'](customer2, amount * 2, weiAmount * 2, { from: issuer, gas: 500000 });
 
       (await this.issuer.issuedCount()).should.be.bignumber.equal(amount * 3);
       (await this.issuer.weiRaised()).should.be.bignumber.equal(weiAmount * 3);
@@ -37,24 +35,18 @@ function shouldBehaveLikeIssuerWithEther(owner, benefactor, customer, [customer2
       (await this.token.balanceOf(customer2)).should.be.bignumber.equal(amount * 2);
     });
 
-    it('only issuer can issue', async function () {
-      await this.issuer
-        .issueWithEther(customer, amount * 3, weiAmount * 3, { from: customer })
-        .should.be.rejectedWith(EVMRevert);
+    it('only benefactor can issue', async function () {
+      expectThrowWithArgs(this.issuer.contract.issue['address,uint256,uint256'], customer, amount * 3, weiAmount * 3, { from: customer, gas: 500000 });
     });
 
     it('fails to issue over allowance', async function () {
-      await this.issuer
-        .issueWithEther(customer, amount * 10, weiAmount * 10, { from: owner })
-        .should.be.rejectedWith(EVMRevert);
+      expectThrowWithArgs(this.issuer.contract.issue['address,uint256,uint256'], customer, amount * 10, weiAmount * 10, { from: issuer, gas: 500000 });
     });
 
     it('fails to issue twice to same address', async function () {
-      await this.issuer.issueWithEther(customer, amount, weiAmount, { from: owner });
-
-      await this.issuer
-        .issueWithEther(customer, amount, weiAmount, { from: owner })
-        .should.be.rejectedWith(EVMRevert);
+      this.issuer.contract.issue['address,uint256,uint256'](customer, amount, weiAmount, { from: issuer, gas: 500000 });
+      
+      expectThrowWithArgs(this.issuer.contract.issue['address,uint256,uint256'], customer, amount, weiAmount, { from: issuer, gas: 500000 });
     });
   });
 }
