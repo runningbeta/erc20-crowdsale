@@ -1,3 +1,4 @@
+const { expectThrowWithArgs } = require('./helpers/expectThrow');
 const { latestTime } = require('./helpers/latestTime');
 const { duration } = require('./helpers/increaseTime');
 const { ether } = require('./helpers/ether');
@@ -11,7 +12,7 @@ contract('TokenDistributor', function ([_, benefactor, owner, customer, wallet, 
   const amount = ether(500.0);
   const weiAmount = ether(42.0);
   const rate = 1000;
-  const cap = ether(420.0);
+  const cap = ether(42.0 * 6);
 
   beforeEach(async function () {
     const openingTime = await latestTime() + duration.days(1);
@@ -34,8 +35,7 @@ contract('TokenDistributor', function ([_, benefactor, owner, customer, wallet, 
   shouldBehaveLikeIssuerWithEther(benefactor, owner, customer, otherAccounts);
 
   it('should respect the cap', async function () {
-    await this.token.approve(this.issuer.address, amount * 4, { from: benefactor });
-    await this.issuer.contract.issue['address,uint256,uint256'](customer, amount, weiAmount, { from: owner, gas: 500000 });
-    (await this.issuer.weiRaised()).should.be.bignumber.most(cap, "WeiRaised exceedes set cap.");
+    await this.token.approve(this.issuer.address, amount * 10, { from: benefactor });
+    expectThrowWithArgs(await this.issuer.contract.issue['address,uint256,uint256'], customer, amount * 7, weiAmount * 7, { from: owner, gas: 500000 });
   });
 });
