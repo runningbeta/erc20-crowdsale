@@ -63,6 +63,24 @@ contract TokenDistributor is Finalizable, IssuerWithEther {
   }
 
   /**
+   * @dev Sets a specific user's maximum contribution.
+   * @param _beneficiary Address to be capped
+   * @param _cap Wei limit for individual contribution
+   */
+  function setUserCap(address _beneficiary, uint256 _cap) external onlyOwner onlyFinalized {
+    crowdsale.setUserCap(_beneficiary, _cap);
+  }
+
+  /**
+   * @dev Sets a group of users' maximum contribution.
+   * @param _beneficiaries List of addresses to be capped
+   * @param _cap Wei limit for individual contribution
+   */
+  function setGroupCap(address[] _beneficiaries, uint256 _cap) external onlyOwner onlyFinalized {
+    crowdsale.setGroupCap(_beneficiaries, _cap);
+  }
+
+  /**
   * @dev Issue the tokens to the beneficiary
   * @param _beneficiary The destination address of the tokens.
   * @param _amount The amount of tokens that are issued.
@@ -101,6 +119,16 @@ contract TokenDistributor is Finalizable, IssuerWithEther {
     escrow.withdraw(payee);
   }
 
+  // In case there are any unsold tokens, they are returned to the benefactor
+  function claimUnsold() public onlyFinalized {
+    require(crowdsale.hasEnded(), "Crowdsale still running");
+    uint256 unsold = token.balanceOf(this);
+
+    if (unsold > 0) {
+      token.safeTransfer(benefactor, unsold);
+    }
+  }
+
   /**
    * @dev Finalization logic that will create a Crowdsale with provided parameters
    * and calculated cap depending on the amount raised in presale.
@@ -121,34 +149,6 @@ contract TokenDistributor is Finalizable, IssuerWithEther {
     token.transferFrom(benefactor, this, allowance);
     token.approve(crowdsale, allowance);
     emit CrowdsaleInstantiation(msg.sender, crowdsale, allowance);
-  }
-
-  /**
-   * @dev Sets a specific user's maximum contribution.
-   * @param _beneficiary Address to be capped
-   * @param _cap Wei limit for individual contribution
-   */
-  function setUserCap(address _beneficiary, uint256 _cap) external onlyOwner onlyFinalized {
-    crowdsale.setUserCap(_beneficiary, _cap);
-  }
-
-  /**
-   * @dev Sets a group of users' maximum contribution.
-   * @param _beneficiaries List of addresses to be capped
-   * @param _cap Wei limit for individual contribution
-   */
-  function setGroupCap(address[] _beneficiaries, uint256 _cap) external onlyOwner onlyFinalized {
-    crowdsale.setGroupCap(_beneficiaries, _cap);
-  }
-
-  // In case there are any unsold tokens, they are returned to the benefactor
-  function claimUnsold() public onlyFinalized {
-    require(crowdsale.hasEnded(), "Crowdsale still running");
-    uint256 unsold = token.balanceOf(this);
-
-    if (unsold > 0) {
-      token.safeTransfer(benefactor, unsold);
-    }
   }
 
 }
