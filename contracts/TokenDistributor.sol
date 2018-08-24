@@ -36,7 +36,7 @@ contract TokenDistributor is Finalizable, IssuerWithEther {
   uint256 public closingTime;
 
   // Escrow contract used to lock team and bonus tokens
-  TokenTimelockIndividualEscrow private escrow;
+  TokenTimelockIndividualEscrow public escrow;
 
   // Crowdsale that is created after the presale distribution is finalized
   SimpleAllowanceCrowdsale public crowdsale;
@@ -62,19 +62,24 @@ contract TokenDistributor is Finalizable, IssuerWithEther {
     escrow = new TokenTimelockIndividualEscrowMock(_token);
   }
 
-  /// @dev Withdraw accumulated balance, called by payee.
-  function withdrawPayments() public {
-    address payee = msg.sender;
-    escrow.withdraw(payee);
+  /**
+  * @dev Issue the tokens to the beneficiary
+  * @param _beneficiary The destination address of the tokens.
+  * @param _amount The amount of tokens that are issued.
+  */
+  function issue(address _beneficiary, uint256 _amount) public onlyNotFinalized {
+    super.issue(_beneficiary, _amount);
   }
 
   /**
   * @dev Issue the tokens to the beneficiary
   * @param _beneficiary The destination address of the tokens.
   * @param _amount The amount of tokens that are issued.
+  * @param _weiAmount The amount of wei exchanged for the tokens.
   */
-  function issue(address _beneficiary, uint256 _amount) public onlyOwner onlyNotFinalized {
-    super.issue(_beneficiary, _amount);
+  function issue(address _beneficiary, uint256 _amount, uint256 _weiAmount) public {
+    require(cap > weiRaised.add(_weiAmount), "Cap reached");
+    super.issue(_beneficiary, _amount, _weiAmount);
   }
 
   /**
@@ -88,6 +93,12 @@ contract TokenDistributor is Finalizable, IssuerWithEther {
     token.transferFrom(benefactor, this, _amount);
     token.approve(escrow, _amount);
     escrow.depositAndLock(_dest, _amount, _releaseTime);
+  }
+
+  /// @dev Withdraw accumulated balance, called by payee.
+  function withdrawPayments() public {
+    address payee = msg.sender;
+    escrow.withdraw(payee);
   }
 
   /**

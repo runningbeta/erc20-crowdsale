@@ -11,7 +11,7 @@ contract('TokenDistributor', function ([_, benefactor, owner, customer, wallet, 
   const amount = ether(500.0);
   const weiAmount = ether(42.0);
   const rate = 1000;
-  const cap = ether(15.0);
+  const cap = ether(420.0);
 
   beforeEach(async function () {
     const openingTime = await latestTime() + duration.days(1);
