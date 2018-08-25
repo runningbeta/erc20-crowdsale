@@ -3,6 +3,8 @@ const { latestTime } = require('./helpers/latestTime');
 const { duration } = require('./helpers/increaseTime');
 const { ether } = require('./helpers/ether');
 
+const BigNumber = web3.BigNumber;
+
 const { shouldBehaveLikeIssuerWithEther } = require('./payment/IssuerWithEther.behaviour');
 
 const Token = artifacts.require('FixedSupplyBurnableToken');
