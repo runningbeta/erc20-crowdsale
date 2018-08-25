@@ -12,3 +12,8 @@ build/
 
 # local env variables
 .env
+
+# Coverage directory
+coverage
+coverage.json
+coverageEnv

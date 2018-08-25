@@ -38,7 +38,7 @@ contract('TokenDistributor', function ([_, benefactor, owner, customer, wallet, 
       cap,
       openingTime,
       closingTime,
-      { from: owner }
+      { from: owner, gas: 500000 }
     );
     this.issuer = this.distributor;
   });
