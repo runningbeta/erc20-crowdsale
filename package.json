@@ -11,7 +11,7 @@
   ],
   "scripts": {
     "compile": "truffle compile",
-    "test": "truffle test",
+    "test": "truffle test --network test",
     "console": "truffle console",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
