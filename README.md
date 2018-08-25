@@ -1,6 +1,6 @@
-# erc20-crowdsale
+# erc20-crowdsale 🔗
 
-Smart contracts and tools for ERC20 token crowdsale
+Smart contracts and tools for running an ERC20 token crowdsale
 
 [![CircleCI](https://circleci.com/gh/runningbeta/erc20-crowdsale/tree/master.svg?style=svg)](https://circleci.com/gh/runningbeta/erc20-crowdsale/tree/master)
 
