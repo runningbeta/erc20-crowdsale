@@ -1,5 +1,6 @@
 pragma solidity ^0.4.24;
 
+import "./lifecycle/Finalizable.sol";
 import "openzeppelin-solidity/contracts/ownership/NoOwner.sol";
 import "openzeppelin-solidity/contracts/lifecycle/Pausable.sol";
 import "openzeppelin-solidity/contracts/token/ERC20/DetailedERC20.sol";
@@ -25,7 +26,7 @@ import "openzeppelin-solidity/contracts/token/ERC20/StandardBurnableToken.sol";
  * This is a BurnableToken where users can burn tokens when burning functionality is
  * enabled (unpaused) by the owner.
  */
-contract FixedSupplyBurnableToken is NoOwner, Pausable, DetailedERC20, StandardBurnableToken {
+contract FixedSupplyBurnableToken is NoOwner, Finalizable, DetailedERC20, StandardBurnableToken {
 
   string public constant NAME = "Example Token";
   string public constant SYMBOL = "TOK";
@@ -44,7 +45,7 @@ contract FixedSupplyBurnableToken is NoOwner, Pausable, DetailedERC20, StandardB
    * @dev Overrides StandardToken._burn in order for burn and burnFrom to be disabled
    * when the contract is paused.
    */
-  function _burn(address _who, uint256 _value) internal whenNotPaused {
+  function _burn(address _who, uint256 _value) internal onlyFinalized {
     super._burn(_who, _value);
   }
 
