@@ -38,10 +38,10 @@ contract TokenEscrow is Ownable {
   }
 
   /**
-  * @dev Stores the token amount as credit to be withdrawn.
-  * @param _payee The destination address of the tokens.
-  * @param _amount The amount of tokens that can be pulled.
-  */
+   * @dev Stores the token amount as credit to be withdrawn.
+   * @param _payee The destination address of the tokens.
+   * @param _amount The amount of tokens that can be pulled.
+   */
   function deposit(address _payee, uint256 _amount) public onlyOwner {
     token.safeTransferFrom(owner, this, _amount);
     deposits[_payee] = deposits[_payee].add(_amount);
@@ -51,9 +51,9 @@ contract TokenEscrow is Ownable {
   }
 
   /**
-  * @dev Withdraw accumulated balance for a payee.
-  * @param _payee The address whose tokens will be withdrawn and transferred to.
-  */
+   * @dev Withdraw accumulated balance for a payee.
+   * @param _payee The address whose tokens will be withdrawn and transferred to.
+   */
   function withdraw(address _payee) public onlyOwner {
     uint256 payment = deposits[_payee];
     assert(token.balanceOf(this) >= payment);

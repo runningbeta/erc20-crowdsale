@@ -22,9 +22,9 @@ contract TokenTimelockEscrow is TokenConditionalEscrow {
   }
 
   /**
-  * @dev Returns whether an address is allowed to withdraw their tokens.
-  * @param _payee The destination address of the tokens.
-  */
+   * @dev Returns whether an address is allowed to withdraw their tokens.
+   * @param _payee The destination address of the tokens.
+   */
   function withdrawalAllowed(address _payee) public view returns (bool) {
     // solium-disable-next-line security/no-block-members
     return block.timestamp >= releaseTime;

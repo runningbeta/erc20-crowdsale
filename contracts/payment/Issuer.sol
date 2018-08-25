@@ -41,10 +41,10 @@ contract Issuer is Ownable {
   }
 
   /**
-  * @dev Issue the tokens to the beneficiary
-  * @param _beneficiary The destination address of the tokens.
-  * @param _amount The amount of tokens that are issued.
-  */
+   * @dev Issue the tokens to the beneficiary
+   * @param _beneficiary The destination address of the tokens.
+   * @param _amount The amount of tokens that are issued.
+   */
   function issue(address _beneficiary, uint256 _amount) public onlyOwner {
     require(!issued[_beneficiary], "Already issued to beneficiary");
     token.transferFrom(benefactor, _beneficiary, _amount);

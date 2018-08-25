@@ -26,11 +26,11 @@ contract IssuerWithEther is Issuer {
   event IssueWithEther(address beneficiary, uint256 amount, uint256 weiAmount);
 
   /**
-  * @dev Issue the tokens to the beneficiary
-  * @param _beneficiary The destination address of the tokens.
-  * @param _amount The amount of tokens that are issued.
-  * @param _weiAmount The amount of wei exchanged for the tokens.
-  */
+   * @dev Issue the tokens to the beneficiary
+   * @param _beneficiary The destination address of the tokens.
+   * @param _amount The amount of tokens that are issued.
+   * @param _weiAmount The amount of wei exchanged for the tokens.
+   */
   function issue(address _beneficiary, uint256 _amount, uint256 _weiAmount) public onlyOwner {
     super.issue(_beneficiary, _amount);
     weiRaised = weiRaised.add(_weiAmount);

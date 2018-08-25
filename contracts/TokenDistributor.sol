@@ -81,31 +81,31 @@ contract TokenDistributor is Finalizable, IssuerWithEther {
   }
 
   /**
-  * @dev Issue the tokens to the beneficiary
-  * @param _beneficiary The destination address of the tokens.
-  * @param _amount The amount of tokens that are issued.
-  */
+   * @dev Issue the tokens to the beneficiary
+   * @param _beneficiary The destination address of the tokens.
+   * @param _amount The amount of tokens that are issued.
+   */
   function issue(address _beneficiary, uint256 _amount) public onlyNotFinalized {
     super.issue(_beneficiary, _amount);
   }
 
   /**
-  * @dev Issue the tokens to the beneficiary
-  * @param _beneficiary The destination address of the tokens.
-  * @param _amount The amount of tokens that are issued.
-  * @param _weiAmount The amount of wei exchanged for the tokens.
-  */
+   * @dev Issue the tokens to the beneficiary
+   * @param _beneficiary The destination address of the tokens.
+   * @param _amount The amount of tokens that are issued.
+   * @param _weiAmount The amount of wei exchanged for the tokens.
+   */
   function issue(address _beneficiary, uint256 _amount, uint256 _weiAmount) public {
     require(cap > weiRaised.add(_weiAmount), "Cap reached");
     super.issue(_beneficiary, _amount, _weiAmount);
   }
 
   /**
-  * @dev Called by the payer to store the sent amount as credit to be pulled.
-  * @param _dest The destination address of the funds.
-  * @param _amount The amount to transfer.
-  * @param _releaseTime The release times after which the tokens can be withdrawn.
-  */
+   * @dev Called by the payer to store the sent amount as credit to be pulled.
+   * @param _dest The destination address of the funds.
+   * @param _amount The amount to transfer.
+   * @param _releaseTime The release times after which the tokens can be withdrawn.
+   */
   function depositAndLock(address _dest, uint256 _amount, uint256 _releaseTime) public onlyOwner onlyNotFinalized {
     assert(token.allowance(benefactor, this) >= _amount);
     token.transferFrom(benefactor, this, _amount);

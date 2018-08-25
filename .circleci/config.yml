@@ -34,7 +34,10 @@ jobs:
           key: v1-dependencies-{{ checksum "package.json" }}
 
       # run linter!
-      - run: npm run lint:sol
+      - run: npm run lint:all
 
       # run tests!
       - run: npm test
+
+      # run coverage!
+      - run: npm run coverage
