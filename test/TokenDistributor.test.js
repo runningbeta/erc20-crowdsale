@@ -43,19 +43,18 @@ contract('TokenDistributor', function ([_, benefactor, owner, customer, wallet, 
     this.issuer = this.distributor;
   });
 
-
   describe('as Finalizable Issuer', function () {
     describe('before finalization', function () {
-
       describe('as a Capped Issuer', function () {
         it('should respect the cap', async function () {
           await this.token.approve(this.issuer.address, amount * 10, { from: benefactor });
-          await expectThrowWithArgs(this.issuer.contract.issue['address,uint256,uint256'], customer, amount * 7, weiAmount * 7, { from: owner, gas: 500000 });
+          await expectThrowWithArgs(this.issuer.contract
+            .issue['address,uint256,uint256'], customer, amount * 7, weiAmount * 7, { from: owner, gas: 500000 });
         });
       });
 
       shouldBehaveLikeIssuerWithEther(benefactor, owner, customer, otherAccounts);
-      
+
       describe('as a IndividuallyCappedCrowdsale proxy', function () {
         it('fails to whitelist a user', async function () {
           await expectThrow(this.issuer.setUserCap(customer, weiAmount, { from: owner }), EVMRevert);
@@ -68,9 +67,10 @@ contract('TokenDistributor', function ([_, benefactor, owner, customer, wallet, 
     });
 
     describe('after finalization', function () {
-      beforeEach(async function() {
+      beforeEach(async function () {
         await this.token.approve(this.issuer.address, amount * 4, { from: benefactor });
-        await this.issuer.contract.issue['address,uint256,uint256'](customer, amount, weiAmount, { from: owner, gas: 500000 });
+        await this.issuer.contract
+          .issue['address,uint256,uint256'](customer, amount, weiAmount, { from: owner, gas: 500000 });
         this.finalizationReceipt = await this.issuer.finalize({ from: owner });
       });
 
@@ -87,15 +87,16 @@ contract('TokenDistributor', function ([_, benefactor, owner, customer, wallet, 
 
       describe('as an Issuer', function () {
         it('should refuse to issue tokens', async function () {
-          expectThrowWithArgs(this.issuer.contract.issue['address,uint256,uint256'], customer, amount * 3, weiAmount * 3, { from: owner, gas: 500000 });
+          expectThrowWithArgs(this.issuer.contract
+            .issue['address,uint256,uint256'], customer, amount * 3, weiAmount * 3, { from: owner, gas: 500000 });
         });
       });
-      
+
       describe('as a IndividuallyCappedCrowdsale proxy', function () {
         it('whitelist a user', async function () {
           await this.issuer.setUserCap(customer, weiAmount, { from: owner });
         });
-  
+
         it('whitelist a group', async function () {
           await this.issuer.setGroupCap(otherAccounts, weiAmount, { from: owner });
         });

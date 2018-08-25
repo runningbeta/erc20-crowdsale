@@ -1,6 +1,6 @@
 const BigNumber = web3.BigNumber;
 
-should = require('chai')
+const should = require('chai')
   .use(require('chai-bignumber')(BigNumber))
   .use(require('chai-as-promised'))
   .should();

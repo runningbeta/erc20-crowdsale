@@ -6,7 +6,6 @@ const should = require('chai').should();
 const Finalizable = artifacts.require('Finalizable');
 
 contract('Finalizable', function ([_, owner, ...other]) {
-
   beforeEach(async function () {
     this.contract = await Finalizable.new({ from: owner });
   });

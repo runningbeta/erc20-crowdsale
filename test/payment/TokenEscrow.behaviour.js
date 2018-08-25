@@ -30,12 +30,12 @@ function shouldBehaveLikeTokenEscrow (owner, [payee1, payee2]) {
 
       it('only the owner can deposit', async function () {
         await this.escrow.deposit(payee1, 1, { from: payee2 })
-        .should.be.rejectedWith(EVMThrow);
+          .should.be.rejectedWith(EVMThrow);
       });
 
       it('rejects deposit if escrow balance is too low', async function () {
         await this.escrow.deposit(payee1, amount, { from: owner })
-        .should.be.rejectedWith(EVMRevert);
+          .should.be.rejectedWith(EVMRevert);
       });
 
       it('emits a deposited event', async function () {
@@ -89,7 +89,7 @@ function shouldBehaveLikeTokenEscrow (owner, [payee1, payee2]) {
 
       it('only the owner can withdraw', async function () {
         await this.escrow.withdraw(payee1, { from: payee1 })
-        .should.be.rejectedWith(EVMRevert);
+          .should.be.rejectedWith(EVMRevert);
       });
 
       it('emits a withdrawn event', async function () {
