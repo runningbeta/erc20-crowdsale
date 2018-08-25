@@ -1,6 +1,6 @@
-const { ether } = require('./helpers/ether');
 const { duration, increaseTimeTo } = require('./helpers/increaseTime');
 const { latestTime } = require('./helpers/latestTime');
+const { ether } = require('./helpers/ether');
 
 const BigNumber = web3.BigNumber;
 const Token = artifacts.require('Token');
