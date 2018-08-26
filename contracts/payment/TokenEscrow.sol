@@ -56,7 +56,6 @@ contract TokenEscrow is Ownable {
    */
   function withdraw(address _payee) public onlyOwner {
     uint256 payment = deposits[_payee];
-    assert(token.balanceOf(this) >= payment);
 
     deposits[_payee] = 0;
     token.safeTransfer(_payee, payment);

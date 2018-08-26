@@ -2,7 +2,6 @@ pragma solidity ^0.4.24;
 
 import "./lifecycle/Finalizable.sol";
 import "openzeppelin-solidity/contracts/ownership/NoOwner.sol";
-import "openzeppelin-solidity/contracts/lifecycle/Pausable.sol";
 import "openzeppelin-solidity/contracts/token/ERC20/DetailedERC20.sol";
 import "openzeppelin-solidity/contracts/token/ERC20/StandardBurnableToken.sol";
 
