@@ -128,8 +128,8 @@ contract('TokenDistributor', function ([_, benefactor, owner, customer, wallet, 
           await this.issuer.claimUnsold({ from: owner });
 
           const finalBalance = await this.token.balanceOf(benefactor);
-          // we had only one issuance (amount) to a customer after we allowed 4 * amount
-          finalBalance.should.be.bignumber.equal(amount.mul(4).add(initialBalance));
+          // we had only no issuances after giving allowance (amount * 4)
+          await (finalBalance.should.be.bignumber.equal(amount.mul(4).plus(initialBalance)));
         });
 
         it('can claim leftover tokens twice', async function () {

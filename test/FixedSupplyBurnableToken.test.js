@@ -58,13 +58,18 @@ contract('FixedSupplyBurnableToken', function ([owner, customer, ...other]) {
       });
 
       it('can burn own tokens', async function () {
+        const initialBalance = await this.token.balanceOf(owner);
         await this.token.approve(owner, amount, { from: owner });
         await this.token.burnFrom(owner, amount, { from: owner });
+
+        (await this.token.balanceOf(owner)).should.be.bignumber.equal(initialBalance.sub(amount));
       });
 
       it('can burn all approved tokens', async function () {
         await this.token.approve(owner, amount, { from: customer });
         await this.token.burnFrom(customer, amount, { from: owner });
+
+        (await this.token.balanceOf(customer)).should.be.bignumber.equal(0);
       });
 
       it('can burn some approved tokens', async function () {
