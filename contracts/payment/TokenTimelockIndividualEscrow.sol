@@ -51,4 +51,13 @@ contract TokenTimelockIndividualEscrow is TokenConditionalEscrow {
     // solium-disable-next-line security/no-block-members
     return block.timestamp >= releaseTimes[_payee];
   }
+
+  /**
+   * @dev Withdraw accumulated balance for a payee.
+   * @param _payee The address whose tokens will be withdrawn and transferred to.
+   */
+  function withdraw(address _payee) public {
+    super.withdraw(_payee);
+    releaseTimes[_payee] = 0;
+  }
 }
