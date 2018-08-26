@@ -62,6 +62,14 @@ contract TokenDistributor is Finalizable, IssuerWithEther {
     escrow = new TokenTimelockIndividualEscrowMock(_token);
   }
 
+  function depositsOf(address _payee) public view returns (uint256) {
+    return escrow.depositsOf(_payee);
+  }
+
+  function getUserCap(address _beneficiary) public view returns (uint256) {
+    return crowdsale.getUserCap(_beneficiary);
+  }
+
   /**
    * @dev Sets a specific user's maximum contribution.
    * @param _beneficiary Address to be capped
