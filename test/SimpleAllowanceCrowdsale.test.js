@@ -15,6 +15,7 @@ require('chai')
 contract('SimpleAllowanceCrowdsale', function ([
   owner,
   wallet,
+  purchaser,
   ...other
 ]) {
   before(async function () {
@@ -48,5 +49,10 @@ contract('SimpleAllowanceCrowdsale', function ([
 
   it('fails to unset wallet', async function () {
     await this.crowdsale.setWallet(0x0).should.be.rejectedWith(EVMRevert);
+  });
+
+  it('non-owner should not be able to change wallet', async function () {
+    await this.crowdsale.setWallet(other[0], { from: purchaser })
+      .should.be.rejectedWith(EVMRevert);
   });
 });
