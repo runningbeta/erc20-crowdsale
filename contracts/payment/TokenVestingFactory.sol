@@ -2,7 +2,7 @@ pragma solidity ^0.4.24;
 
 
 import "openzeppelin-solidity/contracts/token/ERC20/TokenVesting.sol";
-import "../Factory.sol";
+import "../lifecycle/Factory.sol";
 
 
 /// @title Token vesting wallet factory - Allows creation of TokenVesting wallet.
