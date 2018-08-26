@@ -92,10 +92,14 @@ contract TokenDistributor is Finalizable, IssuerWithEther {
    * @param _beneficiary Address whose cap is to be checked
    * @return Current cap for individual user
    */
-  function getUserCap(address _beneficiary) public view returns (uint256) {
+  function getUserCap(address _beneficiary) public view onlyIfCrowdsale returns (uint256) {
     return crowdsale.getUserCap(_beneficiary);
   }
 
+  /**
+   * @dev Returns the token accumulated balance for a payee.
+   * @param _payee The destination address of the tokens.
+   */
   function depositsOf(address _payee) public view returns (uint256) {
     return escrow.depositsOf(_payee);
   }
@@ -139,7 +143,7 @@ contract TokenDistributor is Finalizable, IssuerWithEther {
     escrow.withdraw(payee);
   }
 
-  // In case there are any unsold tokens, they are returned to the benefactor
+  /// @dev In case there are any unsold tokens, they are returned to the benefactor
   function claimUnsold() public onlyIfCrowdsale {
     require(crowdsale.hasEnded(), "Crowdsale still running");
     uint256 unsold = token.balanceOf(this);

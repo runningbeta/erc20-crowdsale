@@ -33,6 +33,10 @@ contract TokenEscrow is Ownable {
     token = _token;
   }
 
+  /**
+   * @dev Returns the token accumulated balance for a payee.
+   * @param _payee The destination address of the tokens.
+   */
   function depositsOf(address _payee) public view returns (uint256) {
     return deposits[_payee];
   }
