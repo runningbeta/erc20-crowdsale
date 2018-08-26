@@ -41,6 +41,13 @@ contract TokenDistributor is Finalizable, IssuerWithEther {
   // Crowdsale that is created after the presale distribution is finalized
   SimpleAllowanceCrowdsale public crowdsale;
 
+  /// @dev Throws if called before the crowdsale is created.
+  modifier onlyIfCrowdsale() {
+    require(isFinalized, "Contract not finalized");
+    require(crowdsale != address(0), "Crowdsale not started");
+    _;
+  }
+
   constructor(
     address _benefactor,
     uint256 _rate,
@@ -67,7 +74,7 @@ contract TokenDistributor is Finalizable, IssuerWithEther {
    * @param _beneficiary Address to be capped
    * @param _cap Wei limit for individual contribution
    */
-  function setUserCap(address _beneficiary, uint256 _cap) external onlyOwner onlyFinalized {
+  function setUserCap(address _beneficiary, uint256 _cap) external onlyOwner onlyIfCrowdsale {
     crowdsale.setUserCap(_beneficiary, _cap);
   }
 
@@ -76,7 +83,7 @@ contract TokenDistributor is Finalizable, IssuerWithEther {
    * @param _beneficiaries List of addresses to be capped
    * @param _cap Wei limit for individual contribution
    */
-  function setGroupCap(address[] _beneficiaries, uint256 _cap) external onlyOwner onlyFinalized {
+  function setGroupCap(address[] _beneficiaries, uint256 _cap) external onlyOwner onlyIfCrowdsale {
     crowdsale.setGroupCap(_beneficiaries, _cap);
   }
 
@@ -133,7 +140,7 @@ contract TokenDistributor is Finalizable, IssuerWithEther {
   }
 
   // In case there are any unsold tokens, they are returned to the benefactor
-  function claimUnsold() public onlyFinalized {
+  function claimUnsold() public onlyIfCrowdsale {
     require(crowdsale.hasEnded(), "Crowdsale still running");
     uint256 unsold = token.balanceOf(this);
 
@@ -148,13 +155,19 @@ contract TokenDistributor is Finalizable, IssuerWithEther {
    */
   function finalization() internal {
     super.finalization();
+    uint256 crowdsaleCap = cap.sub(weiRaised);
+    if (crowdsaleCap == 0) {
+      // Cap reached in presale, no crowdsale necessary
+      return;
+    }
+
     address tokenWallet = this;
     crowdsale = new SimpleAllowanceCrowdsale(
       rate,
       wallet,
       token,
       tokenWallet,
-      cap.sub(weiRaised),
+      crowdsaleCap,
       openingTime,
       closingTime
     );
