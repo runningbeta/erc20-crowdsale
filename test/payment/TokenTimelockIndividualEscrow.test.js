@@ -96,5 +96,4 @@ contract('TokenTimelockIndividualEscrow', function ([owner, ...accounts]) {
       });
     });
   });
-
 });

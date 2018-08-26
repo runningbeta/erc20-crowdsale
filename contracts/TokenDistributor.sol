@@ -62,14 +62,6 @@ contract TokenDistributor is Finalizable, IssuerWithEther {
     escrow = new TokenTimelockIndividualEscrowMock(_token);
   }
 
-  function depositsOf(address _payee) public view returns (uint256) {
-    return escrow.depositsOf(_payee);
-  }
-
-  function getUserCap(address _beneficiary) public view returns (uint256) {
-    return crowdsale.getUserCap(_beneficiary);
-  }
-
   /**
    * @dev Sets a specific user's maximum contribution.
    * @param _beneficiary Address to be capped
@@ -89,6 +81,19 @@ contract TokenDistributor is Finalizable, IssuerWithEther {
   }
 
   /**
+   * @dev Returns the cap of a specific user.
+   * @param _beneficiary Address whose cap is to be checked
+   * @return Current cap for individual user
+   */
+  function getUserCap(address _beneficiary) public view returns (uint256) {
+    return crowdsale.getUserCap(_beneficiary);
+  }
+
+  function depositsOf(address _payee) public view returns (uint256) {
+    return escrow.depositsOf(_payee);
+  }
+
+  /**
    * @dev Issue the tokens to the beneficiary
    * @param _beneficiary The destination address of the tokens.
    * @param _amount The amount of tokens that are issued.
@@ -103,7 +108,7 @@ contract TokenDistributor is Finalizable, IssuerWithEther {
    * @param _amount The amount of tokens that are issued.
    * @param _weiAmount The amount of wei exchanged for the tokens.
    */
-  function issue(address _beneficiary, uint256 _amount, uint256 _weiAmount) public onlyNotFinalized {
+  function issue(address _beneficiary, uint256 _amount, uint256 _weiAmount) public {
     require(cap >= weiRaised.add(_weiAmount), "Cap reached");
     super.issue(_beneficiary, _amount, _weiAmount);
   }
