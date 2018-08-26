@@ -95,7 +95,7 @@ contract TokenDistributor is Finalizable, IssuerWithEther {
    * @param _amount The amount of tokens that are issued.
    * @param _weiAmount The amount of wei exchanged for the tokens.
    */
-  function issue(address _beneficiary, uint256 _amount, uint256 _weiAmount) public {
+  function issue(address _beneficiary, uint256 _amount, uint256 _weiAmount) public onlyNotFinalized {
     require(cap > weiRaised.add(_weiAmount), "Cap reached");
     super.issue(_beneficiary, _amount, _weiAmount);
   }
