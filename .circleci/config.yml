@@ -41,3 +41,5 @@ jobs:
 
       # run coverage!
       - run: npm run coverage
+
+      - run: bash <(curl -s https://codecov.io/bash)
