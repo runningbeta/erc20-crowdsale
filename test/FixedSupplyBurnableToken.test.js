@@ -1,4 +1,5 @@
-const { expectThrowWithArgs } = require('./helpers/expectThrow');
+const { expectThrow } = require('./helpers/expectThrow');
+const { EVMRevert } = require('./helpers/EVMRevert');
 const { ether } = require('./helpers/ether');
 
 const BigNumber = web3.BigNumber;
@@ -40,7 +41,7 @@ contract('FixedSupplyBurnableToken', function ([owner, customer, ...other]) {
       it('fails to burn tokens', async function () {
         const amount = ether(1000.0);
         await this.token.approve(customer, amount, { from: owner });
-        await expectThrowWithArgs(this.token.burnFrom, customer, amount, { from: owner });
+        await expectThrow(() => this.token.burnFrom(customer, amount, { from: owner }), EVMRevert);
       });
     });
 
@@ -54,7 +55,7 @@ contract('FixedSupplyBurnableToken', function ([owner, customer, ...other]) {
       });
 
       it('fails to burn tokens if not approved', async function () {
-        await expectThrowWithArgs(this.token.burnFrom, customer, amount, { from: owner });
+        await expectThrow(() => this.token.burnFrom(customer, amount, { from: owner }), EVMRevert);
       });
 
       it('can burn own tokens', async function () {
@@ -81,7 +82,7 @@ contract('FixedSupplyBurnableToken', function ([owner, customer, ...other]) {
 
       it('fails to burn more than approved amount', async function () {
         await this.token.approve(owner, amount, { from: customer });
-        await expectThrowWithArgs(this.token.burnFrom, customer, amount.mul(2), { from: owner });
+        await expectThrow(() => this.token.burnFrom(customer, amount.mul(2), { from: owner }), EVMRevert);
       });
     });
   });

@@ -1,4 +1,5 @@
-const { expectThrowWithArgs } = require('../helpers/expectThrow');
+const { expectThrow } = require('../helpers/expectThrow');
+const { EVMRevert } = require('../helpers/EVMRevert');
 const { ether } = require('../helpers/ether');
 
 const BigNumber = web3.BigNumber;
@@ -40,21 +41,23 @@ function shouldBehaveLikeIssuerWithEther (benefactor, owner, customer, [customer
     });
 
     it('only benefactor can issue', async function () {
-      await expectThrowWithArgs(this.issuer.contract
-        .issue['address,uint256,uint256'], customer, amount * 3, weiAmount * 3, { from: customer, gas: 500000 });
+      await expectThrow(() => this.issuer.contract
+        .issue['address,uint256,uint256'](customer, amount * 3, weiAmount * 3, { from: customer, gas: 500000 }),
+      EVMRevert);
     });
 
     it('fails to issue over allowance', async function () {
-      await expectThrowWithArgs(this.issuer.contract
-        .issue['address,uint256,uint256'], customer, amount * 5, weiAmount * 5, { from: owner, gas: 500000 });
+      await expectThrow(() => this.issuer.contract
+        .issue['address,uint256,uint256'](customer, amount * 5, weiAmount * 5, { from: owner, gas: 500000 }),
+      EVMRevert);
     });
 
     it('fails to issue twice to same address', async function () {
       await this.issuer.contract
         .issue['address,uint256,uint256'](customer, amount, weiAmount, { from: owner, gas: 500000 });
 
-      await expectThrowWithArgs(this.issuer.contract
-        .issue['address,uint256,uint256'], customer, amount, weiAmount, { from: owner, gas: 500000 });
+      await expectThrow(() => this.issuer.contract
+        .issue['address,uint256,uint256'](customer, amount, weiAmount, { from: owner, gas: 500000 }), EVMRevert);
     });
   });
 }

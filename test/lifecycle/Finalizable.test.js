@@ -17,7 +17,7 @@ contract('Finalizable', function ([_, owner, ...other]) {
 
   it('cannot be finalized twice', async function () {
     await this.contract.finalize({ from: owner });
-    await expectThrow(this.contract.finalize({ from: owner }), EVMRevert);
+    await expectThrow(() => this.contract.finalize({ from: owner }), EVMRevert);
   });
 
   it('logs finalized', async function () {
