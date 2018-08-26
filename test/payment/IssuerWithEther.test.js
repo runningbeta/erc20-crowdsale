@@ -1,3 +1,4 @@
+const { shouldBehaveLikeIssuer } = require('./Issuer.behaviour');
 const { shouldBehaveLikeIssuerWithEther } = require('./IssuerWithEther.behaviour');
 
 const Token = artifacts.require('FixedSupplyBurnableToken');
@@ -9,5 +10,6 @@ contract('IssuerWithEther', function ([_, benefactor, owner, customer, ...otherA
     this.issuer = await IssuerWithEther.new(benefactor, this.token.address, { from: owner });
   });
 
+  shouldBehaveLikeIssuer(benefactor, owner, customer, otherAccounts);
   shouldBehaveLikeIssuerWithEther(benefactor, owner, customer, otherAccounts);
 });

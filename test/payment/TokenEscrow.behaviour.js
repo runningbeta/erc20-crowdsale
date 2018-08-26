@@ -1,6 +1,5 @@
 const expectEvent = require('../helpers/expectEvent');
 const { EVMRevert } = require('../helpers/EVMRevert');
-const { EVMThrow } = require('../helpers/EVMThrow');
 const { ether } = require('../helpers/ether');
 
 const BigNumber = web3.BigNumber;
@@ -13,7 +12,7 @@ require('chai')
 function shouldBehaveLikeTokenEscrow (owner, [payee1, payee2]) {
   const amount = ether(42.0);
 
-  describe('as an escrow', function () {
+  describe('as a TokenEscrow', function () {
     describe('deposits', function () {
       it('can accept a single deposit', async function () {
         await this.token.approve(this.escrow.address, amount, { from: owner });
@@ -30,7 +29,7 @@ function shouldBehaveLikeTokenEscrow (owner, [payee1, payee2]) {
 
       it('only the owner can deposit', async function () {
         await this.escrow.deposit(payee1, 1, { from: payee2 })
-          .should.be.rejectedWith(EVMThrow);
+          .should.be.rejectedWith(EVMRevert);
       });
 
       it('rejects deposit if escrow balance is too low', async function () {

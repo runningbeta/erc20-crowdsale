@@ -1,5 +1,5 @@
-const EVMRevert = 'invalid opcode';
+const EVMThrow = 'invalid opcode';
 
 module.exports = {
-  EVMRevert,
+  EVMThrow,
 };

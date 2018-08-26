@@ -16,17 +16,24 @@ const Token = artifacts.require('FixedSupplyBurnableToken');
 const TokenTimelockEscrowMock = artifacts.require('TokenTimelockEscrowMock');
 
 contract('TokenTimelockEscrow', function ([owner, ...otherAccounts]) {
+  let now;
   let vestingTime;
 
   beforeEach(async function () {
     await advanceBlock();
-    vestingTime = (await latestTime()) + duration.days(10);
+    now = await latestTime();
+    vestingTime = now + duration.days(2);
     this.token = await Token.new({ from: owner });
     this.escrow = await TokenTimelockEscrowMock.new(
       this.token.address,
       vestingTime,
       { from: owner }
     );
+  });
+
+  it('fails if benefactor is zero address', async function () {
+    await (TokenTimelockEscrowMock.new(this.token.address, now, { from: owner }))
+      .should.be.rejectedWith(EVMRevert);
   });
 
   context('before vesting is finished', function () {

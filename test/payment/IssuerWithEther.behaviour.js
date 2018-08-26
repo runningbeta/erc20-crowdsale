@@ -12,7 +12,7 @@ function shouldBehaveLikeIssuerWithEther (benefactor, owner, customer, [customer
   const amount = ether(420.0);
   const weiAmount = ether(42.0);
 
-  describe('as an Issuer', function () {
+  describe('as an IssuerWithEther', function () {
     beforeEach(async function () {
       await this.token.approve(this.issuer.address, amount * 4, { from: benefactor });
     });
@@ -40,19 +40,20 @@ function shouldBehaveLikeIssuerWithEther (benefactor, owner, customer, [customer
     });
 
     it('only benefactor can issue', async function () {
-      expectThrowWithArgs(this.issuer.contract
+      await expectThrowWithArgs(this.issuer.contract
         .issue['address,uint256,uint256'], customer, amount * 3, weiAmount * 3, { from: customer, gas: 500000 });
     });
 
     it('fails to issue over allowance', async function () {
-      expectThrowWithArgs(this.issuer.contract
+      await expectThrowWithArgs(this.issuer.contract
         .issue['address,uint256,uint256'], customer, amount * 5, weiAmount * 5, { from: owner, gas: 500000 });
     });
 
     it('fails to issue twice to same address', async function () {
-      this.issuer.contract.issue['address,uint256,uint256'](customer, amount, weiAmount, { from: owner, gas: 500000 });
+      await this.issuer.contract
+        .issue['address,uint256,uint256'](customer, amount, weiAmount, { from: owner, gas: 500000 });
 
-      expectThrowWithArgs(this.issuer.contract
+      await expectThrowWithArgs(this.issuer.contract
         .issue['address,uint256,uint256'], customer, amount, weiAmount, { from: owner, gas: 500000 });
     });
   });
