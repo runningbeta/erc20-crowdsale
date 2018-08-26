@@ -10,6 +10,11 @@ function inLogs (logs, eventName, eventArgs = {}) {
   return event;
 }
 
+function notInLogs (logs, eventName) {
+  const event = logs.find(e => e.event === eventName);
+  should.not.exist(event);
+}
+
 async function inTransaction (tx, eventName, eventArgs = {}) {
   const { logs } = await tx;
   return inLogs(logs, eventName, eventArgs);
@@ -17,5 +22,6 @@ async function inTransaction (tx, eventName, eventArgs = {}) {
 
 module.exports = {
   inLogs,
+  notInLogs,
   inTransaction,
 };

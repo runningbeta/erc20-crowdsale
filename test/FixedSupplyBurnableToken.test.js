@@ -29,7 +29,7 @@ contract('FixedSupplyBurnableToken', function ([owner, customer, ...other]) {
   });
 
   it('refuses ether', async function () {
-    await this.token.send(ether(1), { from: owner }).should.be.rejectedWith('revert');
+    await this.token.send(ether(1), { from: owner }).should.be.rejectedWith(EVMRevert);
   });
 
   describe('as Finalizable Burnable Token', function () {
@@ -40,7 +40,7 @@ contract('FixedSupplyBurnableToken', function ([owner, customer, ...other]) {
     describe('when not finalized', function () {
       it('fails to burn tokens', async function () {
         const amount = ether(1000.0);
-        await this.token.approve(customer, amount, { from: owner });
+        await this.token.approve(owner, amount, { from: customer });
         await expectThrow(() => this.token.burnFrom(customer, amount, { from: owner }), EVMRevert);
       });
     });

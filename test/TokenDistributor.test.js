@@ -1,4 +1,4 @@
-const { inLogs } = require('./helpers/expectEvent');
+const { inLogs, notInLogs } = require('./helpers/expectEvent');
 const { expectThrow } = require('./helpers/expectThrow');
 const { duration, increaseTimeTo } = require('./helpers/increaseTime');
 const { latestTime } = require('./helpers/latestTime');
@@ -210,16 +210,46 @@ contract('TokenDistributor', function ([_, benefactor, owner, customer, wallet, 
         await this.token.approve(this.distributor.address, amount * 4, { from: benefactor });
         await this.distributor.contract
           .issue['address,uint256,uint256'](customer, amount, weiAmount, { from: owner, gas: 500000 });
-        this.finalizationReceipt = await this.distributor.finalize({ from: owner });
       });
 
-      it('emits a CrowdsaleInstantiated event', async function () {
-        inLogs(this.finalizationReceipt.logs, 'CrowdsaleInstantiated', { sender: owner });
+      describe('if cap reached', function () {
+        beforeEach(async function () {
+          await this.distributor.contract
+            .issue['address,uint256,uint256'](
+              otherAccounts[0],
+              amount.mul(3),
+              weiAmount.mul(5),
+              { from: owner, gas: 500000 }
+            );
+          this.finalizationReceipt = await this.distributor.finalize({ from: owner });
+        });
+
+        it('there is no CrowdsaleInstantiated event', async function () {
+          notInLogs(this.finalizationReceipt.logs, 'CrowdsaleInstantiated');
+        });
+
+        it('crowdsale address is 0x0', async function () {
+          (await this.distributor.crowdsale()).should.equal('0x0000000000000000000000000000000000000000');
+        });
+
+        it('fails to whitelist a user', async function () {
+          await expectThrow(() => this.distributor.setUserCap(customer, weiAmount, { from: owner }), EVMRevert);
+        });
       });
 
-      it('instantiates the Crowdsale with correct allowance', async function () {
-        const event = inLogs(this.finalizationReceipt.logs, 'CrowdsaleInstantiated', { sender: owner });
-        event.args.allowance.should.be.bignumber.equal(amount * 3);
+      describe('if cap not reached', function () {
+        beforeEach(async function () {
+          this.finalizationReceipt = await this.distributor.finalize({ from: owner });
+        });
+
+        it('emits a CrowdsaleInstantiated event', async function () {
+          inLogs(this.finalizationReceipt.logs, 'CrowdsaleInstantiated', { sender: owner });
+        });
+
+        it('instantiates the Crowdsale with correct allowance', async function () {
+          const event = inLogs(this.finalizationReceipt.logs, 'CrowdsaleInstantiated', { sender: owner });
+          event.args.allowance.should.be.bignumber.equal(amount * 3);
+        });
       });
     });
   });
