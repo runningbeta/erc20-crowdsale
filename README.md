@@ -3,7 +3,7 @@
 Smart contracts and tools for running an ERC20 token crowdsale
 
 [![CircleCI](https://circleci.com/gh/runningbeta/erc20-crowdsale/tree/master.svg?style=svg)](https://circleci.com/gh/runningbeta/erc20-crowdsale/tree/master)
-[![codecov.io Code Coverage](https://img.shields.io/codecov/c/github/runningbeta/erc20-crowdsale.svg?maxAge=2592000)](https://codecov.io/github/runningbeta/erc20-crowdsale?branch=master)
+[![codecov](https://codecov.io/gh/runningbeta/erc20-crowdsale/branch/master/graph/badge.svg)](https://codecov.io/gh/runningbeta/erc20-crowdsale)
 
 ## Getting started
 
