@@ -63,11 +63,11 @@ contract('Token', function ([
       });
 
       it('Crowdsale is owned by the creator', async function () {
-        await this.crowdsale.owner().should.eventually.equal(owner);
+        (await this.crowdsale.owner()).should.be.equal(owner);
       });
 
       it('Token is owned by crowdsale', async function () {
-        await this.token.owner().should.eventually.equal(this.crowdsale.address);
+        (await this.token.owner()).should.be.equal(this.crowdsale.address);
       });
 
       it('allows whitelisting of addresses', async function () {

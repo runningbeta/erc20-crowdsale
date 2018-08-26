@@ -17,6 +17,10 @@ contract('SimpleAllowanceCrowdsale', function ([
   wallet,
   ...other
 ]) {
+  before(async function () {
+    this.token = await Token.new({ from: owner });
+  });
+
   let openingTime;
   let closingTime;
 
@@ -24,7 +28,6 @@ contract('SimpleAllowanceCrowdsale', function ([
     openingTime = (await latestTime()) + duration.weeks(1);
     closingTime = openingTime + duration.weeks(1);
 
-    this.token = await Token.new({ from: owner });
     this.crowdsale = await SimpleAllowanceCrowdsale.new(
       new BigNumber(6894),
       wallet,
@@ -44,6 +47,6 @@ contract('SimpleAllowanceCrowdsale', function ([
   });
 
   it('fails to unset wallet', async function () {
-    await (this.crowdsale.setWallet(0x0)).should.be.rejectedWith(EVMRevert);
+    await this.crowdsale.setWallet(0x0).should.be.rejectedWith(EVMRevert);
   });
 });
