@@ -4,8 +4,10 @@ import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "openzeppelin-solidity/contracts/ownership/HasNoEther.sol";
 import "./lifecycle/Finalizable.sol";
 import "./payment/IssuerWithEther.sol";
-import "./payment/TokenTimelockIndividualEscrow.sol";
-import "./mocks/TokenTimelockIndividualEscrowMock.sol";
+import "./payment/TokenTimelockEscrow.sol";
+import "./payment/TokenTimelockFactory.sol";
+import "./payment/TokenVestingFactory.sol";
+import "./mocks/TokenTimelockEscrowMock.sol";
 import "./SimpleAllowanceCrowdsale.sol";
 
 
@@ -36,11 +38,20 @@ contract TokenDistributor is HasNoEther, Finalizable, IssuerWithEther {
   uint256 public openingTime;
   uint256 public closingTime;
 
-  // Escrow contract used to lock team and bonus tokens
-  TokenTimelockIndividualEscrow public escrow;
-
   // Crowdsale that is created after the presale distribution is finalized
   SimpleAllowanceCrowdsale public crowdsale;
+
+  // Escrow contract used to lock team tokens until crowdsale ends
+  TokenTimelockEscrow public crowdsaleEndEscrow;
+
+  // Escrow contract used to lock bonus tokens
+  TokenTimelockEscrow public bonusEscrow;
+
+  // Factory used to create individual time locked token contracts
+  TokenTimelockFactory public timelockFactory;
+
+  // Factory used to create individual vesting token contracts
+  TokenVestingFactory public vestingFactory;
 
   /// @dev Throws if called before the crowdsale is created.
   modifier onlyIfCrowdsale() {
@@ -56,7 +67,8 @@ contract TokenDistributor is HasNoEther, Finalizable, IssuerWithEther {
     ERC20 _token,
     uint256 _cap,
     uint256 _openingTime,
-    uint256 _closingTime
+    uint256 _closingTime,
+    uint256 _bonusTime
   )
     public
     Issuer(_benefactor, _token)
@@ -67,7 +79,10 @@ contract TokenDistributor is HasNoEther, Finalizable, IssuerWithEther {
     cap = _cap;
     openingTime = _openingTime;
     closingTime = _closingTime;
-    escrow = new TokenTimelockIndividualEscrowMock(_token);
+    crowdsaleEndEscrow = new TokenTimelockEscrowMock(_token, _closingTime);
+    bonusEscrow = new TokenTimelockEscrowMock(_token, _bonusTime);
+    timelockFactory = new TokenTimelockFactory();
+    vestingFactory = new TokenVestingFactory();
   }
 
   /**
@@ -98,14 +113,6 @@ contract TokenDistributor is HasNoEther, Finalizable, IssuerWithEther {
   }
 
   /**
-   * @dev Returns the token accumulated balance for a payee.
-   * @param _payee The destination address of the tokens.
-   */
-  function depositsOf(address _payee) public view returns (uint256) {
-    return escrow.depositsOf(_payee);
-  }
-
-  /**
    * @dev Issue the tokens to the beneficiary
    * @param _beneficiary The destination address of the tokens.
    * @param _amount The amount of tokens that are issued.
@@ -126,22 +133,96 @@ contract TokenDistributor is HasNoEther, Finalizable, IssuerWithEther {
   }
 
   /**
+   * @dev Called by the payer to store the sent amount as credit to be pulled when crowdsale ends.
+   * @param _dest The destination address of the funds.
+   * @param _amount The amount to transfer.
+   */
+  function depositUntilCrowdsaleEnd(address _dest, uint256 _amount) public onlyOwner onlyNotFinalized {
+    assert(token.allowance(benefactor, this) >= _amount);
+    token.transferFrom(benefactor, this, _amount);
+    token.approve(crowdsaleEndEscrow, _amount);
+    crowdsaleEndEscrow.deposit(_dest, _amount);
+  }
+
+  /// @dev Withdraw accumulated balance, called by payee.
+  function withdrawCrowdsaleLocked() public {
+    address payee = msg.sender;
+    crowdsaleEndEscrow.withdraw(payee);
+  }
+
+  /**
+   * @dev Called by the payer to store the sent amount as credit to be pulled from token timelock contract.
+   * @param _dest The destination address of the funds.
+   * @param _amount The amount to transfer.
+   */
+  function depositBonus(address _dest, uint256 _amount) public onlyOwner onlyNotFinalized {
+    assert(token.allowance(benefactor, this) >= _amount);
+    token.transferFrom(benefactor, this, _amount);
+    token.approve(bonusEscrow, _amount);
+    bonusEscrow.deposit(_dest, _amount);
+  }
+
+  /// @dev Withdraw accumulated balance, called by payee.
+  function withdrawBonusLocked() public {
+    bonusEscrow.withdraw(msg.sender);
+  }
+
+  /**
    * @dev Called by the payer to store the sent amount as credit to be pulled.
    * @param _dest The destination address of the funds.
    * @param _amount The amount to transfer.
    * @param _releaseTime The release times after which the tokens can be withdrawn.
    */
-  function depositAndLock(address _dest, uint256 _amount, uint256 _releaseTime) public onlyOwner onlyNotFinalized {
+  function depositAndLock(
+    address _dest,
+    uint256 _amount,
+    uint256 _releaseTime
+  )
+    public
+    onlyOwner
+    onlyNotFinalized
+    returns (address tokenWallet)
+  {
     assert(token.allowance(benefactor, this) >= _amount);
-    token.transferFrom(benefactor, this, _amount);
-    token.approve(escrow, _amount);
-    escrow.depositAndLock(_dest, _amount, _releaseTime);
+    tokenWallet = timelockFactory.create(
+      token,
+      _dest,
+      _releaseTime
+    );
+    token.transferFrom(benefactor, tokenWallet, _amount);
   }
 
-  /// @dev Withdraw accumulated balance, called by payee.
-  function withdrawPayments() public {
-    address payee = msg.sender;
-    escrow.withdraw(payee);
+  /**
+   * @dev Called by the payer to store the sent amount as credit to be pulled from token vesting contract.
+   * @param _dest The destination address of the funds.
+   * @param _amount The amount to transfer.
+   * @param _cliff duration in seconds of the cliff in which tokens will begin to vest
+   * @param _start the time (as Unix time) at which point vesting starts
+   * @param _duration duration in seconds of the period in which the tokens will vest
+   * @return Returns wallet address.
+   */
+  function depositAndVest(
+    address _dest,
+    uint256 _amount,
+    uint256 _start,
+    uint256 _cliff,
+    uint256 _duration
+  )
+    public
+    onlyOwner
+    onlyNotFinalized
+    returns (address tokenWallet)
+  {
+    assert(token.allowance(benefactor, this) >= _amount);
+    bool revocable = false;
+    tokenWallet = vestingFactory.create(
+      _dest,
+      _start,
+      _cliff,
+      _duration,
+      revocable
+    );
+    token.transferFrom(benefactor, tokenWallet, _amount);
   }
 
   /// @dev In case there are any unsold tokens, they are returned to the benefactor
