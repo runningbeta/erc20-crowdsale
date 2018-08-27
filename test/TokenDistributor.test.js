@@ -1,6 +1,7 @@
 const { inLogs, notInLogs } = require('./helpers/expectEvent');
 const { expectThrow } = require('./helpers/expectThrow');
 const { duration, increaseTimeTo } = require('./helpers/increaseTime');
+const { advanceBlock } = require('./helpers/advanceToBlock');
 const { latestTime } = require('./helpers/latestTime');
 const { EVMRevert } = require('./helpers/EVMRevert');
 const { EVMThrow } = require('./helpers/EVMThrow');
@@ -24,16 +25,16 @@ contract('TokenDistributor', function ([_, benefactor, owner, customer, wallet, 
   const weiAmount = ether(42.0);
   const rate = new BigNumber(1000);
   const cap = ether(42.0 * 6);
-  let openingTime;
-  let closingTime;
-  let releaseTime;
-  let bonusTime;
+
+  before(async function () {
+    (await advanceBlock()); // get blocks in sync with now
+  });
 
   beforeEach(async function () {
-    openingTime = (await latestTime()) + duration.days(1);
-    closingTime = openingTime + duration.days(2);
-    releaseTime = closingTime + duration.days(5);
-    bonusTime = closingTime + duration.days(10);
+    this.openingTime = (await latestTime()) + duration.days(1);
+    this.closingTime = this.openingTime + duration.days(2);
+    this.releaseTime = this.closingTime + duration.days(5);
+    this.bonusTime = this.closingTime + duration.days(10);
 
     this.token = await Token.new({ from: benefactor });
     this.distributor = await TokenDistributor.new(
@@ -42,9 +43,9 @@ contract('TokenDistributor', function ([_, benefactor, owner, customer, wallet, 
       wallet,
       this.token.address,
       cap,
-      openingTime,
-      closingTime,
-      bonusTime,
+      this.openingTime,
+      this.closingTime,
+      this.bonusTime,
       { from: owner }
     );
     this.issuer = this.distributor;
@@ -115,7 +116,7 @@ contract('TokenDistributor', function ([_, benefactor, owner, customer, wallet, 
 
       describe('during Crowdsale', function () {
         beforeEach(async function () {
-          await increaseTimeTo(openingTime + 1);
+          await increaseTimeTo(this.openingTime + 1);
         });
 
         it('fails to claim leftover tokens', async function () {
@@ -125,7 +126,7 @@ contract('TokenDistributor', function ([_, benefactor, owner, customer, wallet, 
 
       describe('after Crowdsale', function () {
         beforeEach(async function () {
-          await increaseTimeTo(closingTime + 1);
+          await increaseTimeTo(this.closingTime + 1);
         });
 
         it('can claim leftover tokens', async function () {
@@ -152,32 +153,32 @@ contract('TokenDistributor', function ([_, benefactor, owner, customer, wallet, 
     });
 
     it('can deposit and lock tokens', async function () {
-      await this.distributor.depositAndLock(customer, amount.div(10), releaseTime, { from: owner });
+      await this.distributor.depositAndLock(customer, amount.div(10), this.releaseTime, { from: owner });
       (await this.distributor.depositsOf(customer)).should.bignumber.equal(amount.div(10));
     });
 
     it('fails to deposit more than approved', async function () {
-      await (this.distributor.depositAndLock(customer, amount.div(5), releaseTime, { from: owner }))
+      await (this.distributor.depositAndLock(customer, amount.div(5), this.releaseTime, { from: owner }))
         .should.be.rejectedWith(EVMThrow);
     });
 
     it('fails to deposit twice to same user', async function () {
-      await this.distributor.depositAndLock(customer, amount.div(20), releaseTime, { from: owner });
+      await this.distributor.depositAndLock(customer, amount.div(20), this.releaseTime, { from: owner });
       (await this.distributor.depositsOf(customer)).should.bignumber.equal(amount.div(20));
 
-      await (this.distributor.depositAndLock(customer, amount.div(20), releaseTime, { from: owner }))
+      await (this.distributor.depositAndLock(customer, amount.div(20), this.releaseTime, { from: owner }))
         .should.be.rejectedWith(EVMRevert);
     });
 
     it('fails to withdraw', async function () {
-      await this.distributor.depositAndLock(customer, amount.div(20), releaseTime, { from: owner });
+      await this.distributor.depositAndLock(customer, amount.div(20), this.releaseTime, { from: owner });
       await (this.distributor.withdrawPayments({ from: customer })).should.be.rejectedWith(EVMRevert);
     });
 
     describe('after release time', async function () {
       beforeEach(async function () {
-        await this.distributor.depositAndLock(customer, amount.div(20), releaseTime, { from: owner });
-        (await increaseTimeTo(releaseTime + 1));
+        await this.distributor.depositAndLock(customer, amount.div(20), this.releaseTime, { from: owner });
+        (await increaseTimeTo(this.releaseTime + 1));
       });
 
       it('can withdraw', async function () {
@@ -188,8 +189,8 @@ contract('TokenDistributor', function ([_, benefactor, owner, customer, wallet, 
 
       it('can depositAndLock again after withdrawal', async function () {
         await this.distributor.withdrawPayments({ from: customer });
-        releaseTime = (await latestTime()) + duration.days(5);
-        await this.distributor.depositAndLock(customer, amount.div(20), releaseTime, { from: owner });
+        this.releaseTime = (await latestTime()) + duration.days(5);
+        await this.distributor.depositAndLock(customer, amount.div(20), this.releaseTime, { from: owner });
         (await this.distributor.depositsOf(customer)).should.bignumber.equal(amount.div(20));
       });
     });
@@ -201,7 +202,7 @@ contract('TokenDistributor', function ([_, benefactor, owner, customer, wallet, 
       });
 
       it('fails to deposit and lock tokens', async function () {
-        await (this.distributor.depositAndLock(customer, amount.div(10), releaseTime, { from: owner }))
+        await (this.distributor.depositAndLock(customer, amount.div(10), this.releaseTime, { from: owner }))
           .should.be.rejectedWith(EVMRevert);
       });
     });

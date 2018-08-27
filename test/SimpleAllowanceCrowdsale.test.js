@@ -22,12 +22,9 @@ contract('SimpleAllowanceCrowdsale', function ([
     this.token = await Token.new({ from: owner });
   });
 
-  let openingTime;
-  let closingTime;
-
   beforeEach(async function () {
-    openingTime = (await latestTime()) + duration.weeks(1);
-    closingTime = openingTime + duration.weeks(1);
+    this.openingTime = (await latestTime()) + duration.weeks(1);
+    this.closingTime = this.openingTime + duration.weeks(1);
 
     this.crowdsale = await SimpleAllowanceCrowdsale.new(
       new BigNumber(6894),
@@ -35,8 +32,8 @@ contract('SimpleAllowanceCrowdsale', function ([
       this.token.address,
       owner,
       ether(45000),
-      openingTime,
-      closingTime,
+      this.openingTime,
+      this.closingTime,
       { from: owner }
     );
   });
