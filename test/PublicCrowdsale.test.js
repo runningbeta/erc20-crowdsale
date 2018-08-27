@@ -36,7 +36,7 @@ contract('Token', function ([
   });
 
   it('refuses ether', async function () {
-    await this.token.send(ether(1), { from: owner }).should.be.rejectedWith(EVMRevert);
+    await (this.token.send(ether(1), { from: owner })).should.be.rejectedWith(EVMRevert);
   });
 
   describe('PublicCrowdsale', function () {
@@ -60,7 +60,7 @@ contract('Token', function ([
 
     describe('Before Crowdsale', function () {
       it('Crowdsale refuses directly sent ether', async function () {
-        await this.crowdsale.send(ether(1), { from: owner }).should.be.rejectedWith(EVMRevert);
+        await (this.crowdsale.send(ether(1), { from: owner })).should.be.rejectedWith(EVMRevert);
       });
 
       it('Crowdsale is owned by the creator', async function () {
@@ -101,28 +101,28 @@ contract('Token', function ([
           const beneficiary = whitelisted;
           const payee = whitelisted;
           const options = { from: payee, value: ether(1) };
-          await this.crowdsale.buyTokens(beneficiary, options).should.be.rejectedWith(EVMRevert);
+          await (this.crowdsale.buyTokens(beneficiary, options)).should.be.rejectedWith(EVMRevert);
         });
 
         it('whitelisted for non whitelisted', async function () {
           const beneficiary = notWhitelisted;
           const payee = whitelisted;
           const options = { from: payee, value: ether(1) };
-          await this.crowdsale.buyTokens(beneficiary, options).should.be.rejectedWith(EVMRevert);
+          await (this.crowdsale.buyTokens(beneficiary, options)).should.be.rejectedWith(EVMRevert);
         });
 
         it('non whitelisted for himself', async function () {
           const beneficiary = notWhitelisted;
           const payee = notWhitelisted;
           const options = { from: payee, value: ether(1) };
-          await this.crowdsale.buyTokens(beneficiary, options).should.be.rejectedWith(EVMRevert);
+          await (this.crowdsale.buyTokens(beneficiary, options)).should.be.rejectedWith(EVMRevert);
         });
 
         it('non whitelisted for whitelisted', async function () {
           const beneficiary = whitelisted;
           const payee = notWhitelisted;
           const options = { from: payee, value: ether(1) };
-          await this.crowdsale.buyTokens(beneficiary, options).should.be.rejectedWith(EVMRevert);
+          await (this.crowdsale.buyTokens(beneficiary, options)).should.be.rejectedWith(EVMRevert);
         });
       });
     });
@@ -137,21 +137,21 @@ contract('Token', function ([
           const beneficiary = notWhitelisted;
           const payee = notWhitelisted;
           const options = { from: payee, value: ether(1) };
-          await this.crowdsale.buyTokens(beneficiary, options).should.be.rejectedWith(EVMRevert);
+          await (this.crowdsale.buyTokens(beneficiary, options)).should.be.rejectedWith(EVMRevert);
         });
 
         it('whitelisted for non whitelisted', async function () {
           const beneficiary = whitelistRevert;
           const payee = alsoWhitelistedOne;
           const options = { from: payee, value: ether(1) };
-          await this.crowdsale.buyTokens(beneficiary, options).should.be.rejectedWith(EVMRevert);
+          await (this.crowdsale.buyTokens(beneficiary, options)).should.be.rejectedWith(EVMRevert);
         });
 
         it('if investment is too big', async function () {
           const beneficiary = investsTooBig;
           const payee = investsTooBig;
           const options = { from: payee, value: ether(10.1) };
-          await this.crowdsale.buyTokens(beneficiary, options).should.be.rejectedWith(EVMRevert);
+          await (this.crowdsale.buyTokens(beneficiary, options)).should.be.rejectedWith(EVMRevert);
         });
       });
 

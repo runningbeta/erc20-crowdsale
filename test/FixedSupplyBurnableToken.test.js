@@ -29,7 +29,8 @@ contract('FixedSupplyBurnableToken', function ([owner, customer, ...other]) {
   });
 
   it('refuses ether', async function () {
-    await this.token.send(ether(1), { from: owner }).should.be.rejectedWith(EVMRevert);
+    await (this.token.send(ether(1), { from: owner }))
+      .should.be.rejectedWith(EVMRevert);
   });
 
   describe('as Finalizable Burnable Token', function () {

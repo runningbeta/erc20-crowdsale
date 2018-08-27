@@ -44,8 +44,7 @@ contract('TokenTimelockEscrow', function ([owner, ...otherAccounts]) {
       await this.token.approve(this.escrow.address, amount, { from: owner });
       await this.escrow.deposit(payee, amount, { from: owner });
 
-      await this.escrow.withdraw(payee, { from: owner })
-        .should.be.rejectedWith(EVMRevert);
+      await (this.escrow.withdraw(payee, { from: owner })).should.be.rejectedWith(EVMRevert);
     });
   });
 

@@ -34,16 +34,19 @@ function shouldBehaveLikeIssuer (benefactor, owner, customer, [customer2, ...oth
     });
 
     it('only benefactor can issue', async function () {
-      await (this.issuer.issue(customer, amount * 3, { from: customer })).should.be.rejectedWith(EVMRevert);
+      await (this.issuer.issue(customer, amount * 3, { from: customer }))
+        .should.be.rejectedWith(EVMRevert);
     });
 
     it('fails to issue over allowance', async function () {
-      await (this.issuer.issue(customer, amount * 5, { from: owner })).should.be.rejectedWith(EVMRevert);
+      await (this.issuer.issue(customer, amount * 5, { from: owner }))
+        .should.be.rejectedWith(EVMRevert);
     });
 
     it('fails to issue twice to same address', async function () {
       await this.issuer.issue(customer, amount, { from: owner });
-      await (this.issuer.issue(customer, amount, { from: owner })).should.be.rejectedWith(EVMRevert);
+      await (this.issuer.issue(customer, amount, { from: owner }))
+        .should.be.rejectedWith(EVMRevert);
     });
   });
 }

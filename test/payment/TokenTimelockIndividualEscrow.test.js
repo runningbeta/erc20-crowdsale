@@ -1,8 +1,3 @@
-const { EVMRevert } = require('../helpers/EVMRevert');
-const { latestTime } = require('../helpers/latestTime');
-const { increaseTimeTo, duration } = require('../helpers/increaseTime');
-const { ether } = require('../helpers/ether');
-
 const BigNumber = web3.BigNumber;
 
 require('chai')
@@ -14,86 +9,14 @@ const Token = artifacts.require('FixedSupplyBurnableToken');
 const TokenTimelockIndividualEscrow = artifacts.require('TokenTimelockIndividualEscrowMock');
 
 const { shouldBehaveLikeTokenEscrow } = require('./TokenEscrow.behaviour');
+const { shouldBehaveLikeTokenTimelockIndividualEscrow } = require('./TokenTimelockIndividualEscrow.behaviour');
 
 contract('TokenTimelockIndividualEscrow', function ([owner, ...accounts]) {
-  let now;
-  let releaseTime;
-
   beforeEach(async function () {
     this.token = await Token.new({ from: owner });
     this.escrow = await TokenTimelockIndividualEscrow.new(this.token.address, { from: owner });
   });
 
   shouldBehaveLikeTokenEscrow(owner, accounts);
-
-  describe('as an Individual Timelock Escrow', function () {
-    const amount = ether(2.3);
-    const payee = accounts[0];
-    const payee2 = accounts[1];
-    const payee3 = accounts[2];
-
-    beforeEach(async function () {
-      now = await latestTime();
-      releaseTime = now + duration.days(2);
-      await this.token.approve(this.escrow.address, amount * 2, { from: owner });
-    });
-
-    it('can depositAndLock', async function () {
-      await this.escrow.depositAndLock(payee, amount, releaseTime, { from: owner });
-
-      (await this.token.balanceOf(this.escrow.address)).should.bignumber.equal(amount);
-      (await this.escrow.depositsOf(payee)).should.bignumber.equal(amount);
-    });
-
-    describe('Deposit then Lock', function () {
-      beforeEach(async function () {
-        await this.escrow.deposit(payee, amount, { from: owner });
-        await this.escrow.lock(payee, releaseTime, { from: owner });
-
-        await this.escrow.deposit(payee2, amount, { from: owner });
-      });
-
-      it('beneficiary must be a real address', async function () {
-        await (this.escrow.lock(0x0, releaseTime, { from: owner }))
-          .should.be.rejectedWith(EVMRevert);
-      });
-
-      it('release time must be in the future', async function () {
-        await (this.escrow.lock(payee2, now, { from: owner }))
-          .should.be.rejectedWith(EVMRevert);
-      });
-
-      it('fails to lock a locked address', async function () {
-        await (this.escrow.lock(payee, releaseTime, { from: owner }))
-          .should.be.rejectedWith(EVMRevert);
-      });
-
-      it('fails to deposit to a zero deposit address', async function () {
-        await (this.escrow.lock(payee3, releaseTime, { from: owner }))
-          .should.be.rejectedWith(EVMRevert);
-      });
-    });
-
-    describe('Before release time', function () {
-      beforeEach(async function () {
-        await this.escrow.depositAndLock(payee, amount, releaseTime, { from: owner });
-      });
-
-      it('fails to withdraw', async function () {
-        await (this.escrow.withdraw(payee, { from: owner })).should.be.rejectedWith(EVMRevert);
-      });
-    });
-
-    describe('After release time', function () {
-      beforeEach(async function () {
-        await this.escrow.depositAndLock(payee, amount, releaseTime, { from: owner });
-        await increaseTimeTo(releaseTime + 1);
-      });
-
-      it('can withdraw', async function () {
-        await this.escrow.withdraw(payee, { from: owner });
-        (await this.token.balanceOf(payee)).should.be.bignumber.equal(amount);
-      });
-    });
-  });
+  shouldBehaveLikeTokenTimelockIndividualEscrow(owner, accounts);
 });

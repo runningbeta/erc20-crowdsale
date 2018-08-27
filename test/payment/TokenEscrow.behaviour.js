@@ -25,15 +25,21 @@ function shouldBehaveLikeTokenEscrow (owner, [payee1, payee2]) {
 
       it('can accept an empty deposit', async function () {
         await this.escrow.deposit(payee1, 0, { from: owner });
+        (await this.escrow.depositsOf(payee1)).should.be.bignumber.equal(0);
       });
 
       it('only the owner can deposit', async function () {
-        await this.escrow.deposit(payee1, 1, { from: payee2 })
+        await (this.escrow.deposit(payee1, 1, { from: payee2 })).should.be.rejectedWith(EVMRevert);
+      });
+
+      it('fails to deposit if escrow balance is too low', async function () {
+        await (this.escrow.deposit(payee1, amount, { from: owner }))
           .should.be.rejectedWith(EVMRevert);
       });
 
-      it('rejects deposit if escrow balance is too low', async function () {
-        await this.escrow.deposit(payee1, amount, { from: owner })
+      it('fails to deposit to 0x0', async function () {
+        await this.token.approve(this.escrow.address, amount, { from: owner });
+        await (this.escrow.deposit(0x0, amount, { from: owner }))
           .should.be.rejectedWith(EVMRevert);
       });
 
@@ -87,8 +93,7 @@ function shouldBehaveLikeTokenEscrow (owner, [payee1, payee2]) {
       });
 
       it('only the owner can withdraw', async function () {
-        await this.escrow.withdraw(payee1, { from: payee1 })
-          .should.be.rejectedWith(EVMRevert);
+        await (this.escrow.withdraw(payee1, { from: payee1 })).should.be.rejectedWith(EVMRevert);
       });
 
       it('emits a withdrawn event', async function () {
@@ -101,7 +106,7 @@ function shouldBehaveLikeTokenEscrow (owner, [payee1, payee2]) {
       });
     });
   });
-}
+};
 
 module.exports = {
   shouldBehaveLikeTokenEscrow,
