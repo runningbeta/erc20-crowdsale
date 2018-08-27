@@ -17,7 +17,7 @@ contract TokenTimelockEscrow is TokenConditionalEscrow {
 
   constructor(uint256 _releaseTime) public {
     // solium-disable-next-line security/no-block-members
-    require(_releaseTime > block.timestamp, "Vesting period should expire in future.");
+    require(_releaseTime > block.timestamp, "Release time should be in the future.");
     releaseTime = _releaseTime;
   }
 

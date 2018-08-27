@@ -36,7 +36,7 @@ contract TokenTimelockIndividualEscrow is TokenConditionalEscrow {
   function lock(address _payee, uint256 _releaseTime) public onlyOwner {
     require(_payee != address(0), "The destination address of the tokens should not be 0x0.");
     // solium-disable-next-line security/no-block-members
-    require(_releaseTime > block.timestamp, "Vesting period should expire in future.");
+    require(_releaseTime > block.timestamp, "Release time should be in the future.");
     require(releaseTimes[_payee] == 0, "The destination address is already locked.");
     require(depositsOf(_payee) > 0, "There is no need to lock zero balances.");
     releaseTimes[_payee] = _releaseTime;

@@ -17,7 +17,7 @@ const { shouldBehaveLikeTokenEscrow } = require('./TokenEscrow.behaviour');
 
 contract('TokenTimelockIndividualEscrow', function ([owner, ...accounts]) {
   let now;
-  let vestingTime;
+  let releaseTime;
 
   beforeEach(async function () {
     this.token = await Token.new({ from: owner });
@@ -34,12 +34,12 @@ contract('TokenTimelockIndividualEscrow', function ([owner, ...accounts]) {
 
     beforeEach(async function () {
       now = await latestTime();
-      vestingTime = now + duration.days(2);
+      releaseTime = now + duration.days(2);
       await this.token.approve(this.escrow.address, amount * 2, { from: owner });
     });
 
     it('can depositAndLock', async function () {
-      await this.escrow.depositAndLock(payee, amount, vestingTime, { from: owner });
+      await this.escrow.depositAndLock(payee, amount, releaseTime, { from: owner });
 
       (await this.token.balanceOf(this.escrow.address)).should.bignumber.equal(amount);
       (await this.escrow.depositsOf(payee)).should.bignumber.equal(amount);
@@ -48,35 +48,35 @@ contract('TokenTimelockIndividualEscrow', function ([owner, ...accounts]) {
     describe('Deposit then Lock', function () {
       beforeEach(async function () {
         await this.escrow.deposit(payee, amount, { from: owner });
-        await this.escrow.lock(payee, vestingTime, { from: owner });
+        await this.escrow.lock(payee, releaseTime, { from: owner });
 
         await this.escrow.deposit(payee2, amount, { from: owner });
       });
 
       it('beneficiary must be a real address', async function () {
-        await (this.escrow.lock(0x0, vestingTime, { from: owner }))
+        await (this.escrow.lock(0x0, releaseTime, { from: owner }))
           .should.be.rejectedWith(EVMRevert);
       });
 
-      it('vesting time must be in the future', async function () {
+      it('release time must be in the future', async function () {
         await (this.escrow.lock(payee2, now, { from: owner }))
           .should.be.rejectedWith(EVMRevert);
       });
 
       it('fails to lock a locked address', async function () {
-        await (this.escrow.lock(payee, vestingTime, { from: owner }))
+        await (this.escrow.lock(payee, releaseTime, { from: owner }))
           .should.be.rejectedWith(EVMRevert);
       });
 
       it('fails to deposit to a zero deposit address', async function () {
-        await (this.escrow.lock(payee3, vestingTime, { from: owner }))
+        await (this.escrow.lock(payee3, releaseTime, { from: owner }))
           .should.be.rejectedWith(EVMRevert);
       });
     });
 
-    describe('Before vesting', function () {
+    describe('Before release time', function () {
       beforeEach(async function () {
-        await this.escrow.depositAndLock(payee, amount, vestingTime, { from: owner });
+        await this.escrow.depositAndLock(payee, amount, releaseTime, { from: owner });
       });
 
       it('fails to withdraw', async function () {
@@ -84,10 +84,10 @@ contract('TokenTimelockIndividualEscrow', function ([owner, ...accounts]) {
       });
     });
 
-    describe('After vesting', function () {
+    describe('After release time', function () {
       beforeEach(async function () {
-        await this.escrow.depositAndLock(payee, amount, vestingTime, { from: owner });
-        await increaseTimeTo(vestingTime + 1);
+        await this.escrow.depositAndLock(payee, amount, releaseTime, { from: owner });
+        await increaseTimeTo(releaseTime + 1);
       });
 
       it('can withdraw', async function () {

@@ -17,16 +17,16 @@ const TokenTimelockEscrowMock = artifacts.require('TokenTimelockEscrowMock');
 
 contract('TokenTimelockEscrow', function ([owner, ...otherAccounts]) {
   let now;
-  let vestingTime;
+  let releaseTime;
 
   beforeEach(async function () {
     await advanceBlock();
     now = await latestTime();
-    vestingTime = now + duration.days(2);
+    releaseTime = now + duration.days(2);
     this.token = await Token.new({ from: owner });
     this.escrow = await TokenTimelockEscrowMock.new(
       this.token.address,
-      vestingTime,
+      releaseTime,
       { from: owner }
     );
   });
@@ -36,7 +36,7 @@ contract('TokenTimelockEscrow', function ([owner, ...otherAccounts]) {
       .should.be.rejectedWith(EVMRevert);
   });
 
-  context('before vesting is finished', function () {
+  context('before release time', function () {
     const amount = ether(23.0);
     const payee = otherAccounts[1];
 
@@ -49,9 +49,9 @@ contract('TokenTimelockEscrow', function ([owner, ...otherAccounts]) {
     });
   });
 
-  context('after vesting is finished', function () {
+  context('after release time', function () {
     beforeEach(async function () {
-      await increaseTimeTo(vestingTime + 1);
+      await increaseTimeTo(releaseTime + 1);
     });
 
     shouldBehaveLikeTokenEscrow(owner, otherAccounts);
