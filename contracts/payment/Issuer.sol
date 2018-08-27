@@ -34,8 +34,8 @@ contract Issuer is Ownable {
   uint256 public issuedCount;
 
   constructor(address _benefactor, ERC20 _token) public {
-    require(address(_benefactor) != address(0), "Benefactor address should not be 0x0");
-    require(address(_token) != address(0), "Token address should not be 0x0");
+    require(address(_benefactor) != address(0), "Benefactor address should not be 0x0.");
+    require(address(_token) != address(0), "Token address should not be 0x0.");
     benefactor = _benefactor;
     token = _token;
   }
@@ -46,7 +46,7 @@ contract Issuer is Ownable {
    * @param _amount The amount of tokens that are issued.
    */
   function issue(address _beneficiary, uint256 _amount) public onlyOwner {
-    require(!issued[_beneficiary], "Already issued to beneficiary");
+    require(!issued[_beneficiary], "Already issued to beneficiary.");
     token.transferFrom(benefactor, _beneficiary, _amount);
     issued[_beneficiary] = true;
     issuedCount = issuedCount.add(_amount);

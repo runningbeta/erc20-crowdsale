@@ -14,13 +14,13 @@ contract Finalizable is Ownable {
 
   /// @dev Throws if called before the contract is finalized.
   modifier onlyFinalized() {
-    require(isFinalized, "Contract not finalized");
+    require(isFinalized, "Contract not finalized.");
     _;
   }
 
   /// @dev Throws if called after the contract is finalized.
   modifier onlyNotFinalized() {
-    require(!isFinalized, "Contract already finalized");
+    require(!isFinalized, "Contract already finalized.");
     _;
   }
 

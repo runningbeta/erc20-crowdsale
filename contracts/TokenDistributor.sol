@@ -55,8 +55,8 @@ contract TokenDistributor is HasNoEther, Finalizable, IssuerWithEther {
 
   /// @dev Throws if called before the crowdsale is created.
   modifier onlyIfCrowdsale() {
-    require(isFinalized, "Contract not finalized");
-    require(crowdsale != address(0), "Crowdsale not started");
+    require(isFinalized, "Contract not finalized.");
+    require(crowdsale != address(0), "Crowdsale not started.");
     _;
   }
 
