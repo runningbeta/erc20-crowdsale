@@ -1,6 +1,7 @@
 pragma solidity ^0.4.24;
 
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
+import "openzeppelin-solidity/contracts/ownership/HasNoEther.sol";
 import "./lifecycle/Finalizable.sol";
 import "./payment/IssuerWithEther.sol";
 import "./payment/TokenTimelockIndividualEscrow.sol";
@@ -12,7 +13,7 @@ import "./SimpleAllowanceCrowdsale.sol";
  * @title TokenDistributor
  * @dev This is a token distribution contract.
  */
-contract TokenDistributor is Finalizable, IssuerWithEther {
+contract TokenDistributor is HasNoEther, Finalizable, IssuerWithEther {
   using SafeMath for uint256;
   using SafeERC20 for ERC20;
 

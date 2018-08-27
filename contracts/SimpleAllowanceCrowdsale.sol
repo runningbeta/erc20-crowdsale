@@ -1,6 +1,8 @@
 pragma solidity ^0.4.24;
 
 import "openzeppelin-solidity/contracts/token/ERC20/ERC20.sol";
+import "openzeppelin-solidity/contracts/ownership/HasNoTokens.sol";
+import "openzeppelin-solidity/contracts/ownership/HasNoContracts.sol";
 import "openzeppelin-solidity/contracts/crowdsale/validation/IndividuallyCappedCrowdsale.sol";
 import "openzeppelin-solidity/contracts/crowdsale/validation/CappedCrowdsale.sol";
 import "openzeppelin-solidity/contracts/crowdsale/validation/TimedCrowdsale.sol";
@@ -12,7 +14,16 @@ import "openzeppelin-solidity/contracts/crowdsale/emission/AllowanceCrowdsale.so
  * @dev This is a simple crowdsale that will sell tokens util the cap is reached or
  * the allowance is spent.
  */
-contract SimpleAllowanceCrowdsale is AllowanceCrowdsale, CappedCrowdsale, TimedCrowdsale, IndividuallyCappedCrowdsale {
+// solium-disable-next-line
+contract SimpleAllowanceCrowdsale
+  is
+    HasNoTokens,
+    HasNoContracts,
+    AllowanceCrowdsale,
+    CappedCrowdsale,
+    TimedCrowdsale,
+    IndividuallyCappedCrowdsale
+{
 
   event WalletChange(address wallet);
 
