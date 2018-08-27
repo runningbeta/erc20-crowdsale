@@ -8,6 +8,8 @@ import "../lifecycle/Factory.sol";
 /// @title Token vesting wallet factory - Allows creation of TokenVesting wallet.
 contract TokenVestingFactory is Factory {
 
+  mapping(address => address[]) public beneficiaryInstantiations;
+
   /**
    * @dev Allows verified creation of token vesting wallet.
    * Creates a vesting contract that vests its balance of any ERC20 token to the
@@ -32,6 +34,7 @@ contract TokenVestingFactory is Factory {
   {
     wallet = new TokenVesting(_beneficiary, _start, _cliff, _duration, _revocable);
     TokenVesting(wallet).transferOwnership(msg.sender);
+    beneficiaryInstantiations[_beneficiary].push(wallet);
     register(wallet);
   }
 }
