@@ -27,11 +27,13 @@ contract('TokenDistributor', function ([_, benefactor, owner, customer, wallet, 
   let openingTime;
   let closingTime;
   let releaseTime;
+  let bonusTime;
 
   beforeEach(async function () {
     openingTime = (await latestTime()) + duration.days(1);
     closingTime = openingTime + duration.days(2);
     releaseTime = closingTime + duration.days(5);
+    bonusTime = closingTime + duration.days(10);
 
     this.token = await Token.new({ from: benefactor });
     this.distributor = await TokenDistributor.new(
@@ -42,6 +44,7 @@ contract('TokenDistributor', function ([_, benefactor, owner, customer, wallet, 
       cap,
       openingTime,
       closingTime,
+      bonusTime,
       { from: owner }
     );
     this.issuer = this.distributor;
