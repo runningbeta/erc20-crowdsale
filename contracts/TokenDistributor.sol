@@ -73,12 +73,23 @@ contract TokenDistributor is HasNoEther, Finalizable, IssuerWithEther {
     public
     Issuer(_benefactor, _token)
   {
+    require(_benefactor != address(0), "Benefactor address should not be 0x0.");
+    require(_rate > 0, "Rate should not be > 0.");
+    require(_wallet != address(0), "Wallet address should not be 0x0.");
+    require(_token != address(0), "Token address should not be 0x0.");
+    require(_cap > 0, "Cap should be > 0.");
+    // solium-disable-next-line security/no-block-members
+    require(_openingTime > block.timestamp, "Opening time should be in the future.");
+    require(_closingTime > _openingTime, "Closing time should be after opening.");
+    require(_bonusTime > _closingTime, "Bonus time should be after closing time.");
+
     rate = _rate;
     wallet = _wallet;
     token = _token;
     cap = _cap;
     openingTime = _openingTime;
     closingTime = _closingTime;
+
     crowdsaleEndEscrow = new TokenTimelockEscrowMock(_token, _closingTime);
     bonusEscrow = new TokenTimelockEscrowMock(_token, _bonusTime);
     timelockFactory = new TokenTimelockFactory();
@@ -128,7 +139,7 @@ contract TokenDistributor is HasNoEther, Finalizable, IssuerWithEther {
    * @param _weiAmount The amount of wei exchanged for the tokens.
    */
   function issue(address _beneficiary, uint256 _amount, uint256 _weiAmount) public {
-    require(cap >= weiRaised.add(_weiAmount), "Cap reached");
+    require(cap >= weiRaised.add(_weiAmount), "Cap reached.");
     super.issue(_beneficiary, _amount, _weiAmount);
   }
 
@@ -138,7 +149,7 @@ contract TokenDistributor is HasNoEther, Finalizable, IssuerWithEther {
    * @param _amount The amount to transfer.
    */
   function depositUntilCrowdsaleEnd(address _dest, uint256 _amount) public onlyOwner onlyNotFinalized {
-    assert(token.allowance(benefactor, this) >= _amount);
+    require(token.allowance(benefactor, this) >= _amount, "Not enough allowance.");
     token.transferFrom(benefactor, this, _amount);
     token.approve(crowdsaleEndEscrow, _amount);
     crowdsaleEndEscrow.deposit(_dest, _amount);
@@ -156,7 +167,7 @@ contract TokenDistributor is HasNoEther, Finalizable, IssuerWithEther {
    * @param _amount The amount to transfer.
    */
   function depositBonus(address _dest, uint256 _amount) public onlyOwner onlyNotFinalized {
-    assert(token.allowance(benefactor, this) >= _amount);
+    require(token.allowance(benefactor, this) >= _amount, "Not enough allowance.");
     token.transferFrom(benefactor, this, _amount);
     token.approve(bonusEscrow, _amount);
     bonusEscrow.deposit(_dest, _amount);
@@ -168,10 +179,12 @@ contract TokenDistributor is HasNoEther, Finalizable, IssuerWithEther {
   }
 
   /**
-   * @dev Called by the payer to store the sent amount as credit to be pulled.
+   * @dev Called by the payer to store the sent amount as credit to be pulled
+   * from token timelock contract.
    * @param _dest The destination address of the funds.
    * @param _amount The amount to transfer.
    * @param _releaseTime The release times after which the tokens can be withdrawn.
+   * @return Returns wallet address.
    */
   function depositAndLock(
     address _dest,
@@ -183,7 +196,8 @@ contract TokenDistributor is HasNoEther, Finalizable, IssuerWithEther {
     onlyNotFinalized
     returns (address tokenWallet)
   {
-    assert(token.allowance(benefactor, this) >= _amount);
+    require(token.allowance(benefactor, this) >= _amount, "Not enough allowance.");
+    require(_dest != address(0), "Destination address should not be 0x0.");
     tokenWallet = timelockFactory.create(
       token,
       _dest,
@@ -193,7 +207,8 @@ contract TokenDistributor is HasNoEther, Finalizable, IssuerWithEther {
   }
 
   /**
-   * @dev Called by the payer to store the sent amount as credit to be pulled from token vesting contract.
+   * @dev Called by the payer to store the sent amount as credit to be pulled
+   * from token vesting contract.
    * @param _dest The destination address of the funds.
    * @param _amount The amount to transfer.
    * @param _cliff duration in seconds of the cliff in which tokens will begin to vest
@@ -213,7 +228,8 @@ contract TokenDistributor is HasNoEther, Finalizable, IssuerWithEther {
     onlyNotFinalized
     returns (address tokenWallet)
   {
-    assert(token.allowance(benefactor, this) >= _amount);
+    require(token.allowance(benefactor, this) >= _amount, "Not enough allowance.");
+    require(_dest != address(0), "Destination address should not be 0x0.");
     bool revocable = false;
     tokenWallet = vestingFactory.create(
       _dest,
@@ -227,7 +243,7 @@ contract TokenDistributor is HasNoEther, Finalizable, IssuerWithEther {
 
   /// @dev In case there are any unsold tokens, they are returned to the benefactor
   function claimUnsold() public onlyIfCrowdsale {
-    require(crowdsale.hasEnded(), "Crowdsale still running");
+    require(crowdsale.hasEnded(), "Crowdsale still running.");
     uint256 unsold = token.balanceOf(this);
 
     if (unsold > 0) {

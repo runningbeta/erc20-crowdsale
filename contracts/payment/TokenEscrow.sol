@@ -47,7 +47,7 @@ contract TokenEscrow is Ownable {
    * @param _amount The amount of tokens that can be pulled.
    */
   function deposit(address _payee, uint256 _amount) public onlyOwner {
-    require(_payee != address(0), "The destination address of the tokens must not be 0x0.");
+    require(_payee != address(0), "Destination address should not be 0x0.");
     token.safeTransferFrom(owner, this, _amount);
     deposits[_payee] = deposits[_payee].add(_amount);
     totalDeposits = totalDeposits.add(_amount);
