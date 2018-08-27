@@ -11,8 +11,8 @@ import "openzeppelin-solidity/contracts/crowdsale/emission/AllowanceCrowdsale.so
 
 /**
  * @title SimpleAllowanceCrowdsale
- * @dev This is a simple crowdsale that will sell tokens util the cap is reached or
- * the allowance is spent.
+ * @dev This is a ERC20 token crowdsale that will sell tokens util
+ * the cap is reached, time expired or the allowance is spent.
  */
 // solium-disable-next-line
 contract SimpleAllowanceCrowdsale

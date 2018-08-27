@@ -22,8 +22,8 @@ import "openzeppelin-solidity/contracts/token/ERC20/StandardBurnableToken.sol";
  *
  * @notice All tokens are pre-assigned to the creator. Note they can later distribute these
  * tokens as they wish using `transfer` and other `StandardToken` functions.
- * This is a BurnableToken where users can burn tokens when burning functionality is
- * enabled (unpaused) by the owner.
+ * This is a BurnableToken where users can burn tokens when the burning functionality is
+ * enabled (contract is finalized) by the owner.
  */
 contract FixedSupplyBurnableToken is NoOwner, Finalizable, DetailedERC20, StandardBurnableToken {
 
