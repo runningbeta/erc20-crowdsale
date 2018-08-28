@@ -29,6 +29,9 @@ contract SampleAllowanceCrowdsale
 
   event WalletChange(address wallet);
 
+  // When withdrawals open
+  uint256 public withdrawTime;
+
   constructor(
     uint256 _rate,
     address _wallet,
@@ -36,7 +39,8 @@ contract SampleAllowanceCrowdsale
     address _tokenWallet,
     uint256 _cap,
     uint256 _openingTime,
-    uint256 _closingTime
+    uint256 _closingTime,
+    uint256 _withdrawTime
   )
     public
     Crowdsale(_rate, _wallet, _token)
@@ -44,7 +48,8 @@ contract SampleAllowanceCrowdsale
     CappedCrowdsale(_cap)
     TimedCrowdsale(_openingTime, _closingTime)
   {
-    // constructor
+    require(_withdrawTime >= _closingTime, "Withdrawals should open after crowdsale closes.");
+    withdrawTime = _withdrawTime;
   }
 
   /**
@@ -54,6 +59,15 @@ contract SampleAllowanceCrowdsale
    */
   function hasEnded() public view returns (bool) {
     return hasClosed() || capReached();
+  }
+
+  /**
+   * @dev Withdraw tokens only after configured withdraw time.
+   */
+  function withdrawTokens() public {
+    // solium-disable-next-line security/no-block-members
+    require(block.timestamp > withdrawTime, "Withdrawals not open.");
+    super.withdrawTokens();
   }
 
   /**

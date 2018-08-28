@@ -40,6 +40,8 @@ contract TokenDistributor is HasNoEther, Finalizable, IssuerWithEther {
 
   uint256 public openingTime;
   uint256 public closingTime;
+  // When withdrawals open
+  uint256 public withdrawTime;
 
   // Crowdsale that is created after the presale distribution is finalized
   SampleAllowanceCrowdsale public crowdsale;
@@ -71,6 +73,7 @@ contract TokenDistributor is HasNoEther, Finalizable, IssuerWithEther {
     uint256 _cap,
     uint256 _openingTime,
     uint256 _closingTime,
+    uint256 _withdrawTime,
     uint256 _bonusTime
   )
     public
@@ -83,6 +86,7 @@ contract TokenDistributor is HasNoEther, Finalizable, IssuerWithEther {
     require(_openingTime > block.timestamp, "Opening time should be in the future.");
     require(_closingTime > _openingTime, "Closing time should be after opening.");
     require(_bonusTime > _closingTime, "Bonus time should be after closing time.");
+    require(_withdrawTime >= _closingTime, "Withdrawals should open after crowdsale closes.");
 
     rate = _rate;
     wallet = _wallet;
@@ -90,6 +94,7 @@ contract TokenDistributor is HasNoEther, Finalizable, IssuerWithEther {
     cap = _cap;
     openingTime = _openingTime;
     closingTime = _closingTime;
+    withdrawTime = _withdrawTime;
 
     presaleEscrow = new TokenTimelockEscrowMock(_token, _closingTime);
     bonusEscrow = new TokenTimelockEscrowMock(_token, _bonusTime);
@@ -283,7 +288,8 @@ contract TokenDistributor is HasNoEther, Finalizable, IssuerWithEther {
       tokenWallet,
       crowdsaleCap,
       openingTime,
-      closingTime
+      closingTime,
+      withdrawTime
     );
     uint256 allowance = token.allowance(benefactor, this);
     token.transferFrom(benefactor, this, allowance);

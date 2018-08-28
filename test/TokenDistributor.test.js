@@ -34,6 +34,8 @@ contract('TokenDistributor', function ([_, benefactor, owner, customer, wallet, 
     this.now = (await latestTime());
     this.openingTime = this.now + duration.days(1);
     this.closingTime = this.openingTime + duration.days(2);
+    this.withdrawTime = this.closingTime + duration.days(2);
+
     this.releaseTime = this.closingTime + duration.days(5);
     this.bonusTime = this.closingTime + duration.days(10);
 
@@ -46,6 +48,7 @@ contract('TokenDistributor', function ([_, benefactor, owner, customer, wallet, 
       cap,
       this.openingTime,
       this.closingTime,
+      this.withdrawTime,
       this.bonusTime,
       { from: owner }
     );
