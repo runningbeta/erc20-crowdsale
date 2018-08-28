@@ -19,6 +19,7 @@ const { shouldBehaveLikeIssuerWithEther } = require('./payment/IssuerWithEther.b
 
 const Token = artifacts.require('FixedSupplyBurnableToken');
 const TokenDistributor = artifacts.require('TokenDistributor');
+const TokenTimelock = artifacts.require('TokenTimelock');
 
 contract('TokenDistributor', function ([_, benefactor, owner, customer, wallet, ...otherAccounts]) {
   const amount = ether(500.0);
@@ -147,14 +148,26 @@ contract('TokenDistributor', function ([_, benefactor, owner, customer, wallet, 
     });
   });
 
-  describe('as an TokenTimelockEscrow proxy', function () {
+  describe('as an TokenTimelockFactory proxy', function () {
     beforeEach(async function () {
       await this.token.approve(this.distributor.address, amount.div(10), { from: benefactor });
     });
 
     it('can deposit and lock tokens', async function () {
-      await this.distributor.depositAndLock(customer, amount.div(10), this.releaseTime, { from: owner });
-      (await this.distributor.depositsOf(customer)).should.bignumber.equal(amount.div(10));
+      const resp = await this.distributor
+        .depositAndLock(customer, amount.div(10), this.releaseTime, { from: owner });
+      console.log(resp);
+      console.log('AAaaaaaaAA');
+      console.log(resp.receipt);
+      console.log('BBaaaaaaBB');
+      console.log(resp.receipt.logs);
+      const event = inLogs(resp.receipt.logs, 'ContractInstantiation', { sender: owner });
+      const walletAddr = event.args.instantiation;
+
+      const walletBalance = await this.token.balanceOf(walletAddr);
+      walletBalance.should.bignumber.equal(amount.div(10));
+      const wallet = await TokenTimelock.at(walletAddr);
+      (await TokenTimelock.at(wallet).beneficiary()).should.be.equal(customer);
     });
 
     it('fails to deposit more than approved', async function () {

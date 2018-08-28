@@ -1,4 +1,4 @@
-const expectEvent = require('../helpers/expectEvent');
+const { inLogs } = require('../helpers/expectEvent');
 const { EVMRevert } = require('../helpers/EVMRevert');
 const { ether } = require('../helpers/ether');
 
@@ -45,9 +45,9 @@ function shouldBehaveLikeTokenEscrow (owner, [payee1, payee2]) {
 
       it('emits a deposited event', async function () {
         await this.token.approve(this.escrow.address, amount, { from: owner });
-        const receipt = await this.escrow.deposit(payee1, amount, { from: owner });
+        const { logs } = await this.escrow.deposit(payee1, amount, { from: owner });
 
-        const event = expectEvent.inLogs(receipt.logs, 'Deposited', { payee: payee1 });
+        const event = inLogs(logs, 'Deposited', { payee: payee1 });
         event.args.amount.should.be.bignumber.equal(amount);
       });
 
@@ -99,9 +99,9 @@ function shouldBehaveLikeTokenEscrow (owner, [payee1, payee2]) {
       it('emits a withdrawn event', async function () {
         await this.token.approve(this.escrow.address, amount, { from: owner });
         await this.escrow.deposit(payee1, amount, { from: owner });
-        const receipt = await this.escrow.withdraw(payee1, { from: owner });
+        const { logs } = await this.escrow.withdraw(payee1, { from: owner });
 
-        const event = expectEvent.inLogs(receipt.logs, 'Withdrawn', { payee: payee1 });
+        const event = inLogs(logs, 'Withdrawn', { payee: payee1 });
         event.args.amount.should.be.bignumber.equal(amount);
       });
     });
