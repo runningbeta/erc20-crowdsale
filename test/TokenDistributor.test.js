@@ -31,7 +31,8 @@ contract('TokenDistributor', function ([_, benefactor, owner, customer, wallet, 
   });
 
   beforeEach(async function () {
-    this.openingTime = (await latestTime()) + duration.days(1);
+    this.now = (await latestTime());
+    this.openingTime = this.now + duration.days(1);
     this.closingTime = this.openingTime + duration.days(2);
     this.releaseTime = this.closingTime + duration.days(5);
     this.bonusTime = this.closingTime + duration.days(10);
@@ -49,6 +50,120 @@ contract('TokenDistributor', function ([_, benefactor, owner, customer, wallet, 
       { from: owner }
     );
     this.issuer = this.distributor;
+  });
+
+  describe('when creating', function () {
+    it('fails if benefactor address is 0x0', async function () {
+      await (TokenDistributor.new(
+        0x0,
+        rate,
+        wallet,
+        this.token.address,
+        cap,
+        this.openingTime,
+        this.closingTime,
+        this.bonusTime,
+        { from: owner }
+      )).should.be.rejectedWith(EVMRevert);
+    });
+
+    it('fails if rate is zero', async function () {
+      await (TokenDistributor.new(
+        benefactor,
+        0,
+        wallet,
+        this.token.address,
+        cap,
+        this.openingTime,
+        this.closingTime,
+        this.bonusTime,
+        { from: owner }
+      )).should.be.rejectedWith(EVMRevert);
+    });
+
+    it('fails if wallet address is 0x0', async function () {
+      await (TokenDistributor.new(
+        benefactor,
+        rate,
+        0x0,
+        this.token.address,
+        cap,
+        this.openingTime,
+        this.closingTime,
+        this.bonusTime,
+        { from: owner }
+      )).should.be.rejectedWith(EVMRevert);
+    });
+
+    it('fails if token contract address is 0x0', async function () {
+      await (TokenDistributor.new(
+        benefactor,
+        rate,
+        wallet,
+        0x0,
+        cap,
+        this.openingTime,
+        this.closingTime,
+        this.bonusTime,
+        { from: owner }
+      )).should.be.rejectedWith(EVMRevert);
+    });
+
+    it('fails if cap is 0', async function () {
+      await (TokenDistributor.new(
+        benefactor,
+        rate,
+        wallet,
+        this.token.address,
+        0,
+        this.openingTime,
+        this.closingTime,
+        this.bonusTime,
+        { from: owner }
+      )).should.be.rejectedWith(EVMRevert);
+    });
+
+    it('fails if opening time has passed', async function () {
+      await (TokenDistributor.new(
+        benefactor,
+        rate,
+        wallet,
+        this.token.address,
+        cap,
+        this.now,
+        this.closingTime,
+        this.bonusTime,
+        { from: owner }
+      )).should.be.rejectedWith(EVMRevert);
+    });
+
+    it('fails if opening time if after closing time', async function () {
+      await (TokenDistributor.new(
+        benefactor,
+        rate,
+        wallet,
+        this.token.address,
+        cap,
+        this.openingTime,
+        this.now,
+        this.bonusTime,
+        { from: owner }
+      )).should.be.rejectedWith(EVMRevert);
+    });
+
+    it('fails if bonus time if before closing time', async function () {
+      await (TokenDistributor.new(
+        benefactor,
+        rate,
+        wallet,
+        this.token.address,
+        cap,
+        this.openingTime,
+        this.closingTime,
+        this.now,
+        { from: owner }
+      )).should.be.rejectedWith(EVMRevert);
+    });
   });
 
   describe('as a Capped Issuer', function () {

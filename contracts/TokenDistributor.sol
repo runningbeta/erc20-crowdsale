@@ -76,10 +76,8 @@ contract TokenDistributor is HasNoEther, Finalizable, IssuerWithEther {
     public
     Issuer(_benefactor, _token)
   {
-    require(_benefactor != address(0), "Benefactor address should not be 0x0.");
     require(_rate > 0, "Rate should not be > 0.");
     require(_wallet != address(0), "Wallet address should not be 0x0.");
-    require(_token != address(0), "Token address should not be 0x0.");
     require(_cap > 0, "Cap should be > 0.");
     // solium-disable-next-line security/no-block-members
     require(_openingTime > block.timestamp, "Opening time should be in the future.");
