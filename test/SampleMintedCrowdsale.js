@@ -5,7 +5,7 @@ const { ether } = require('./helpers/ether');
 
 const BigNumber = web3.BigNumber;
 const Token = artifacts.require('Token');
-const PublicCrowdsale = artifacts.require('PublicCrowdsale');
+const SampleMintedCrowdsale = artifacts.require('SampleMintedCrowdsale');
 
 require('chai')
   .use(require('chai-bignumber')(BigNumber))
@@ -39,14 +39,14 @@ contract('Token', function ([
     await (this.token.send(ether(1), { from: owner })).should.be.rejectedWith(EVMRevert);
   });
 
-  describe('PublicCrowdsale', function () {
+  describe('SampleMintedCrowdsale', function () {
     let openingTime;
     let closingTime;
 
     before(async function () {
       openingTime = (await latestTime()) + duration.weeks(1);
       closingTime = openingTime + duration.weeks(1);
-      this.crowdsale = await PublicCrowdsale.new(
+      this.crowdsale = await SampleMintedCrowdsale.new(
         new BigNumber(6894),
         wallet,
         this.token.address,

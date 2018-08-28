@@ -5,14 +5,14 @@ const { ether } = require('./helpers/ether');
 
 const BigNumber = web3.BigNumber;
 const Token = artifacts.require('Token');
-const SimpleAllowanceCrowdsale = artifacts.require('SimpleAllowanceCrowdsale');
+const SampleAllowanceCrowdsale = artifacts.require('SampleAllowanceCrowdsale');
 
 require('chai')
   .use(require('chai-bignumber')(BigNumber))
   .use(require('chai-as-promised'))
   .should();
 
-contract('SimpleAllowanceCrowdsale', function ([
+contract('SampleAllowanceCrowdsale', function ([
   owner,
   wallet,
   purchaser,
@@ -26,7 +26,7 @@ contract('SimpleAllowanceCrowdsale', function ([
     this.openingTime = (await latestTime()) + duration.weeks(1);
     this.closingTime = this.openingTime + duration.weeks(1);
 
-    this.crowdsale = await SimpleAllowanceCrowdsale.new(
+    this.crowdsale = await SampleAllowanceCrowdsale.new(
       new BigNumber(6894),
       wallet,
       this.token.address,

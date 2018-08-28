@@ -8,7 +8,7 @@ import "./payment/TokenTimelockEscrow.sol";
 import "./payment/TokenTimelockFactory.sol";
 import "./payment/TokenVestingFactory.sol";
 import "./mocks/TokenTimelockEscrowMock.sol";
-import "./SimpleAllowanceCrowdsale.sol";
+import "./SampleAllowanceCrowdsale.sol";
 
 
 /**
@@ -42,7 +42,7 @@ contract TokenDistributor is HasNoEther, Finalizable, IssuerWithEther {
   uint256 public closingTime;
 
   // Crowdsale that is created after the presale distribution is finalized
-  SimpleAllowanceCrowdsale public crowdsale;
+  SampleAllowanceCrowdsale public crowdsale;
 
   // Escrow contract used to lock team tokens until crowdsale ends
   TokenTimelockEscrow public crowdsaleEndEscrow;
@@ -267,7 +267,7 @@ contract TokenDistributor is HasNoEther, Finalizable, IssuerWithEther {
     }
 
     address tokenWallet = this;
-    crowdsale = new SimpleAllowanceCrowdsale(
+    crowdsale = new SampleAllowanceCrowdsale(
       rate,
       wallet,
       token,

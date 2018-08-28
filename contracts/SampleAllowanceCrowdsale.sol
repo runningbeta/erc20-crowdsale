@@ -7,22 +7,24 @@ import "openzeppelin-solidity/contracts/crowdsale/validation/IndividuallyCappedC
 import "openzeppelin-solidity/contracts/crowdsale/validation/CappedCrowdsale.sol";
 import "openzeppelin-solidity/contracts/crowdsale/validation/TimedCrowdsale.sol";
 import "openzeppelin-solidity/contracts/crowdsale/emission/AllowanceCrowdsale.sol";
+import "openzeppelin-solidity/contracts/crowdsale/distribution/PostDeliveryCrowdsale.sol";
 
 
 /**
- * @title SimpleAllowanceCrowdsale
+ * @title SampleAllowanceCrowdsale
  * @dev This is a ERC20 token crowdsale that will sell tokens util
  * the cap is reached, time expired or the allowance is spent.
  */
 // solium-disable-next-line
-contract SimpleAllowanceCrowdsale
+contract SampleAllowanceCrowdsale
   is
     HasNoTokens,
     HasNoContracts,
     AllowanceCrowdsale,
     CappedCrowdsale,
     TimedCrowdsale,
-    IndividuallyCappedCrowdsale
+    IndividuallyCappedCrowdsale,
+    PostDeliveryCrowdsale
 {
 
   event WalletChange(address wallet);

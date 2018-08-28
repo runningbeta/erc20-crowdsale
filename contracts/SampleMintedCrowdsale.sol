@@ -9,11 +9,11 @@ import "openzeppelin-solidity/contracts/crowdsale/emission/MintedCrowdsale.sol";
 
 
 /**
- * @title PublicCrowdsale
- * @dev This is a crowdsale.
+ * @title SampleMintedCrowdsale
+ * @dev This is a sample crowdsale.
  */
 // solium-disable-next-line
-contract PublicCrowdsale
+contract SampleMintedCrowdsale
   is
     HasNoTokens,
     HasNoContracts,
