@@ -45,7 +45,7 @@ contract TokenDistributor is HasNoEther, Finalizable, IssuerWithEther {
   SampleAllowanceCrowdsale public crowdsale;
 
   // Escrow contract used to lock team tokens until crowdsale ends
-  TokenTimelockEscrow public crowdsaleEndEscrow;
+  TokenTimelockEscrow public presaleEscrow;
 
   // Escrow contract used to lock bonus tokens
   TokenTimelockEscrow public bonusEscrow;
@@ -91,7 +91,7 @@ contract TokenDistributor is HasNoEther, Finalizable, IssuerWithEther {
     openingTime = _openingTime;
     closingTime = _closingTime;
 
-    crowdsaleEndEscrow = new TokenTimelockEscrowMock(_token, _closingTime);
+    presaleEscrow = new TokenTimelockEscrowMock(_token, _closingTime);
     bonusEscrow = new TokenTimelockEscrowMock(_token, _bonusTime);
     timelockFactory = new TokenTimelockFactory();
     vestingFactory = new TokenVestingFactory();
@@ -149,17 +149,28 @@ contract TokenDistributor is HasNoEther, Finalizable, IssuerWithEther {
    * @param _dest The destination address of the funds.
    * @param _amount The amount to transfer.
    */
-  function depositUntilCrowdsaleEnd(address _dest, uint256 _amount) public onlyOwner onlyNotFinalized {
+  function depositPresaleTokens(address _dest, uint256 _amount) public onlyOwner onlyNotFinalized {
     require(token.allowance(benefactor, this) >= _amount, "Not enough allowance.");
     token.transferFrom(benefactor, this, _amount);
-    token.approve(crowdsaleEndEscrow, _amount);
-    crowdsaleEndEscrow.deposit(_dest, _amount);
+    token.approve(presaleEscrow, _amount);
+    presaleEscrow.deposit(_dest, _amount);
+  }
+
+  /**
+   * @dev Called by the payer to store the sent amount as credit to be pulled when crowdsale ends.
+   * @param _dest The destination address of the funds.
+   * @param _amount The amount to transfer.
+   * @param _weiAmount The amount of wei exchanged for the tokens.
+   */
+  function depositPresaleTokens(address _dest, uint256 _amount, uint256 _weiAmount) public {
+    require(cap >= weiRaised.add(_weiAmount), "Cap reached.");
+    depositPresaleTokens(_dest, _amount);
+    weiRaised = weiRaised.add(_weiAmount);
   }
 
   /// @dev Withdraw accumulated balance, called by payee.
-  function withdrawCrowdsaleLocked() public {
-    address payee = msg.sender;
-    crowdsaleEndEscrow.withdraw(payee);
+  function withdrawPresale() public {
+    presaleEscrow.withdraw(msg.sender);
   }
 
   /**
@@ -175,7 +186,7 @@ contract TokenDistributor is HasNoEther, Finalizable, IssuerWithEther {
   }
 
   /// @dev Withdraw accumulated balance, called by payee.
-  function withdrawBonusLocked() public {
+  function withdrawBonus() public {
     bonusEscrow.withdraw(msg.sender);
   }
 
