@@ -4,7 +4,6 @@ const { duration, increaseTimeTo } = require('./helpers/increaseTime');
 const { advanceBlock } = require('./helpers/advanceToBlock');
 const { latestTime } = require('./helpers/latestTime');
 const { EVMRevert } = require('./helpers/EVMRevert');
-const { EVMThrow } = require('./helpers/EVMThrow');
 const { ether } = require('./helpers/ether');
 
 const BigNumber = web3.BigNumber;
@@ -165,39 +164,57 @@ contract('TokenDistributor', function ([_, benefactor, owner, customer, wallet, 
 
     it('fails to deposit more than approved', async function () {
       await (this.distributor.depositAndLock(customer, amount.div(5), this.releaseTime, { from: owner }))
-        .should.be.rejectedWith(EVMThrow);
-    });
-
-    it('fails to deposit twice to same user', async function () {
-      await this.distributor.depositAndLock(customer, amount.div(20), this.releaseTime, { from: owner });
-      (await this.distributor.depositsOf(customer)).should.bignumber.equal(amount.div(20));
-
-      await (this.distributor.depositAndLock(customer, amount.div(20), this.releaseTime, { from: owner }))
         .should.be.rejectedWith(EVMRevert);
     });
 
+    it('can deposit twice to same user', async function () {
+      // First deposit
+      const resp1 = await this.distributor
+        .depositAndLock(customer, amount.div(100), this.releaseTime, { from: owner });
+      let event = inLogs(resp1.logs, 'ContractInstantiation', { sender: this.distributor.address });
+      let walletAddr = event.args.instantiation;
+
+      (await this.token.balanceOf(walletAddr)).should.bignumber.equal(amount.div(100));
+      (await TokenTimelock.at(walletAddr).beneficiary()).should.be.equal(customer);
+
+      // Second deposit
+      const resp2 = await this.distributor
+        .depositAndLock(customer, amount.div(200), this.releaseTime + duration.days(10), { from: owner });
+      event = inLogs(resp2.logs, 'ContractInstantiation', { sender: this.distributor.address });
+      walletAddr = event.args.instantiation;
+
+      (await this.token.balanceOf(walletAddr)).should.bignumber.equal(amount.div(200));
+      (await TokenTimelock.at(walletAddr).beneficiary()).should.be.equal(customer);
+    });
+
     it('fails to withdraw', async function () {
-      await this.distributor.depositAndLock(customer, amount.div(20), this.releaseTime, { from: owner });
-      await (this.distributor.withdrawPayments({ from: customer })).should.be.rejectedWith(EVMRevert);
+      const { logs } = await this.distributor
+        .depositAndLock(customer, amount.div(10), this.releaseTime, { from: owner });
+      const event = inLogs(logs, 'ContractInstantiation', { sender: this.distributor.address });
+      const walletAddr = event.args.instantiation;
+
+      (await this.token.balanceOf(walletAddr)).should.bignumber.equal(amount.div(10));
+      (await TokenTimelock.at(walletAddr).beneficiary()).should.be.equal(customer);
+      await (TokenTimelock.at(walletAddr).release({ from: customer })).should.be.rejectedWith(EVMRevert);
     });
 
     describe('after release time', async function () {
       beforeEach(async function () {
-        await this.distributor.depositAndLock(customer, amount.div(20), this.releaseTime, { from: owner });
+        const { logs } = await this.distributor
+          .depositAndLock(customer, amount.div(20), this.releaseTime, { from: owner });
+        const event = inLogs(logs, 'ContractInstantiation', { sender: this.distributor.address });
+        this.walletAddr = event.args.instantiation;
+
         (await increaseTimeTo(this.releaseTime + 1));
       });
 
       it('can withdraw', async function () {
-        await this.distributor.withdrawPayments({ from: customer });
-        (await this.distributor.depositsOf(customer)).should.be.bignumber.equal(0);
-        (await this.token.balanceOf(customer)).should.be.bignumber.equal(amount.div(20));
-      });
+        (await TokenTimelock.at(this.walletAddr).beneficiary()).should.be.equal(customer);
 
-      it('can depositAndLock again after withdrawal', async function () {
-        await this.distributor.withdrawPayments({ from: customer });
-        this.releaseTime = (await latestTime()) + duration.days(5);
-        await this.distributor.depositAndLock(customer, amount.div(20), this.releaseTime, { from: owner });
-        (await this.distributor.depositsOf(customer)).should.bignumber.equal(amount.div(20));
+        await TokenTimelock.at(this.walletAddr).release({ from: customer });
+
+        (await this.token.balanceOf(this.walletAddr)).should.bignumber.equal(0);
+        (await this.token.balanceOf(customer)).should.bignumber.equal(amount.div(20));
       });
     });
 
