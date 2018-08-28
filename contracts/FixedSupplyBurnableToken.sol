@@ -33,6 +33,12 @@ contract FixedSupplyBurnableToken is NoOwner, Finalizable, DetailedERC20, Standa
 
   uint256 public constant INITIAL_SUPPLY = 1000000000 * (10 ** uint256(DECIMALS));
 
+  /// @dev Throws if called before the contract is finalized.
+  modifier onlyFinalizedOrOwner() {
+    require(isFinalized || msg.sender == owner, "Contract not finalized or sender not owner.");
+    _;
+  }
+
   /// @dev Constructor that gives msg.sender all of existing tokens.
   constructor() public DetailedERC20(NAME, SYMBOL, DECIMALS) {
     totalSupply_ = INITIAL_SUPPLY;
@@ -44,7 +50,7 @@ contract FixedSupplyBurnableToken is NoOwner, Finalizable, DetailedERC20, Standa
    * @dev Overrides StandardToken._burn in order for burn and burnFrom to be disabled
    * when the contract is paused.
    */
-  function _burn(address _who, uint256 _value) internal onlyFinalized {
+  function _burn(address _who, uint256 _value) internal onlyFinalizedOrOwner {
     super._burn(_who, _value);
   }
 
