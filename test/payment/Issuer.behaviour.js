@@ -1,3 +1,4 @@
+const { expectThrow } = require('../helpers/expectThrow');
 const { EVMRevert } = require('../helpers/EVMRevert');
 const { ether } = require('../helpers/ether');
 
@@ -17,15 +18,15 @@ function shouldBehaveLikeIssuer (benefactor, owner, customer, [customer2, ...oth
     });
 
     it('issue some tokens', async function () {
-      await this.issuer.issue(customer, amount, { from: owner });
+      await this.issuer.contract.issue['address,uint256'](customer, amount, { from: owner, gas: 500000 });
 
       (await this.issuer.issuedCount()).should.be.bignumber.equal(amount);
       (await this.token.balanceOf(customer)).should.be.bignumber.equal(amount);
     });
 
     it('issue tokens multiple times', async function () {
-      await this.issuer.issue(customer, amount, { from: owner });
-      await this.issuer.issue(customer2, amount * 2, { from: owner });
+      await this.issuer.contract.issue['address,uint256'](customer, amount, { from: owner, gas: 500000 });
+      await this.issuer.contract.issue['address,uint256'](customer2, amount * 2, { from: owner, gas: 500000 });
 
       (await this.issuer.issuedCount()).should.be.bignumber.equal(amount * 3);
 
@@ -34,19 +35,21 @@ function shouldBehaveLikeIssuer (benefactor, owner, customer, [customer2, ...oth
     });
 
     it('only benefactor can issue', async function () {
-      await (this.issuer.issue(customer, amount * 3, { from: customer }))
-        .should.be.rejectedWith(EVMRevert);
+      await expectThrow(() => this.issuer.contract
+        .issue['address,uint256'](customer, amount * 3, { from: customer, gas: 500000 }),
+      EVMRevert);
     });
 
     it('fails to issue over allowance', async function () {
-      await (this.issuer.issue(customer, amount * 5, { from: owner }))
-        .should.be.rejectedWith(EVMRevert);
+      await expectThrow(() => this.issuer.contract
+        .issue['address,uint256'](customer, amount * 5, { from: owner, gas: 500000 }),
+      EVMRevert);
     });
 
     it('fails to issue twice to same address', async function () {
-      await this.issuer.issue(customer, amount, { from: owner });
-      await (this.issuer.issue(customer, amount, { from: owner }))
-        .should.be.rejectedWith(EVMRevert);
+      await this.issuer.contract.issue['address,uint256'](customer, amount, { from: owner, gas: 500000 });
+      await expectThrow(() => this.issuer.contract
+        .issue['address,uint256'](customer, amount, { from: owner, gas: 500000 }), EVMRevert);
     });
   });
 }

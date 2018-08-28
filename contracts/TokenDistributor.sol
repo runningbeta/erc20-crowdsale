@@ -149,7 +149,7 @@ contract TokenDistributor is HasNoEther, Finalizable, IssuerWithEther {
    * @param _dest The destination address of the funds.
    * @param _amount The amount to transfer.
    */
-  function depositPresaleTokens(address _dest, uint256 _amount) public onlyOwner onlyNotFinalized {
+  function depositPresale(address _dest, uint256 _amount) public onlyOwner onlyNotFinalized {
     require(token.allowance(benefactor, this) >= _amount, "Not enough allowance.");
     token.transferFrom(benefactor, this, _amount);
     token.approve(presaleEscrow, _amount);
@@ -162,9 +162,9 @@ contract TokenDistributor is HasNoEther, Finalizable, IssuerWithEther {
    * @param _amount The amount to transfer.
    * @param _weiAmount The amount of wei exchanged for the tokens.
    */
-  function depositPresaleTokens(address _dest, uint256 _amount, uint256 _weiAmount) public {
+  function depositPresale(address _dest, uint256 _amount, uint256 _weiAmount) public {
     require(cap >= weiRaised.add(_weiAmount), "Cap reached.");
-    depositPresaleTokens(_dest, _amount);
+    depositPresale(_dest, _amount);
     weiRaised = weiRaised.add(_weiAmount);
   }
 
