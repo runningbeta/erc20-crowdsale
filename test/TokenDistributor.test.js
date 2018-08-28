@@ -154,20 +154,13 @@ contract('TokenDistributor', function ([_, benefactor, owner, customer, wallet, 
     });
 
     it('can deposit and lock tokens', async function () {
-      const resp = await this.distributor
+      const { logs } = await this.distributor
         .depositAndLock(customer, amount.div(10), this.releaseTime, { from: owner });
-      console.log(resp);
-      console.log('AAaaaaaaAA');
-      console.log(resp.receipt);
-      console.log('BBaaaaaaBB');
-      console.log(resp.receipt.logs);
-      const event = inLogs(resp.receipt.logs, 'ContractInstantiation', { sender: owner });
+      const event = inLogs(logs, 'ContractInstantiation', { sender: this.distributor.address });
       const walletAddr = event.args.instantiation;
 
-      const walletBalance = await this.token.balanceOf(walletAddr);
-      walletBalance.should.bignumber.equal(amount.div(10));
-      const wallet = await TokenTimelock.at(walletAddr);
-      (await TokenTimelock.at(wallet).beneficiary()).should.be.equal(customer);
+      (await this.token.balanceOf(walletAddr)).should.bignumber.equal(amount.div(10));
+      (await TokenTimelock.at(walletAddr).beneficiary()).should.be.equal(customer);
     });
 
     it('fails to deposit more than approved', async function () {

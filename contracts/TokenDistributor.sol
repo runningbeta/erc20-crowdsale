@@ -19,6 +19,9 @@ contract TokenDistributor is HasNoEther, Finalizable, IssuerWithEther {
   using SafeMath for uint256;
   using SafeERC20 for ERC20;
 
+  // We also declare Factory.ContractInstantiation here to read it in truffle logs
+  // https://github.com/trufflesuite/truffle/issues/555
+  event ContractInstantiation(address sender, address instantiation);
   event CrowdsaleInstantiated(address sender, address instantiation, uint256 allowance);
 
   // The token being sold
