@@ -45,6 +45,8 @@ contract TokenDistributor is HasNoEther, Finalizable, IssuerWithEther {
 
   // Crowdsale that is created after the presale distribution is finalized
   SampleAllowanceCrowdsale public crowdsale;
+  // Allowance that is given to crowdsale contract after it is created
+  uint256 public crowdsaleAllowance;
 
   // Escrow contract used to lock team tokens until crowdsale ends
   TokenTimelockEscrow public presaleEscrow;
@@ -261,7 +263,8 @@ contract TokenDistributor is HasNoEther, Finalizable, IssuerWithEther {
   /// @dev In case there are any unsold tokens, they are returned to the benefactor
   function claimUnsold() public onlyIfCrowdsale {
     require(crowdsale.hasEnded(), "Crowdsale still running.");
-    uint256 unsold = token.balanceOf(this);
+    uint256 sold = crowdsale.tokensSold();
+    uint256 unsold = crowdsaleAllowance.sub(sold);
 
     if (unsold > 0) {
       token.safeTransfer(benefactor, unsold);
@@ -291,10 +294,10 @@ contract TokenDistributor is HasNoEther, Finalizable, IssuerWithEther {
       closingTime,
       withdrawTime
     );
-    uint256 allowance = token.allowance(benefactor, this);
-    token.transferFrom(benefactor, this, allowance);
-    token.approve(crowdsale, allowance);
-    emit CrowdsaleInstantiated(msg.sender, crowdsale, allowance);
+    crowdsaleAllowance = token.allowance(benefactor, this);
+    token.transferFrom(benefactor, this, crowdsaleAllowance);
+    token.approve(crowdsale, crowdsaleAllowance);
+    emit CrowdsaleInstantiated(msg.sender, crowdsale, crowdsaleAllowance);
   }
 
 }

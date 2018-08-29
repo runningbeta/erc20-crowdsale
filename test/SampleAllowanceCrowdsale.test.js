@@ -13,6 +13,8 @@ require('chai')
   .use(require('chai-as-promised'))
   .should();
 
+const TOTAL_SUPPLY = 1000000000 * (10 ** 18);
+
 contract('SampleAllowanceCrowdsale', function ([
   owner,
   wallet,
@@ -26,7 +28,7 @@ contract('SampleAllowanceCrowdsale', function ([
   beforeEach(async function () {
     this.openingTime = (await latestTime()) + duration.weeks(1);
     this.closingTime = this.openingTime + duration.weeks(1);
-    this.withdrawTime = this.closingTime + duration.weeks(1);
+    this.withdrawTime = this.closingTime + duration.weeks(2);
 
     this.token = await Token.new({ from: owner });
     this.crowdsale = await SampleAllowanceCrowdsale.new(
@@ -40,6 +42,7 @@ contract('SampleAllowanceCrowdsale', function ([
       this.withdrawTime,
       { from: owner }
     );
+    this.token.approve(this.crowdsale.address, TOTAL_SUPPLY, { from: owner });
   });
 
   it('can change wallet', async function () {

@@ -32,6 +32,9 @@ contract SampleAllowanceCrowdsale
   // When withdrawals open
   uint256 public withdrawTime;
 
+  // Amount of tokens sold
+  uint256 public tokensSold;
+
   constructor(
     uint256 _rate,
     address _wallet,
@@ -78,6 +81,21 @@ contract SampleAllowanceCrowdsale
     require(_wallet != address(0), "Wallet address should not be 0x0.");
     wallet = _wallet;
     emit WalletChange(_wallet);
+  }
+
+  /**
+   * @dev We use this function to store the total amount sold
+   * @param _beneficiary Token purchaser
+   * @param _tokenAmount Amount of tokens purchased
+   */
+  function _processPurchase(
+    address _beneficiary,
+    uint256 _tokenAmount
+  )
+    internal
+  {
+    super._processPurchase(_beneficiary, _tokenAmount);
+    tokensSold = tokensSold.add(_tokenAmount);
   }
 
 }
