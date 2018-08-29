@@ -34,6 +34,8 @@ contract SampleAllowanceCrowdsale
 
   // Amount of tokens sold
   uint256 public tokensSold;
+  // Amount of tokens delivered
+  uint256 public tokensDelivered;
 
   constructor(
     uint256 _rate,
@@ -84,7 +86,7 @@ contract SampleAllowanceCrowdsale
   }
 
   /**
-   * @dev We use this function to store the total amount sold
+   * @dev We use this function to store the total amount of tokens sold
    * @param _beneficiary Token purchaser
    * @param _tokenAmount Amount of tokens purchased
    */
@@ -96,6 +98,21 @@ contract SampleAllowanceCrowdsale
   {
     super._processPurchase(_beneficiary, _tokenAmount);
     tokensSold = tokensSold.add(_tokenAmount);
+  }
+
+  /**
+   * @dev We use this function to store the total amount of tokens delivered
+   * @param _beneficiary Address performing the token purchase
+   * @param _tokenAmount Number of tokens to be emitted
+   */
+  function _deliverTokens(
+    address _beneficiary,
+    uint256 _tokenAmount
+  )
+    internal
+  {
+    super._deliverTokens(_beneficiary, _tokenAmount);
+    tokensDelivered = tokensDelivered.add(_tokenAmount);
   }
 
 }

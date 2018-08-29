@@ -210,7 +210,7 @@ contract('TokenDistributor', function ([_, benefactor, owner, customer, wallet, 
       describe('as an Issuer', function () {
         it('fails to issue tokens', async function () {
           expectThrow(() => this.distributor.contract
-            .issue['address,uint256,uint256'](customer, amount * 3, weiAmount * 3, { from: owner, gas: 500000 }),
+            .issue['address,uint256,uint256'](customer, amount.mul(3), weiAmount.mul(3), { from: owner, gas: 500000 }),
           EVMRevert);
         });
       });
@@ -228,7 +228,7 @@ contract('TokenDistributor', function ([_, benefactor, owner, customer, wallet, 
 
     describe('after Finalization', function () {
       beforeEach(async function () {
-        await this.token.approve(this.distributor.address, amount * 4, { from: benefactor });
+        await this.token.approve(this.distributor.address, amount.mul(4), { from: benefactor });
         await this.distributor.finalize({ from: owner });
       });
 
@@ -368,7 +368,7 @@ contract('TokenDistributor', function ([_, benefactor, owner, customer, wallet, 
   describe('as a Crowdsale Instatiator', function () {
     describe('after finalization', function () {
       beforeEach(async function () {
-        await this.token.approve(this.distributor.address, amount * 4, { from: benefactor });
+        await this.token.approve(this.distributor.address, amount.mul(4), { from: benefactor });
         await this.distributor.contract
           .issue['address,uint256,uint256'](customer, amount, weiAmount, { from: owner, gas: 500000 });
       });
@@ -409,7 +409,7 @@ contract('TokenDistributor', function ([_, benefactor, owner, customer, wallet, 
 
         it('instantiates the Crowdsale with correct allowance', async function () {
           const event = inLogs(this.finalizationReceipt.logs, 'CrowdsaleInstantiated', { sender: owner });
-          event.args.allowance.should.be.bignumber.equal(amount * 3);
+          event.args.allowance.should.be.bignumber.equal(amount.mul(3));
         });
       });
     });

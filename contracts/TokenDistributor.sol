@@ -274,10 +274,14 @@ contract TokenDistributor is HasNoEther, Finalizable, IssuerWithEther {
   function claimUnsold() public onlyIfCrowdsale {
     require(crowdsale.hasEnded(), "Crowdsale still running.");
     uint256 sold = crowdsale.tokensSold();
-    uint256 unsold = crowdsaleAllowance.sub(sold);
+    uint256 delivered = crowdsale.tokensDelivered();
+    uint256 toBeDelivered = sold.sub(delivered);
 
-    if (unsold > 0) {
-      token.safeTransfer(benefactor, unsold);
+    uint256 balance = token.balanceOf(this);
+    uint256 claimable = balance.sub(toBeDelivered);
+
+    if (claimable > 0) {
+      token.safeTransfer(benefactor, claimable);
     }
   }
 
