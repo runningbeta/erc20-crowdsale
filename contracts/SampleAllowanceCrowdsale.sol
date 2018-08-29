@@ -64,12 +64,18 @@ contract SampleAllowanceCrowdsale
     return hasClosed() || capReached();
   }
 
-  /// @dev Withdraw tokens only after crowdsale ends for beneficiary
+  /**
+   * @dev Withdraw tokens only after crowdsale ends.
+   * @param _beneficiary Token purchaser
+   */
   function withdrawTokens(address _beneficiary) public {
     _withdrawTokens(_beneficiary);
   }
 
-  /// @dev Withdraw tokens only after crowdsale ends for beneficiaries.
+  /**
+   * @dev Withdraw tokens only after crowdsale ends.
+   * @param _beneficiaries List of token purchasers
+   */
   function withdrawTokens(address[] _beneficiaries) public {
     for (uint32 i = 0; i < _beneficiaries.length; i ++) {
       _withdrawTokens(_beneficiaries[i]);
@@ -108,6 +114,7 @@ contract SampleAllowanceCrowdsale
 
   /**
    * @dev Withdraw tokens only after crowdsale ends.
+   * @param _beneficiary Token purchaser
    */
   function _withdrawTokens(address _beneficiary) internal {
     // solium-disable-next-line security/no-block-members

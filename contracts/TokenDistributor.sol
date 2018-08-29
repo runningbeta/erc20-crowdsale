@@ -94,8 +94,8 @@ contract TokenDistributor is HasNoEther, Finalizable {
     // solium-disable-next-line security/no-block-members
     require(_openingTime > block.timestamp, "Opening time should be in the future.");
     require(_closingTime > _openingTime, "Closing time should be after opening.");
-    require(_bonusTime > _closingTime, "Bonus time should be after closing time.");
     require(_withdrawTime >= _closingTime, "Withdrawals should open after crowdsale closes.");
+    require(_bonusTime > _withdrawTime, "Bonus time should be set after withdrawals open.");
 
     benefactor = _benefactor;
     rate = _rate;
@@ -310,10 +310,10 @@ contract TokenDistributor is HasNoEther, Finalizable {
     require(crowdsale.hasEnded(), "Crowdsale still running.");
     uint256 sold = crowdsale.tokensSold();
     uint256 delivered = crowdsale.tokensDelivered();
-    uint256 toBeDelivered = sold.sub(delivered);
+    uint256 toDeliver = sold.sub(delivered);
 
     uint256 balance = token.balanceOf(this);
-    uint256 claimable = balance.sub(toBeDelivered);
+    uint256 claimable = balance.sub(toDeliver);
 
     if (claimable > 0) {
       token.safeTransfer(_beneficiary, claimable);
