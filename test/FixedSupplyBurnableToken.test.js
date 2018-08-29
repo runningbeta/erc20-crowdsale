@@ -38,15 +38,17 @@ contract('FixedSupplyBurnableToken', function ([owner, alice, bob, ...other]) {
       await this.token.transfer(alice, amount, { from: owner });
     });
 
-    describe('when not finalized', function () {
-      it('owner can burn tokens', async function () {
-        const amount = ether(1000.0);
-        await this.token.approve(owner, amount, { from: alice });
-        const totalSupply = await this.token.totalSupply();
+    const ownerCanBurn = async function () {
+      const amount = ether(1000.0);
+      await this.token.approve(owner, amount, { from: alice });
+      const totalSupply = await this.token.totalSupply();
 
-        await this.token.burnFrom(alice, amount, { from: owner });
-        (await this.token.totalSupply()).should.be.bignumber.equal(totalSupply.sub(amount));
-      });
+      await this.token.burnFrom(alice, amount, { from: owner });
+      (await this.token.totalSupply()).should.be.bignumber.equal(totalSupply.sub(amount));
+    };
+
+    describe('when not finalized', function () {
+      it('owner can burn tokens', ownerCanBurn);
 
       it('other fail to burn tokens', async function () {
         const amount = ether(1000.0);
@@ -64,6 +66,8 @@ contract('FixedSupplyBurnableToken', function ([owner, alice, bob, ...other]) {
       it('should return unpaused', async function () {
         await this.token.isFinalized().should.eventually.equal(true);
       });
+
+      it('owner can burn tokens', ownerCanBurn);
 
       it('fails to burn tokens if not approved', async function () {
         await expectThrow(() => this.token.burnFrom(alice, amount, { from: owner }), EVMRevert);
