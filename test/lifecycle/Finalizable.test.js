@@ -1,9 +1,14 @@
-const { expectThrow } = require('../helpers/expectThrow');
+const { inLogs } = require('../helpers/expectEvent');
 const { EVMRevert } = require('../helpers/EVMRevert');
 
-const should = require('chai').should();
+const BigNumber = web3.BigNumber;
 
-const Finalizable = artifacts.require('Finalizable');
+const should = require('chai')
+  .use(require('chai-bignumber')(BigNumber))
+  .use(require('chai-as-promised'))
+  .should();
+
+const Finalizable = artifacts.require('FinalizableMock');
 
 contract('Finalizable', function ([_, owner, ...other]) {
   beforeEach(async function () {
@@ -15,14 +20,34 @@ contract('Finalizable', function ([_, owner, ...other]) {
     (await this.contract.isFinalized()).should.be.equal(true);
   });
 
-  it('cannot be finalized twice', async function () {
-    await this.contract.finalize({ from: owner });
-    await expectThrow(() => this.contract.finalize({ from: owner }), EVMRevert);
+  it('can execute onlyNotFinalized', async function () {
+    await this.contract.notFinalized();
   });
 
-  it('logs finalized', async function () {
-    const { logs } = await this.contract.finalize({ from: owner });
-    const event = logs.find(e => e.event === 'Finalized');
-    should.exist(event);
+  it('fails to execute onlyFinalized', async function () {
+    await (this.contract.finalized()).should.be.rejectedWith(EVMRevert);
+  });
+
+  describe('when finalized', function () {
+    beforeEach(async function () {
+      const tx = await this.contract.finalize({ from: owner });
+      this.logs = tx.logs;
+    });
+
+    it('logs finalized', async function () {
+      inLogs(this.logs, 'Finalized');
+    });
+
+    it('cannot be finalized twice', async function () {
+      await (this.contract.finalize({ from: owner })).should.be.rejectedWith(EVMRevert);
+    });
+
+    it('fails to execute onlyNotFinalized', async function () {
+      await (this.contract.notFinalized()).should.be.rejectedWith(EVMRevert);
+    });
+
+    it('can execute onlyFinalized', async function () {
+      await this.contract.finalized();
+    });
   });
 });
