@@ -99,7 +99,6 @@ contract('SampleAllowanceCrowdsale', function ([
       });
 
       it('can withdraw for multiple addresses', async function () {
-        // eslint-disable-next-line dot-notation
         await this.crowdsale.contract.withdrawTokens['address[]']([alice, bob], { from: owner, gas: 500000 });
       });
     });
