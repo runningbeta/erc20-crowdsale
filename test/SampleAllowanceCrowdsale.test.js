@@ -20,15 +20,15 @@ contract('SampleAllowanceCrowdsale', function ([
   ...other
 ]) {
   before(async function () {
-    this.token = await Token.new({ from: owner });
+    (await advanceBlock());
   });
 
   beforeEach(async function () {
-    await advanceBlock();
     this.openingTime = (await latestTime()) + duration.weeks(1);
     this.closingTime = this.openingTime + duration.weeks(1);
     this.withdrawTime = this.closingTime + duration.weeks(1);
 
+    this.token = await Token.new({ from: owner });
     this.crowdsale = await SampleAllowanceCrowdsale.new(
       new BigNumber(6894),
       wallet,
@@ -57,26 +57,36 @@ contract('SampleAllowanceCrowdsale', function ([
       .should.be.rejectedWith(EVMRevert);
   });
 
-  describe('before withdrawal opens', function () {
-    before(async function () {
+  describe('after opening time', function () {
+    beforeEach(async function () {
       await increaseTimeTo(this.openingTime + 1);
+      await this.crowdsale.setUserCap(alice, ether(10), { from: owner });
+    });
+
+    it('can buy tokens', async function () {
       await this.crowdsale.buyTokens(alice, { from: alice, value: ether(1) });
+      (await this.crowdsale.balances(alice)).should.be.bignumber.equal(ether(1).mul(6894));
     });
 
-    it('can not withdraw', async function () {
-      await (this.crowdsale.withdrawTokens({ from: alice })).should.be.rejectedWith(EVMRevert);
-    });
-  });
+    describe('before withdrawal opens', function () {
+      beforeEach(async function () {
+        await this.crowdsale.buyTokens(alice, { from: alice, value: ether(1) });
+      });
 
-  describe('after withdrawal opens', function () {
-    before(async function () {
-      await increaseTimeTo(this.openingTime + 1);
-      await this.crowdsale.buyTokens(alice, { from: alice, value: ether(1) });
-      await increaseTimeTo(this.withdrawTime + 1);
+      it('can not withdraw', async function () {
+        await (this.crowdsale.withdrawTokens({ from: alice })).should.be.rejectedWith(EVMRevert);
+      });
     });
 
-    it('can withdraw', async function () {
-      await this.crowdsale.withdrawTokens({ from: alice });
+    describe('after withdrawal opens', function () {
+      beforeEach(async function () {
+        await this.crowdsale.buyTokens(alice, { from: alice, value: ether(1) });
+        await increaseTimeTo(this.withdrawTime + 1);
+      });
+
+      it('can withdraw', async function () {
+        await this.crowdsale.withdrawTokens({ from: alice });
+      });
     });
   });
 });
