@@ -45,21 +45,6 @@ contract('SampleAllowanceCrowdsale', function ([
     this.token.approve(this.crowdsale.address, totalSupply, { from: owner });
   });
 
-  it('can change wallet', async function () {
-    (await this.crowdsale.wallet()).should.be.equal(wallet);
-    await this.crowdsale.setWallet(other[0]);
-    (await this.crowdsale.wallet()).should.be.equal(other[0]);
-  });
-
-  it('fails to unset wallet', async function () {
-    await (this.crowdsale.setWallet(0x0)).should.be.rejectedWith(EVMRevert);
-  });
-
-  it('non-owner should not be able to change wallet', async function () {
-    await (this.crowdsale.setWallet(other[0], { from: alice }))
-      .should.be.rejectedWith(EVMRevert);
-  });
-
   describe('after opening time', function () {
     beforeEach(async function () {
       await increaseTimeTo(this.openingTime + 1);

@@ -58,6 +58,21 @@ contract('Token', function ([
       await this.token.transferOwnership(this.crowdsale.address, { from: owner });
     });
 
+    it('can change wallet', async function () {
+      (await this.crowdsale.wallet()).should.be.equal(wallet);
+      await this.crowdsale.setWallet(other[0]);
+      (await this.crowdsale.wallet()).should.be.equal(other[0]);
+    });
+
+    it('fails to unset wallet', async function () {
+      await (this.crowdsale.setWallet(0x0)).should.be.rejectedWith(EVMRevert);
+    });
+
+    it('non-owner should not be able to change wallet', async function () {
+      await (this.crowdsale.setWallet(other[0], { from: other[0] }))
+        .should.be.rejectedWith(EVMRevert);
+    });
+
     describe('Before Crowdsale', function () {
       it('Crowdsale refuses directly sent ether', async function () {
         await (this.crowdsale.send(ether(1), { from: owner })).should.be.rejectedWith(EVMRevert);
