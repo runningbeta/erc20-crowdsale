@@ -1,8 +1,15 @@
 pragma solidity ^0.4.24;
 
 
+import "openzeppelin-solidity/contracts/token/ERC20/TokenVesting.sol";
+import "../lifecycle/Factory.sol";
+import "./TokenVestingFactory.sol";
+
+
 /// @title Token vesting wallet factory - Allows creation of TokenVesting wallet.
-contract TokenVestingFactory {
+contract TokenVestingFactoryImpl is TokenVestingFactory, Factory {
+
+  mapping(address => address[]) public beneficiaryInstantiations;
 
   /**
    * @dev Allows verified creation of token vesting wallet.
@@ -24,5 +31,11 @@ contract TokenVestingFactory {
     bool _revocable
   )
     public
-    returns (address wallet);
+    returns (address wallet)
+  {
+    wallet = new TokenVesting(_beneficiary, _start, _cliff, _duration, _revocable);
+    TokenVesting(wallet).transferOwnership(msg.sender);
+    beneficiaryInstantiations[_beneficiary].push(wallet);
+    register(wallet);
+  }
 }

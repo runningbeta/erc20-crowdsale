@@ -19,6 +19,8 @@ const { shouldBehaveLikeIssuerWithEther } = require('./payment/IssuerWithEther.b
 const Token = artifacts.require('FixedSupplyBurnableToken');
 const TokenDistributor = artifacts.require('TokenDistributor');
 const TokenTimelock = artifacts.require('TokenTimelock');
+const TokenVestingFactory = artifacts.require('TokenVestingFactoryImpl');
+const TokenTimelockFactory = artifacts.require('TokenTimelockFactoryImpl');
 
 contract('TokenDistributor', function ([_, benefactor, owner, customer, wallet, ...otherAccounts]) {
   const amount = ether(500.0);
@@ -52,6 +54,12 @@ contract('TokenDistributor', function ([_, benefactor, owner, customer, wallet, 
       this.bonusTime,
       { from: owner }
     );
+    // init distributor factories
+    const vestingFactory = await TokenVestingFactory.new({ from: owner });
+    await this.distributor.setTokenVestingFactory(vestingFactory.address, { from: owner });
+    const timelockFactory = await TokenTimelockFactory.new({ from: owner });
+    await this.distributor.setTokenTimelockFactory(timelockFactory.address, { from: owner });
+    // global required for tests
     this.issuer = this.distributor;
   });
 
@@ -65,6 +73,7 @@ contract('TokenDistributor', function ([_, benefactor, owner, customer, wallet, 
         cap,
         this.openingTime,
         this.closingTime,
+        this.withdrawTime,
         this.bonusTime,
         { from: owner }
       )).should.be.rejectedWith(EVMRevert);
@@ -79,6 +88,7 @@ contract('TokenDistributor', function ([_, benefactor, owner, customer, wallet, 
         cap,
         this.openingTime,
         this.closingTime,
+        this.withdrawTime,
         this.bonusTime,
         { from: owner }
       )).should.be.rejectedWith(EVMRevert);
@@ -93,6 +103,7 @@ contract('TokenDistributor', function ([_, benefactor, owner, customer, wallet, 
         cap,
         this.openingTime,
         this.closingTime,
+        this.withdrawTime,
         this.bonusTime,
         { from: owner }
       )).should.be.rejectedWith(EVMRevert);
@@ -107,6 +118,7 @@ contract('TokenDistributor', function ([_, benefactor, owner, customer, wallet, 
         cap,
         this.openingTime,
         this.closingTime,
+        this.withdrawTime,
         this.bonusTime,
         { from: owner }
       )).should.be.rejectedWith(EVMRevert);
@@ -121,6 +133,7 @@ contract('TokenDistributor', function ([_, benefactor, owner, customer, wallet, 
         0,
         this.openingTime,
         this.closingTime,
+        this.withdrawTime,
         this.bonusTime,
         { from: owner }
       )).should.be.rejectedWith(EVMRevert);
@@ -135,6 +148,7 @@ contract('TokenDistributor', function ([_, benefactor, owner, customer, wallet, 
         cap,
         this.now,
         this.closingTime,
+        this.withdrawTime,
         this.bonusTime,
         { from: owner }
       )).should.be.rejectedWith(EVMRevert);
@@ -149,6 +163,7 @@ contract('TokenDistributor', function ([_, benefactor, owner, customer, wallet, 
         cap,
         this.openingTime,
         this.now,
+        this.withdrawTime,
         this.bonusTime,
         { from: owner }
       )).should.be.rejectedWith(EVMRevert);
@@ -163,6 +178,7 @@ contract('TokenDistributor', function ([_, benefactor, owner, customer, wallet, 
         cap,
         this.openingTime,
         this.closingTime,
+        this.withdrawTime,
         this.now,
         { from: owner }
       )).should.be.rejectedWith(EVMRevert);

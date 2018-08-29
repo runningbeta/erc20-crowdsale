@@ -100,8 +100,6 @@ contract TokenDistributor is HasNoEther, Finalizable, IssuerWithEther {
 
     presaleEscrow = new TokenTimelockEscrowMock(_token, _closingTime);
     bonusEscrow = new TokenTimelockEscrowMock(_token, _bonusTime);
-    timelockFactory = new TokenTimelockFactory();
-    vestingFactory = new TokenVestingFactory();
   }
 
   /**
@@ -197,6 +195,12 @@ contract TokenDistributor is HasNoEther, Finalizable, IssuerWithEther {
     bonusEscrow.withdraw(msg.sender);
   }
 
+  /// @dev Setter for TokenTimelockFactory because of gas limits
+  function setTokenTimelockFactory(address _timelockFactory) public onlyOwner {
+    require(timelockFactory == address(0), "TokenTimelockFactory should not be initalizied.");
+    timelockFactory = TokenTimelockFactory(_timelockFactory);
+  }
+
   /**
    * @dev Called by the payer to store the sent amount as credit to be pulled
    * from token timelock contract.
@@ -223,6 +227,12 @@ contract TokenDistributor is HasNoEther, Finalizable, IssuerWithEther {
       _releaseTime
     );
     token.transferFrom(benefactor, tokenWallet, _amount);
+  }
+
+  /// @dev Setter for TokenVestingFactory because of gas limits
+  function setTokenVestingFactory(address _vestingFactory) public onlyOwner {
+    require(vestingFactory == address(0), "TokenVestingFactory should not be initalizied.");
+    vestingFactory = TokenVestingFactory(_vestingFactory);
   }
 
   /**
