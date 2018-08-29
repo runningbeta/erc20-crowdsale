@@ -98,7 +98,7 @@ contract TokenDistributor is HasNoEther, Finalizable, IssuerWithEther {
     closingTime = _closingTime;
     withdrawTime = _withdrawTime;
 
-    presaleEscrow = new TokenTimelockEscrowMock(_token, _closingTime);
+    presaleEscrow = new TokenTimelockEscrowMock(_token, _withdrawTime);
     bonusEscrow = new TokenTimelockEscrowMock(_token, _bonusTime);
   }
 
@@ -221,6 +221,7 @@ contract TokenDistributor is HasNoEther, Finalizable, IssuerWithEther {
   {
     require(token.allowance(benefactor, this) >= _amount, "Not enough allowance.");
     require(_dest != address(0), "Destination address should not be 0x0.");
+    require(_releaseTime >= withdrawTime, "Tokens should unlock after withdrawals open.");
     tokenWallet = timelockFactory.create(
       token,
       _dest,
@@ -259,6 +260,7 @@ contract TokenDistributor is HasNoEther, Finalizable, IssuerWithEther {
   {
     require(token.allowance(benefactor, this) >= _amount, "Not enough allowance.");
     require(_dest != address(0), "Destination address should not be 0x0.");
+    require(_start.add(_cliff) >= withdrawTime, "Tokens should unlock after withdrawals open.");
     bool revocable = false;
     tokenWallet = vestingFactory.create(
       _dest,
