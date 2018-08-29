@@ -42,10 +42,13 @@ contract TokenDistributor is HasNoEther, Finalizable {
   // 1 wei will give you 1 unit, or 0.001 TOK.
   uint256 public rate;
 
+  // Max cap for presale + crowdsale
   uint256 public cap;
 
+  // Crowdsale is open in this period
   uint256 public openingTime;
   uint256 public closingTime;
+
   // When withdrawals open
   uint256 public withdrawTime;
 

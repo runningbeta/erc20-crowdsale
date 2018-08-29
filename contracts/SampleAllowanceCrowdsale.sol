@@ -32,6 +32,7 @@ contract SampleAllowanceCrowdsale
 
   // Amount of tokens sold
   uint256 public tokensSold;
+
   // Amount of tokens delivered
   uint256 public tokensDelivered;
 

@@ -25,6 +25,7 @@ To test this project locally:
 # clone the repo
 git clone https://github.com/runningbeta/erc20-crowdsale.git
 cd erc20-crowdsale
+
 # install dependencies
 npm install
 
@@ -37,13 +38,19 @@ truffle test --network test
 npm run test
 ```
 
-To check the coverage report
+To check the coverage report:
 
 ```bash
 # run tests with coverage
 npm run coverage
 ```
 
+To run JavaScript and Solidity linter:
+
+```bash
+# run eslint and solium
+npm run lint:all
+```
 
 ## License
 
