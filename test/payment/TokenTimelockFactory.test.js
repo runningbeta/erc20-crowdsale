@@ -1,7 +1,7 @@
 const { shouldBehaveLikeTokenTimelockFactory } = require('./TokenTimelockFactory.behaviour');
 
 const Token = artifacts.require('FixedSupplyBurnableToken');
-const TokenTimelockFactory = artifacts.require('TokenTimelockFactory');
+const TokenTimelockFactory = artifacts.require('TokenTimelockFactoryImpl');
 
 contract('TokenTimelockFactory', function ([_, owner, beneficiary, ...otherAccounts]) {
   beforeEach(async function () {
