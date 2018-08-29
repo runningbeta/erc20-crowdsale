@@ -13,9 +13,6 @@ require('chai')
   .use(require('chai-as-promised'))
   .should();
 
-const { shouldBehaveLikeIssuer } = require('./payment/Issuer.behaviour');
-const { shouldBehaveLikeIssuerWithEther } = require('./payment/IssuerWithEther.behaviour');
-
 const Token = artifacts.require('FixedSupplyBurnableToken');
 const TokenDistributor = artifacts.require('TokenDistributor');
 const TokenTimelock = artifacts.require('TokenTimelock');
@@ -59,8 +56,6 @@ contract('TokenDistributor', function ([_, benefactor, owner, customer, wallet, 
     await this.distributor.setTokenVestingFactory(vestingFactory.address, { from: owner });
     const timelockFactory = await TokenTimelockFactory.new({ from: owner });
     await this.distributor.setTokenTimelockFactory(timelockFactory.address, { from: owner });
-    // global required for tests
-    this.issuer = this.distributor;
   });
 
   describe('when creating', function () {
@@ -185,34 +180,29 @@ contract('TokenDistributor', function ([_, benefactor, owner, customer, wallet, 
     });
   });
 
-  describe('as a Capped Issuer', function () {
-    it('can issue tokens LoE to cap', async function () {
+  describe('as a Crowdsale Factory', function () {
+    it('can deposit tokens LoE to cap', async function () {
       await this.token.approve(this.distributor.address, amount, { from: benefactor });
       await this.distributor.contract
-        .issue['address,uint256,uint256'](customer, amount, weiAmount, { from: owner, gas: 500000 });
+        .depositPresale['address,uint256,uint256'](customer, amount, weiAmount, { from: owner, gas: 500000 });
     });
 
-    it('fail to issue above cap', async function () {
+    it('fail to deposit above cap', async function () {
       await this.token.approve(this.distributor.address, amount.mul(10), { from: benefactor });
       await expectThrow(() => this.distributor.contract
-        .issue['address,uint256,uint256'](customer, amount.mul(7), weiAmount.mul(7), { from: owner, gas: 500000 }),
+        .depositPresale['address,uint256,uint256'](customer, amount.mul(7), weiAmount.mul(7), { from: owner, gas: 500000 }),
       EVMRevert);
     });
-
-    shouldBehaveLikeIssuer(benefactor, owner, customer, otherAccounts);
-    shouldBehaveLikeIssuerWithEther(benefactor, owner, customer, otherAccounts);
 
     describe('after Finalization', function () {
       beforeEach(async function () {
         await this.distributor.finalize({ from: owner });
       });
 
-      describe('as an Issuer', function () {
-        it('fails to issue tokens', async function () {
-          expectThrow(() => this.distributor.contract
-            .issue['address,uint256,uint256'](customer, amount.mul(3), weiAmount.mul(3), { from: owner, gas: 500000 }),
-          EVMRevert);
-        });
+      it('fails to deposit tokens', async function () {
+        expectThrow(() => this.distributor.contract
+          .depositPresale['address,uint256,uint256'](customer, amount.mul(3), weiAmount.mul(3), { from: owner, gas: 500000 }),
+        EVMRevert);
       });
     });
   });
@@ -370,13 +360,13 @@ contract('TokenDistributor', function ([_, benefactor, owner, customer, wallet, 
       beforeEach(async function () {
         await this.token.approve(this.distributor.address, amount.mul(4), { from: benefactor });
         await this.distributor.contract
-          .issue['address,uint256,uint256'](customer, amount, weiAmount, { from: owner, gas: 500000 });
+          .depositPresale['address,uint256,uint256'](customer, amount, weiAmount, { from: owner, gas: 500000 });
       });
 
       describe('if cap reached', function () {
         beforeEach(async function () {
           await this.distributor.contract
-            .issue['address,uint256,uint256'](
+            .depositPresale['address,uint256,uint256'](
               otherAccounts[0],
               amount.mul(3),
               weiAmount.mul(5),

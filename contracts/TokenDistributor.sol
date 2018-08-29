@@ -3,7 +3,6 @@ pragma solidity ^0.4.24;
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "openzeppelin-solidity/contracts/ownership/HasNoEther.sol";
 import "./lifecycle/Finalizable.sol";
-import "./payment/IssuerWithEther.sol";
 import "./payment/TokenTimelockEscrow.sol";
 import "./payment/TokenTimelockFactory.sol";
 import "./payment/TokenVestingFactory.sol";
@@ -15,7 +14,7 @@ import "./SampleAllowanceCrowdsale.sol";
  * @title TokenDistributor
  * @dev This is a token distribution contract.
  */
-contract TokenDistributor is HasNoEther, Finalizable, IssuerWithEther {
+contract TokenDistributor is HasNoEther, Finalizable {
   using SafeMath for uint256;
   using SafeERC20 for ERC20;
 
@@ -24,11 +23,18 @@ contract TokenDistributor is HasNoEther, Finalizable, IssuerWithEther {
   event ContractInstantiation(address sender, address instantiation);
   event CrowdsaleInstantiated(address sender, address instantiation, uint256 allowance);
 
+  // Amount of wei raised
+  uint256 public weiRaised;
+
   // The token being sold
   ERC20 public token;
 
   // Address where funds are collected
   address public wallet;
+
+  /// Party (team multisig) who is in the control of the token pool.
+  /// @notice this will be different from the owner address (scripted) that calls this contract.
+  address public benefactor;
 
   // How many token units a buyer gets per wei.
   // The rate is the conversion between wei and the smallest and indivisible token unit.
@@ -79,10 +85,11 @@ contract TokenDistributor is HasNoEther, Finalizable, IssuerWithEther {
     uint256 _bonusTime
   )
     public
-    Issuer(_benefactor, _token)
   {
+    require(address(_benefactor) != address(0), "Benefactor address should not be 0x0.");
     require(_rate > 0, "Rate should not be > 0.");
     require(_wallet != address(0), "Wallet address should not be 0x0.");
+    require(address(_token) != address(0), "Token address should not be 0x0.");
     require(_cap > 0, "Cap should be > 0.");
     // solium-disable-next-line security/no-block-members
     require(_openingTime > block.timestamp, "Opening time should be in the future.");
@@ -90,6 +97,7 @@ contract TokenDistributor is HasNoEther, Finalizable, IssuerWithEther {
     require(_bonusTime > _closingTime, "Bonus time should be after closing time.");
     require(_withdrawTime >= _closingTime, "Withdrawals should open after crowdsale closes.");
 
+    benefactor = _benefactor;
     rate = _rate;
     wallet = _wallet;
     token = _token;
@@ -127,26 +135,6 @@ contract TokenDistributor is HasNoEther, Finalizable, IssuerWithEther {
    */
   function getUserCap(address _beneficiary) public view onlyIfCrowdsale returns (uint256) {
     return crowdsale.getUserCap(_beneficiary);
-  }
-
-  /**
-   * @dev Issue the tokens to the beneficiary
-   * @param _beneficiary The destination address of the tokens.
-   * @param _amount The amount of tokens that are issued.
-   */
-  function issue(address _beneficiary, uint256 _amount) public onlyNotFinalized {
-    super.issue(_beneficiary, _amount);
-  }
-
-  /**
-   * @dev Issue the tokens to the beneficiary
-   * @param _beneficiary The destination address of the tokens.
-   * @param _amount The amount of tokens that are issued.
-   * @param _weiAmount The amount of wei exchanged for the tokens.
-   */
-  function issue(address _beneficiary, uint256 _amount, uint256 _weiAmount) public {
-    require(cap >= weiRaised.add(_weiAmount), "Cap reached.");
-    super.issue(_beneficiary, _amount, _weiAmount);
   }
 
   /**
