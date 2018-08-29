@@ -23,15 +23,6 @@ contract TokenDistributor is HasNoEther, Finalizable {
   event ContractInstantiation(address sender, address instantiation);
   event CrowdsaleInstantiated(address sender, address instantiation, uint256 allowance);
 
-  // Amount of wei raised
-  uint256 public weiRaised;
-
-  // The token being sold
-  ERC20 public token;
-
-  // Address where funds are collected
-  address public wallet;
-
   /// Party (team multisig) who is in the control of the token pool.
   /// @notice this will be different from the owner address (scripted) that calls this contract.
   address public benefactor;
@@ -41,6 +32,12 @@ contract TokenDistributor is HasNoEther, Finalizable {
   // So, if you are using a rate of 1 with a DetailedERC20 token with 3 decimals called TOK
   // 1 wei will give you 1 unit, or 0.001 TOK.
   uint256 public rate;
+
+   // Address where funds are collected
+  address public wallet;
+
+  // The token being sold
+  ERC20 public token;
 
   // Max cap for presale + crowdsale
   uint256 public cap;
@@ -52,10 +49,14 @@ contract TokenDistributor is HasNoEther, Finalizable {
   // When withdrawals open
   uint256 public withdrawTime;
 
-  // Crowdsale that is created after the presale distribution is finalized
-  SampleAllowanceCrowdsale public crowdsale;
+  // Amount of wei raised
+  uint256 public weiRaised;
+
   // Allowance that is given to crowdsale contract after it is created
   uint256 public crowdsaleAllowance;
+
+  // Crowdsale that is created after the presale distribution is finalized
+  SampleAllowanceCrowdsale public crowdsale;
 
   // Escrow contract used to lock team tokens until crowdsale ends
   TokenTimelockEscrow public presaleEscrow;
