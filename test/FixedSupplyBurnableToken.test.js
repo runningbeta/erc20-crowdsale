@@ -44,7 +44,7 @@ contract('FixedSupplyBurnableToken', function ([owner, alice, bob, ...other]) {
         await this.token.approve(owner, amount, { from: alice });
         const totalSupply = await this.token.totalSupply();
 
-        this.token.burnFrom(alice, amount, { from: owner });
+        await this.token.burnFrom(alice, amount, { from: owner });
         (await this.token.totalSupply()).should.be.bignumber.equal(totalSupply.sub(amount));
       });
 
