@@ -20,11 +20,11 @@ contract SampleAllowanceCrowdsale
   is
     HasNoTokens,
     HasNoContracts,
-    AllowanceCrowdsale,
-    CappedCrowdsale,
     TimedCrowdsale,
+    CappedCrowdsale,
     IndividuallyCappedCrowdsale,
-    PostDeliveryCrowdsale
+    PostDeliveryCrowdsale,
+    AllowanceCrowdsale
 {
 
   event WalletChange(address wallet);
@@ -49,9 +49,9 @@ contract SampleAllowanceCrowdsale
   )
     public
     Crowdsale(_rate, _wallet, _token)
-    AllowanceCrowdsale(_tokenWallet)
-    CappedCrowdsale(_cap)
     TimedCrowdsale(_openingTime, _closingTime)
+    CappedCrowdsale(_cap)
+    AllowanceCrowdsale(_tokenWallet)
   {
     require(_withdrawTime >= _closingTime, "Withdrawals should open after crowdsale closes.");
     withdrawTime = _withdrawTime;

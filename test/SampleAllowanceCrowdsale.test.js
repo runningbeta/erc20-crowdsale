@@ -5,15 +5,13 @@ const { EVMRevert } = require('./helpers/EVMRevert');
 const { ether } = require('./helpers/ether');
 
 const BigNumber = web3.BigNumber;
-const Token = artifacts.require('Token');
+const Token = artifacts.require('FixedSupplyBurnableToken');
 const SampleAllowanceCrowdsale = artifacts.require('SampleAllowanceCrowdsale');
 
 require('chai')
   .use(require('chai-bignumber')(BigNumber))
   .use(require('chai-as-promised'))
   .should();
-
-const TOTAL_SUPPLY = 1000000000 * (10 ** 18);
 
 contract('SampleAllowanceCrowdsale', function ([
   owner,
@@ -42,7 +40,8 @@ contract('SampleAllowanceCrowdsale', function ([
       this.withdrawTime,
       { from: owner }
     );
-    this.token.approve(this.crowdsale.address, TOTAL_SUPPLY, { from: owner });
+    const totalSupply = await this.token.totalSupply();
+    this.token.approve(this.crowdsale.address, totalSupply, { from: owner });
   });
 
   it('can change wallet', async function () {
