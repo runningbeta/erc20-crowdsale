@@ -46,6 +46,12 @@ function shouldBehaveLikeIssuer (benefactor, owner, customer, [customer2, ...oth
       EVMRevert);
     });
 
+    it('fails to issue to 0x0 address', async function () {
+      await expectThrow(() => this.issuer.contract
+        .issue['address,uint256'](0x0, amount * 3, { from: owner, gas: 500000 }),
+      EVMRevert);
+    });
+
     it('fails to issue twice to same address', async function () {
       await this.issuer.contract.issue['address,uint256'](customer, amount, { from: owner, gas: 500000 });
       await expectThrow(() => this.issuer.contract

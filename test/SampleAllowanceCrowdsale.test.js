@@ -19,6 +19,7 @@ contract('SampleAllowanceCrowdsale', function ([
   wallet,
   alice,
   bob,
+  charlie,
   ...other
 ]) {
   before(async function () {
@@ -77,8 +78,23 @@ contract('SampleAllowanceCrowdsale', function ([
         await this.crowdsale.buyTokens(alice, { from: alice, value: ether(1) });
       });
 
-      it('can not withdraw', async function () {
-        await expectThrow(() => this.crowdsale.contract.withdrawTokens['']({ from: alice }), EVMRevert);
+      it('fails to withdraw', async function () {
+        await expectThrow(() => this.crowdsale.contract.withdrawTokens['']({ from: alice, gas: 500000 }), EVMRevert);
+      });
+
+      it('fails to withdraw for address', async function () {
+        // eslint-disable-next-line dot-notation
+        await expectThrow(() => this.crowdsale.contract.withdrawTokens['address'](
+          alice,
+          { from: alice, gas: 500000 }
+        ), EVMRevert);
+      });
+
+      it('fails to withdraw for multiple address', async function () {
+        await expectThrow(() => this.crowdsale.contract.withdrawTokens['address[]'](
+          [alice, bob],
+          { from: alice, gas: 500000 }
+        ), EVMRevert);
       });
     });
 
@@ -91,6 +107,10 @@ contract('SampleAllowanceCrowdsale', function ([
 
       it('can withdraw', async function () {
         await this.crowdsale.contract.withdrawTokens['']({ from: alice, gas: 500000 });
+      });
+
+      it('fails to withdraw if not bought', async function () {
+        await expectThrow(() => this.crowdsale.contract.withdrawTokens['']({ from: charlie, gas: 500000 }), EVMRevert);
       });
 
       it('can withdraw for address', async function () {
