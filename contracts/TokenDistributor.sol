@@ -178,6 +178,18 @@ contract TokenDistributor is HasNoEther, Finalizable, IssuerWithEther {
     presaleEscrow.withdraw(msg.sender);
   }
 
+  /// @dev Withdraw accumulated balance for beneficiary.
+  function withdrawPresale(address _beneficiary) public {
+    presaleEscrow.withdraw(_beneficiary);
+  }
+
+  /// @dev Withdraw accumulated balance for beneficiaries.
+  function withdrawPresale(address[] _beneficiaries) public {
+    for (uint32 i = 0; i < _beneficiaries.length; i ++) {
+      presaleEscrow.withdraw(_beneficiaries[i]);
+    }
+  }
+
   /**
    * @dev Called by the payer to store the sent amount as credit to be pulled from token timelock contract.
    * @param _dest The destination address of the funds.
@@ -193,6 +205,18 @@ contract TokenDistributor is HasNoEther, Finalizable, IssuerWithEther {
   /// @dev Withdraw accumulated balance, called by payee.
   function withdrawBonus() public {
     bonusEscrow.withdraw(msg.sender);
+  }
+
+  /// @dev Withdraw accumulated balance for beneficiary.
+  function withdrawBonus(address _beneficiary) public {
+    bonusEscrow.withdraw(_beneficiary);
+  }
+
+  /// @dev Withdraw accumulated balance for beneficiaries.
+  function withdrawBonus(address[] _beneficiaries) public {
+    for (uint32 i = 0; i < _beneficiaries.length; i ++) {
+      bonusEscrow.withdraw(_beneficiaries[i]);
+    }
   }
 
   /// @dev Setter for TokenTimelockFactory because of gas limits
@@ -273,7 +297,7 @@ contract TokenDistributor is HasNoEther, Finalizable, IssuerWithEther {
   }
 
   /// @dev In case there are any unsold tokens, they are returned to the benefactor
-  function claimUnsold() public onlyIfCrowdsale {
+  function claimUnsold(address _beneficiary) public onlyIfCrowdsale onlyOwner {
     require(crowdsale.hasEnded(), "Crowdsale still running.");
     uint256 sold = crowdsale.tokensSold();
     uint256 delivered = crowdsale.tokensDelivered();
@@ -283,7 +307,7 @@ contract TokenDistributor is HasNoEther, Finalizable, IssuerWithEther {
     uint256 claimable = balance.sub(toBeDelivered);
 
     if (claimable > 0) {
-      token.safeTransfer(benefactor, claimable);
+      token.safeTransfer(_beneficiary, claimable);
     }
   }
 

@@ -7,7 +7,7 @@ import "openzeppelin-solidity/contracts/crowdsale/validation/IndividuallyCappedC
 import "openzeppelin-solidity/contracts/crowdsale/validation/CappedCrowdsale.sol";
 import "openzeppelin-solidity/contracts/crowdsale/validation/TimedCrowdsale.sol";
 import "openzeppelin-solidity/contracts/crowdsale/emission/AllowanceCrowdsale.sol";
-import "openzeppelin-solidity/contracts/crowdsale/distribution/PostDeliveryCrowdsale.sol";
+import "./crowdsale/distribution/PostDeliveryCrowdsale.sol";
 
 
 /**
@@ -66,13 +66,16 @@ contract SampleAllowanceCrowdsale
     return hasClosed() || capReached();
   }
 
-  /**
-   * @dev Withdraw tokens only after configured withdraw time.
-   */
-  function withdrawTokens() public {
-    // solium-disable-next-line security/no-block-members
-    require(block.timestamp > withdrawTime, "Withdrawals not open.");
-    super.withdrawTokens();
+  /// @dev Withdraw tokens only after crowdsale ends for beneficiary
+  function withdrawTokens(address _beneficiary) public {
+    _withdrawTokens(_beneficiary);
+  }
+
+  /// @dev Withdraw tokens only after crowdsale ends for beneficiaries.
+  function withdrawTokens(address[] _beneficiaries) public {
+    for (uint32 i = 0; i < _beneficiaries.length; i ++) {
+      _withdrawTokens(_beneficiaries[i]);
+    }
   }
 
   /**
@@ -113,6 +116,15 @@ contract SampleAllowanceCrowdsale
   {
     super._deliverTokens(_beneficiary, _tokenAmount);
     tokensDelivered = tokensDelivered.add(_tokenAmount);
+  }
+
+  /**
+   * @dev Withdraw tokens only after crowdsale ends.
+   */
+  function _withdrawTokens(address _beneficiary) internal {
+    // solium-disable-next-line security/no-block-members
+    require(block.timestamp > withdrawTime, "Withdrawals not open.");
+    super._withdrawTokens(_beneficiary);
   }
 
 }

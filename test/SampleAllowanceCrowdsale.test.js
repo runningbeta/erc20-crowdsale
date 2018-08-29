@@ -1,6 +1,7 @@
 const { duration, increaseTimeTo } = require('./helpers/increaseTime');
 const { advanceBlock } = require('./helpers/advanceToBlock');
 const { latestTime } = require('./helpers/latestTime');
+const { expectThrow } = require('./helpers/expectThrow');
 const { EVMRevert } = require('./helpers/EVMRevert');
 const { ether } = require('./helpers/ether');
 
@@ -76,7 +77,7 @@ contract('SampleAllowanceCrowdsale', function ([
       });
 
       it('can not withdraw', async function () {
-        await (this.crowdsale.withdrawTokens({ from: alice })).should.be.rejectedWith(EVMRevert);
+        await expectThrow(() => this.crowdsale.contract.withdrawTokens['']({ from: alice }), EVMRevert);
       });
     });
 
@@ -87,7 +88,12 @@ contract('SampleAllowanceCrowdsale', function ([
       });
 
       it('can withdraw', async function () {
-        await this.crowdsale.withdrawTokens({ from: alice });
+        await this.crowdsale.contract.withdrawTokens['']({ from: alice });
+      });
+
+      it('can withdraw with address', async function () {
+        // eslint-disable-next-line dot-notation
+        await this.crowdsale.contract.withdrawTokens['address'](alice, { from: alice });
       });
     });
   });

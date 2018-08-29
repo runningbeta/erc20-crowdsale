@@ -244,7 +244,7 @@ contract('TokenDistributor', function ([_, benefactor, owner, customer, wallet, 
 
       describe('before Crowdsale', function () {
         it('fails to claim leftover tokens', async function () {
-          await expectThrow(() => this.distributor.claimUnsold({ from: owner }), EVMRevert);
+          await expectThrow(() => this.distributor.claimUnsold(benefactor, { from: owner }), EVMRevert);
         });
       });
 
@@ -254,7 +254,7 @@ contract('TokenDistributor', function ([_, benefactor, owner, customer, wallet, 
         });
 
         it('fails to claim leftover tokens', async function () {
-          await expectThrow(() => this.distributor.claimUnsold({ from: owner }), EVMRevert);
+          await expectThrow(() => this.distributor.claimUnsold(benefactor, { from: owner }), EVMRevert);
         });
       });
 
@@ -265,7 +265,7 @@ contract('TokenDistributor', function ([_, benefactor, owner, customer, wallet, 
 
         it('can claim leftover tokens', async function () {
           const initialBalance = await this.token.balanceOf(benefactor);
-          await this.distributor.claimUnsold({ from: owner });
+          await this.distributor.claimUnsold(benefactor, { from: owner });
 
           const finalBalance = await this.token.balanceOf(benefactor);
           // we had only no issuances after giving allowance (amount * 4)
@@ -273,9 +273,9 @@ contract('TokenDistributor', function ([_, benefactor, owner, customer, wallet, 
         });
 
         it('can claim leftover tokens twice', async function () {
-          await this.distributor.claimUnsold({ from: owner });
+          await this.distributor.claimUnsold(benefactor, { from: owner });
           // token balance is zero, can be called again
-          await this.distributor.claimUnsold({ from: owner });
+          await this.distributor.claimUnsold(benefactor, { from: owner });
         });
       });
     });
