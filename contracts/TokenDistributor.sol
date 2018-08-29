@@ -12,7 +12,7 @@ import "./SampleAllowanceCrowdsale.sol";
 
 /**
  * @title TokenDistributor
- * @dev This is a token distribution contract.
+ * @dev This is a token distribution contract used to distribute tokens and create a public Crowdsale.
  */
 contract TokenDistributor is HasNoEther, Finalizable {
   using SafeMath for uint256;
@@ -138,7 +138,7 @@ contract TokenDistributor is HasNoEther, Finalizable {
   }
 
   /**
-   * @dev Called by the payer to store the sent amount as credit to be pulled when crowdsale ends.
+   * @dev Called by the payer to store the sent amount as credit to be pulled when withdrawals open.
    * @param _dest The destination address of the funds.
    * @param _amount The amount to transfer.
    */
@@ -150,7 +150,7 @@ contract TokenDistributor is HasNoEther, Finalizable {
   }
 
   /**
-   * @dev Called by the payer to store the sent amount as credit to be pulled when crowdsale ends.
+   * @dev Called by the payer to store the sent amount as credit to be pulled when withdrawals open.
    * @param _dest The destination address of the funds.
    * @param _amount The amount to transfer.
    * @param _weiAmount The amount of wei exchanged for the tokens.
@@ -161,17 +161,23 @@ contract TokenDistributor is HasNoEther, Finalizable {
     weiRaised = weiRaised.add(_weiAmount);
   }
 
-  /// @dev Withdraw accumulated balance, called by payee.
+  /// @dev Withdraw accumulated balance, called by beneficiary.
   function withdrawPresale() public {
     presaleEscrow.withdraw(msg.sender);
   }
 
-  /// @dev Withdraw accumulated balance for beneficiary.
+  /**
+   * @dev Withdraw accumulated balance for beneficiary.
+   * @param _beneficiary Address of beneficiary
+   */
   function withdrawPresale(address _beneficiary) public {
     presaleEscrow.withdraw(_beneficiary);
   }
 
-  /// @dev Withdraw accumulated balance for beneficiaries.
+  /**
+   * @dev Withdraw accumulated balances for beneficiaries.
+   * @param _beneficiaries List of addresses of beneficiaries
+   */
   function withdrawPresale(address[] _beneficiaries) public {
     for (uint32 i = 0; i < _beneficiaries.length; i ++) {
       presaleEscrow.withdraw(_beneficiaries[i]);
@@ -190,24 +196,33 @@ contract TokenDistributor is HasNoEther, Finalizable {
     bonusEscrow.deposit(_dest, _amount);
   }
 
-  /// @dev Withdraw accumulated balance, called by payee.
+  /// @dev Withdraw accumulated balance, called by beneficiary.
   function withdrawBonus() public {
     bonusEscrow.withdraw(msg.sender);
   }
 
-  /// @dev Withdraw accumulated balance for beneficiary.
+  /**
+   * @dev Withdraw accumulated balance for beneficiary.
+   * @param _beneficiary Address of beneficiary
+   */
   function withdrawBonus(address _beneficiary) public {
     bonusEscrow.withdraw(_beneficiary);
   }
 
-  /// @dev Withdraw accumulated balance for beneficiaries.
+  /**
+   * @dev Withdraw accumulated balances for beneficiaries.
+   * @param _beneficiaries List of addresses of beneficiaries
+   */
   function withdrawBonus(address[] _beneficiaries) public {
     for (uint32 i = 0; i < _beneficiaries.length; i ++) {
       bonusEscrow.withdraw(_beneficiaries[i]);
     }
   }
 
-  /// @dev Setter for TokenTimelockFactory because of gas limits
+  /**
+   * @dev Setter for TokenTimelockFactory because of gas limits
+   * @param _timelockFactory Address of the TokenTimelockFactory contract
+   */
   function setTokenTimelockFactory(address _timelockFactory) public onlyOwner {
     require(timelockFactory == address(0), "TokenTimelockFactory should not be initalizied.");
     timelockFactory = TokenTimelockFactory(_timelockFactory);
@@ -242,7 +257,10 @@ contract TokenDistributor is HasNoEther, Finalizable {
     token.transferFrom(benefactor, tokenWallet, _amount);
   }
 
-  /// @dev Setter for TokenVestingFactory because of gas limits
+  /**
+   * @dev Setter for TokenVestingFactory because of gas limits
+   * @param _vestingFactory Address of the TokenVestingFactory contract
+   */
   function setTokenVestingFactory(address _vestingFactory) public onlyOwner {
     require(vestingFactory == address(0), "TokenVestingFactory should not be initalizied.");
     vestingFactory = TokenVestingFactory(_vestingFactory);
@@ -284,7 +302,10 @@ contract TokenDistributor is HasNoEther, Finalizable {
     token.transferFrom(benefactor, tokenWallet, _amount);
   }
 
-  /// @dev In case there are any unsold tokens, they are returned to the benefactor
+  /**
+   * @dev In case there are any unsold tokens, they are claimed by the owner
+   * @param _beneficiary Address where claimable tokens are going to be transfered
+   */
   function claimUnsold(address _beneficiary) public onlyIfCrowdsale onlyOwner {
     require(crowdsale.hasEnded(), "Crowdsale still running.");
     uint256 sold = crowdsale.tokensSold();

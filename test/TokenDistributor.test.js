@@ -189,9 +189,9 @@ contract('TokenDistributor', function ([_, benefactor, owner, customer, wallet, 
 
     it('fail to deposit above cap', async function () {
       await this.token.approve(this.distributor.address, amount.mul(10), { from: benefactor });
+      const options = { from: owner, gas: 500000 };
       await expectThrow(() => this.distributor.contract
-        .depositPresale['address,uint256,uint256'](customer, amount.mul(7), weiAmount.mul(7), { from: owner, gas: 500000 }),
-      EVMRevert);
+        .depositPresale['address,uint256,uint256'](customer, amount.mul(7), weiAmount.mul(7), options), EVMRevert);
     });
 
     describe('after Finalization', function () {
@@ -200,9 +200,9 @@ contract('TokenDistributor', function ([_, benefactor, owner, customer, wallet, 
       });
 
       it('fails to deposit tokens', async function () {
+        const options = { from: owner, gas: 500000 };
         expectThrow(() => this.distributor.contract
-          .depositPresale['address,uint256,uint256'](customer, amount.mul(3), weiAmount.mul(3), { from: owner, gas: 500000 }),
-        EVMRevert);
+          .depositPresale['address,uint256,uint256'](customer, amount.mul(3), weiAmount.mul(3), options), EVMRevert);
       });
     });
   });
