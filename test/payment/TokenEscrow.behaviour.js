@@ -43,6 +43,12 @@ function shouldBehaveLikeTokenEscrow (owner, [payee1, payee2]) {
           .should.be.rejectedWith(EVMRevert);
       });
 
+      it('fails to deposit to escrow address', async function () {
+        await this.token.approve(this.escrow.address, amount, { from: owner });
+        await (this.escrow.deposit(this.escrow.address, amount, { from: owner }))
+          .should.be.rejectedWith(EVMRevert);
+      });
+
       it('emits a deposited event', async function () {
         await this.token.approve(this.escrow.address, amount, { from: owner });
         const { logs } = await this.escrow.deposit(payee1, amount, { from: owner });
