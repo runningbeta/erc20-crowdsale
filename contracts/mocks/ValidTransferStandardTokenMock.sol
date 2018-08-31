@@ -1,7 +1,7 @@
 pragma solidity ^0.4.24;
 
 import "openzeppelin-solidity/contracts/token/ERC20/DetailedERC20.sol";
-import "../ERC20/ValidTransferStandardToken.sol";
+import "../token/ERC20/ValidTransferStandardToken.sol";
 
 
 /**

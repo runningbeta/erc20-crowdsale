@@ -1,4 +1,3 @@
-const { expectThrow } = require('../helpers/expectThrow');
 const { EVMRevert } = require('../helpers/EVMRevert');
 const { ether } = require('../helpers/ether');
 
@@ -67,5 +66,4 @@ contract('ValidTransferStandardToken', function ([owner, alice, bob, ...other]) 
       (await this.token.balanceOf(this.token.address)).should.be.bignumber.equal(0);
     });
   });
-
 });

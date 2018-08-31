@@ -6,7 +6,6 @@ import "openzeppelin-solidity/contracts/token/ERC20/StandardToken.sol";
 contract ValidTransferStandardToken is StandardToken {
 
   modifier validDestination(address _to) {
-    require(_to != address(0), "Transfering tokens to 0x0 address is not allowed.");
     require(_to != address(this), "Transfering tokens to token contract address is not allowed.");
     _;
   }
