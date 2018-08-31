@@ -15,7 +15,7 @@ contract TokenTimelockIndividualEscrow is TokenConditionalEscrow {
   event Locked(address indexed payee, uint256 _releaseTime);
 
   // release times of the beneficiaries of tokens
-  mapping(address => uint256) private releaseTimes;
+  mapping(address => uint256) public releaseTimes;
 
   /**
    * @dev Stores the token amount as credit to be withdrawn.
