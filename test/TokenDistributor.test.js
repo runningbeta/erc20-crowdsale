@@ -352,6 +352,16 @@ contract('TokenDistributor', function ([_, benefactor, owner, customer, wallet, 
           await increaseTimeTo(this.closingTime + 1);
         });
 
+        it('fails to claim leftover tokens', async function () {
+          await expectThrow(() => this.distributor.claimUnsold(benefactor, { from: owner }), EVMRevert);
+        });
+      });
+
+      describe('after Withdraw time', function () {
+        beforeEach(async function () {
+          await increaseTimeTo(this.withdrawTime + 1);
+        });
+
         it('can claim leftover tokens', async function () {
           const initialBalance = await this.token.balanceOf(benefactor);
           await this.distributor.claimUnsold(benefactor, { from: owner });

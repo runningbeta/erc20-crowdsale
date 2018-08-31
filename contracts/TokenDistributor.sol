@@ -311,7 +311,8 @@ contract TokenDistributor is HasNoEther, Finalizable {
    * @param _beneficiary Address where claimable tokens are going to be transfered
    */
   function claimUnsold(address _beneficiary) public onlyIfCrowdsale onlyOwner {
-    require(crowdsale.hasEnded(), "Crowdsale still running.");
+    // solium-disable-next-line security/no-block-members
+    require(block.timestamp > withdrawTime, "Withdrawals not open.");
     uint256 sold = crowdsale.tokensSold();
     uint256 delivered = crowdsale.tokensDelivered();
     uint256 toDeliver = sold.sub(delivered);
