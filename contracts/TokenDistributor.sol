@@ -228,7 +228,8 @@ contract TokenDistributor is HasNoEther, Finalizable {
    * @param _timelockFactory Address of the TokenTimelockFactory contract
    */
   function setTokenTimelockFactory(address _timelockFactory) public onlyOwner {
-    require(timelockFactory == address(0), "TokenTimelockFactory should not be initalizied.");
+    require(_timelockFactory != address(0), "Factory address should not be 0x0.");
+    require(timelockFactory == address(0), "Factory already initalizied.");
     timelockFactory = TokenTimelockFactory(_timelockFactory);
   }
 
@@ -266,7 +267,8 @@ contract TokenDistributor is HasNoEther, Finalizable {
    * @param _vestingFactory Address of the TokenVestingFactory contract
    */
   function setTokenVestingFactory(address _vestingFactory) public onlyOwner {
-    require(vestingFactory == address(0), "TokenVestingFactory should not be initalizied.");
+    require(_vestingFactory != address(0), "Factory address should not be 0x0.");
+    require(vestingFactory == address(0), "Factory already initalizied.");
     vestingFactory = TokenVestingFactory(_vestingFactory);
   }
 
