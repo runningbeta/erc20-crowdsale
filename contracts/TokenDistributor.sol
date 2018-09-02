@@ -147,6 +147,7 @@ contract TokenDistributor is HasNoEther, Finalizable {
    * @param _amount The amount to transfer.
    */
   function depositPresale(address _dest, uint256 _amount) public onlyOwner onlyNotFinalized {
+    require(_dest != address(this), "Transfering tokens to this contract address is not allowed.");
     require(token.allowance(benefactor, this) >= _amount, "Not enough allowance.");
     token.transferFrom(benefactor, this, _amount);
     token.approve(presaleEscrow, _amount);
@@ -194,6 +195,7 @@ contract TokenDistributor is HasNoEther, Finalizable {
    * @param _amount The amount to transfer.
    */
   function depositBonus(address _dest, uint256 _amount) public onlyOwner onlyNotFinalized {
+    require(_dest != address(this), "Transfering tokens to this contract address is not allowed.");
     require(token.allowance(benefactor, this) >= _amount, "Not enough allowance.");
     token.transferFrom(benefactor, this, _amount);
     token.approve(bonusEscrow, _amount);
@@ -253,6 +255,7 @@ contract TokenDistributor is HasNoEther, Finalizable {
   {
     require(token.allowance(benefactor, this) >= _amount, "Not enough allowance.");
     require(_dest != address(0), "Destination address should not be 0x0.");
+    require(_dest != address(this), "Transfering tokens to this contract address is not allowed.");
     require(_releaseTime >= withdrawTime, "Tokens should unlock after withdrawals open.");
     tokenWallet = timelockFactory.create(
       token,
@@ -296,6 +299,7 @@ contract TokenDistributor is HasNoEther, Finalizable {
   {
     require(token.allowance(benefactor, this) >= _amount, "Not enough allowance.");
     require(_dest != address(0), "Destination address should not be 0x0.");
+    require(_dest != address(this), "Transfering tokens to this contract address is not allowed.");
     require(_start.add(_cliff) >= withdrawTime, "Tokens should unlock after withdrawals open.");
     bool revocable = false;
     tokenWallet = vestingFactory.create(

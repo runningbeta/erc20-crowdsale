@@ -37,6 +37,7 @@ contract TokenVestingFactoryImpl is TokenVestingFactory, Factory {
     returns (address wallet)
   {
     /// @dev TokenVesting checks that beneficiary is not 0x0
+    require(_beneficiary != address(this), "Transfering tokens to this contract address is not allowed.");
     wallet = new TokenVesting(_beneficiary, _start, _cliff, _duration, _revocable);
     beneficiaryInstantiations[_beneficiary].push(wallet);
     register(wallet);

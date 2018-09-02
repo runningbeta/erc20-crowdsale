@@ -11,7 +11,7 @@ contract SafeStandardToken is StandardToken {
 
   /// @dev Throws if destination address is not valid.
   modifier onlyValidDestination(address _to) {
-    require(_to != address(this), "Transfering tokens to token contract address is not allowed.");
+    require(_to != address(this), "Transfering tokens to this contract address is not allowed.");
     _;
   }
 

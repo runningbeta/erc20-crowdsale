@@ -31,6 +31,7 @@ contract TokenTimelockFactoryImpl is TokenTimelockFactory, Factory {
   {
     require(_token != address(0), "Token address should not be 0x0.");
     require(_beneficiary != address(0), "Beneficiary address should not be 0x0.");
+    require(_beneficiary != address(this), "Transfering tokens to this contract address is not allowed.");
     wallet = new TokenTimelock(_token, _beneficiary, _releaseTime);
     beneficiaryInstantiations[_beneficiary].push(wallet);
     register(wallet);
