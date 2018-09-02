@@ -3,8 +3,6 @@ const { duration } = require('../helpers/increaseTime');
 const { advanceBlock } = require('../helpers/advanceToBlock');
 const { ether } = require('../helpers/ether');
 
-const moment = require('moment');
-
 const BigNumber = web3.BigNumber;
 
 require('chai')
