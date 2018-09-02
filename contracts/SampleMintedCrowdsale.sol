@@ -17,10 +17,10 @@ contract SampleMintedCrowdsale
   is
     HasNoTokens,
     HasNoContracts,
-    MintedCrowdsale,
-    CappedCrowdsale,
     TimedCrowdsale,
-    IndividuallyCappedCrowdsale
+    CappedCrowdsale,
+    IndividuallyCappedCrowdsale,
+    MintedCrowdsale
 {
 
   event WalletChange(address wallet);
@@ -35,8 +35,8 @@ contract SampleMintedCrowdsale
   )
     public
     Crowdsale(_rate, _wallet, _token)
-    CappedCrowdsale(_cap)
     TimedCrowdsale(_openingTime, _closingTime)
+    CappedCrowdsale(_cap)
   {
     // constructor
   }

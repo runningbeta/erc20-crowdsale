@@ -6,7 +6,10 @@ import "../lifecycle/Factory.sol";
 import "./TokenVestingFactory.sol";
 
 
-/// @title Token vesting wallet factory - Allows creation of TokenVesting wallet.
+/**
+ * @title TokenVestingFactoryImpl
+ * @dev Allows creation of token vesting wallet.
+ */
 contract TokenVestingFactoryImpl is TokenVestingFactory, Factory {
 
   mapping(address => address[]) public beneficiaryInstantiations;

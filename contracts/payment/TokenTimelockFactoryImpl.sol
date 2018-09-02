@@ -6,7 +6,10 @@ import "../lifecycle/Factory.sol";
 import "./TokenTimelockFactory.sol";
 
 
-/// @title Token timelock wallet factory - Allows creation of timelock wallet.
+/**
+ * @title TokenTimelockFactoryImpl
+ * @dev Allows creation of timelock wallet.
+ */
 contract TokenTimelockFactoryImpl is TokenTimelockFactory, Factory {
 
   mapping(address => address[]) public beneficiaryInstantiations;

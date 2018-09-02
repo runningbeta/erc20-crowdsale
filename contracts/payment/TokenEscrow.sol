@@ -7,8 +7,8 @@ import "openzeppelin-solidity/contracts/token/ERC20/SafeERC20.sol";
 
 
 /**
- * @title Escrow
- * @dev Base escrow contract, holds funds destinated to a payee until they
+ * @title TokenEscrow
+ * @dev Base token escrow contract, holds funds destinated to a payee until they
  * withdraw them. The contract that uses the escrow as its payment method
  * should be its owner, and provide public methods redirecting to the escrow's
  * deposit and withdraw.
