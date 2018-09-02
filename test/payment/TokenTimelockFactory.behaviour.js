@@ -53,28 +53,36 @@ function shouldBehaveLikeTokenTimelockFactory (owner, beneficiary, otherAccounts
 
       it('cannot be released before time limit', async function () {
         await (this.timelock.release()).should.be.rejectedWith(EVMRevert);
+        (await this.token.balanceOf(beneficiary)).should.be.bignumber.equal(0);
       });
 
       it('cannot be released just before time limit', async function () {
         await increaseTimeTo(this.releaseTime - duration.seconds(3));
+
         await (this.timelock.release()).should.be.rejectedWith(EVMRevert);
+        (await this.token.balanceOf(beneficiary)).should.be.bignumber.equal(0);
       });
 
       it('can be released just after limit', async function () {
         await increaseTimeTo(this.releaseTime + duration.seconds(1));
+
         await this.timelock.release();
         (await this.token.balanceOf(beneficiary)).should.be.bignumber.equal(amount);
       });
 
       it('can be released after time limit', async function () {
         await increaseTimeTo(this.releaseTime + duration.years(1));
+
         await this.timelock.release();
         (await this.token.balanceOf(beneficiary)).should.be.bignumber.equal(amount);
       });
 
       it('cannot be released twice', async function () {
         await increaseTimeTo(this.releaseTime + duration.years(1));
+
         await this.timelock.release();
+        (await this.token.balanceOf(beneficiary)).should.be.bignumber.equal(amount);
+
         await (this.timelock.release()).should.be.rejectedWith(EVMRevert);
         (await this.token.balanceOf(beneficiary)).should.be.bignumber.equal(amount);
       });

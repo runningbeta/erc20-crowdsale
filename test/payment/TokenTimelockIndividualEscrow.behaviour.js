@@ -41,6 +41,7 @@ function shouldBehaveLikeTokenTimelockIndividualEscrow (owner, accounts) {
 
       await (this.escrow.depositAndLock(payee, amount, vestingTime + duration.days(2), { from: owner }))
         .should.be.rejectedWith(EVMRevert);
+      (await this.escrow.depositsOf(payee)).should.bignumber.equal(amount);
     });
 
     describe('Deposit then Lock', function () {
@@ -79,6 +80,7 @@ function shouldBehaveLikeTokenTimelockIndividualEscrow (owner, accounts) {
       it('fails to withdraw', async function () {
         await (this.escrow.withdraw(payee, { from: owner }))
           .should.be.rejectedWith(EVMRevert);
+        (await this.token.balanceOf(payee)).should.be.bignumber.equal(0);
       });
     });
 

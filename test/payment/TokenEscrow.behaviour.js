@@ -14,43 +14,50 @@ function shouldBehaveLikeTokenEscrow (owner, [payee1, payee2]) {
 
   describe('as a TokenEscrow', function () {
     describe('deposits', function () {
-      it('can accept a single deposit', async function () {
+      beforeEach(async function () {
         await this.token.approve(this.escrow.address, amount, { from: owner });
+      });
+
+      it('can accept a single deposit', async function () {
         await this.escrow.deposit(payee1, amount, { from: owner });
 
         (await this.token.balanceOf(this.escrow.address)).should.be.bignumber.equal(amount);
-
         (await this.escrow.depositsOf(payee1)).should.be.bignumber.equal(amount);
       });
 
       it('can accept an empty deposit', async function () {
         await this.escrow.deposit(payee1, 0, { from: owner });
+
+        (await this.token.balanceOf(this.escrow.address)).should.be.bignumber.equal(0);
         (await this.escrow.depositsOf(payee1)).should.be.bignumber.equal(0);
       });
 
       it('only the owner can deposit', async function () {
         await (this.escrow.deposit(payee1, 1, { from: payee2 })).should.be.rejectedWith(EVMRevert);
+
+        (await this.token.balanceOf(this.escrow.address)).should.be.bignumber.equal(0);
+        (await this.escrow.depositsOf(payee1)).should.be.bignumber.equal(0);
       });
 
       it('fails to deposit if escrow balance is too low', async function () {
-        await (this.escrow.deposit(payee1, amount, { from: owner }))
+        await (this.escrow.deposit(payee1, amount.mul(2), { from: owner }))
           .should.be.rejectedWith(EVMRevert);
+
+        (await this.token.balanceOf(this.escrow.address)).should.be.bignumber.equal(0);
+        (await this.escrow.depositsOf(payee1)).should.be.bignumber.equal(0);
       });
 
       it('fails to deposit to 0x0', async function () {
-        await this.token.approve(this.escrow.address, amount, { from: owner });
         await (this.escrow.deposit(0x0, amount, { from: owner }))
           .should.be.rejectedWith(EVMRevert);
       });
 
       it('fails to deposit to escrow address', async function () {
-        await this.token.approve(this.escrow.address, amount, { from: owner });
         await (this.escrow.deposit(this.escrow.address, amount, { from: owner }))
           .should.be.rejectedWith(EVMRevert);
       });
 
       it('emits a deposited event', async function () {
-        await this.token.approve(this.escrow.address, amount, { from: owner });
         const { logs } = await this.escrow.deposit(payee1, amount, { from: owner });
 
         const event = inLogs(logs, 'Deposited', { payee: payee1 });
@@ -58,24 +65,23 @@ function shouldBehaveLikeTokenEscrow (owner, [payee1, payee2]) {
       });
 
       it('can add multiple deposits on a single account', async function () {
-        await this.token.approve(this.escrow.address, amount * 3, { from: owner });
-        await this.escrow.deposit(payee1, amount, { from: owner });
-        await this.escrow.deposit(payee1, amount * 2, { from: owner });
+        await this.escrow.deposit(payee1, amount.div(3), { from: owner });
+        await this.escrow.deposit(payee1, amount.div(3).mul(2), { from: owner });
 
-        (await this.token.balanceOf(this.escrow.address)).should.be.bignumber.equal(amount * 3);
+        (await this.token.balanceOf(this.escrow.address)).should.be.bignumber.equal(amount);
 
-        (await this.escrow.depositsOf(payee1)).should.be.bignumber.equal(amount * 3);
+        (await this.token.balanceOf(this.escrow.address)).should.be.bignumber.equal(amount);
+        (await this.escrow.depositsOf(payee1)).should.be.bignumber.equal(amount);
       });
 
       it('can track deposits to multiple accounts', async function () {
-        await this.token.approve(this.escrow.address, amount * 3, { from: owner });
-        await this.escrow.deposit(payee1, amount, { from: owner });
-        await this.escrow.deposit(payee2, amount * 2, { from: owner });
+        await this.escrow.deposit(payee1, amount.div(3), { from: owner });
+        await this.escrow.deposit(payee2, amount.div(3).mul(2), { from: owner });
 
-        (await this.token.balanceOf(this.escrow.address)).should.be.bignumber.equal(amount * 3);
+        (await this.token.balanceOf(this.escrow.address)).should.be.bignumber.equal(amount);
 
-        (await this.escrow.depositsOf(payee1)).should.be.bignumber.equal(amount);
-        (await this.escrow.depositsOf(payee2)).should.be.bignumber.equal(amount * 2);
+        (await this.escrow.depositsOf(payee1)).should.be.bignumber.equal(amount.div(3));
+        (await this.escrow.depositsOf(payee2)).should.be.bignumber.equal(amount.div(3).mul(2));
       });
     });
 

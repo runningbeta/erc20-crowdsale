@@ -38,24 +38,36 @@ function shouldBehaveLikeIssuer (benefactor, owner, customer, [customer2, ...oth
       await expectThrow(() => this.issuer.contract
         .issue['address,uint256'](customer, amount * 3, { from: customer, gas: 500000 }),
       EVMRevert);
+
+      (await this.issuer.issuedCount()).should.be.bignumber.equal(0);
+      (await this.token.balanceOf(customer)).should.be.bignumber.equal(0);
     });
 
     it('fails to issue over allowance', async function () {
       await expectThrow(() => this.issuer.contract
         .issue['address,uint256'](customer, amount * 5, { from: owner, gas: 500000 }),
       EVMRevert);
+
+      (await this.issuer.issuedCount()).should.be.bignumber.equal(0);
+      (await this.token.balanceOf(customer)).should.be.bignumber.equal(0);
     });
 
     it('fails to issue to 0x0 address', async function () {
       await expectThrow(() => this.issuer.contract
         .issue['address,uint256'](0x0, amount * 3, { from: owner, gas: 500000 }),
       EVMRevert);
+
+      (await this.issuer.issuedCount()).should.be.bignumber.equal(0);
+      (await this.token.balanceOf(0x0)).should.be.bignumber.equal(0);
     });
 
     it('fails to issue twice to same address', async function () {
       await this.issuer.contract.issue['address,uint256'](customer, amount, { from: owner, gas: 500000 });
       await expectThrow(() => this.issuer.contract
         .issue['address,uint256'](customer, amount, { from: owner, gas: 500000 }), EVMRevert);
+
+      (await this.issuer.issuedCount()).should.be.bignumber.equal(amount);
+      (await this.token.balanceOf(customer)).should.be.bignumber.equal(amount);
     });
   });
 }

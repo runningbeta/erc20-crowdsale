@@ -44,12 +44,20 @@ function shouldBehaveLikeIssuerWithEther (benefactor, owner, customer, [customer
       await expectThrow(() => this.issuer.contract
         .issue['address,uint256,uint256'](customer, amount * 3, weiAmount * 3, { from: customer, gas: 500000 }),
       EVMRevert);
+
+      (await this.issuer.issuedCount()).should.be.bignumber.equal(0);
+      (await this.issuer.weiRaised()).should.be.bignumber.equal(0);
+      (await this.token.balanceOf(customer)).should.be.bignumber.equal(0);
     });
 
     it('fails to issue over allowance', async function () {
       await expectThrow(() => this.issuer.contract
         .issue['address,uint256,uint256'](customer, amount * 5, weiAmount * 5, { from: owner, gas: 500000 }),
       EVMRevert);
+
+      (await this.issuer.issuedCount()).should.be.bignumber.equal(0);
+      (await this.issuer.weiRaised()).should.be.bignumber.equal(0);
+      (await this.token.balanceOf(customer)).should.be.bignumber.equal(0);
     });
 
     it('fails to issue twice to same address', async function () {
@@ -58,6 +66,10 @@ function shouldBehaveLikeIssuerWithEther (benefactor, owner, customer, [customer
 
       await expectThrow(() => this.issuer.contract
         .issue['address,uint256,uint256'](customer, amount, weiAmount, { from: owner, gas: 500000 }), EVMRevert);
+
+      (await this.issuer.issuedCount()).should.be.bignumber.equal(amount);
+      (await this.issuer.weiRaised()).should.be.bignumber.equal(weiAmount);
+      (await this.token.balanceOf(customer)).should.be.bignumber.equal(amount);
     });
   });
 }
