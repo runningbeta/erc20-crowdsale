@@ -2,14 +2,14 @@ const { EVMRevert } = require('../helpers/EVMRevert');
 const { ether } = require('../helpers/ether');
 
 const BigNumber = web3.BigNumber;
-const Token = artifacts.require('ValidTransferStandardTokenMock');
+const Token = artifacts.require('SafeStandardTokenMock');
 
 require('chai')
   .use(require('chai-bignumber')(BigNumber))
   .use(require('chai-as-promised'))
   .should();
 
-contract('ValidTransferStandardToken', function ([owner, alice, bob, ...other]) {
+contract('SafeStandardToken', function ([owner, alice, bob, ...other]) {
   const amount = ether(10.0);
 
   beforeEach(async function () {

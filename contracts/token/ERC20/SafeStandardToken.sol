@@ -3,7 +3,7 @@ pragma solidity ^0.4.24;
 import "openzeppelin-solidity/contracts/token/ERC20/StandardToken.sol";
 
 
-contract ValidTransferStandardToken is StandardToken {
+contract SafeStandardToken is StandardToken {
 
   modifier validDestination(address _to) {
     require(_to != address(this), "Transfering tokens to token contract address is not allowed.");

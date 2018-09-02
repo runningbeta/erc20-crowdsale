@@ -1,7 +1,7 @@
 pragma solidity ^0.4.24;
 
 import "./lifecycle/Finalizable.sol";
-import "./token/ERC20/ValidTransferStandardToken.sol";
+import "./token/ERC20/SafeStandardToken.sol";
 import "openzeppelin-solidity/contracts/ownership/NoOwner.sol";
 import "openzeppelin-solidity/contracts/token/ERC20/DetailedERC20.sol";
 import "openzeppelin-solidity/contracts/token/ERC20/StandardBurnableToken.sol";
@@ -26,7 +26,7 @@ import "openzeppelin-solidity/contracts/token/ERC20/StandardBurnableToken.sol";
  * This is a BurnableToken where users can burn tokens when the burning functionality is
  * enabled (contract is finalized) by the owner.
  */
-contract FixedSupplyBurnableToken is NoOwner, Finalizable, DetailedERC20, StandardBurnableToken, ValidTransferStandardToken {
+contract FixedSupplyBurnableToken is NoOwner, Finalizable, DetailedERC20, StandardBurnableToken, SafeStandardToken {
 
   string public constant NAME = "Example Token";
   string public constant SYMBOL = "TOK";

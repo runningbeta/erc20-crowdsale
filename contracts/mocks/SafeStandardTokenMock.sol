@@ -1,11 +1,11 @@
 pragma solidity ^0.4.24;
 
 import "openzeppelin-solidity/contracts/token/ERC20/DetailedERC20.sol";
-import "../token/ERC20/ValidTransferStandardToken.sol";
+import "../token/ERC20/SafeStandardToken.sol";
 
 
 /**
- * @title ValidTransferStandardToken
+ * @title SafeStandardToken
  * @dev ERC20 Example Token (TOK)
  *
  * TOK Tokens are divisible by 1e18 (1 000 000 000 000 000 000) base.
@@ -21,7 +21,7 @@ import "../token/ERC20/ValidTransferStandardToken.sol";
  * @notice All tokens are pre-assigned to the creator. Note they can later distribute these
  * tokens as they wish using `transfer` and other `StandardToken` functions.
  */
-contract ValidTransferStandardTokenMock is DetailedERC20, ValidTransferStandardToken {
+contract SafeStandardTokenMock is DetailedERC20, SafeStandardToken {
   string public constant NAME = "Example Token";
   string public constant SYMBOL = "TOK";
   uint8 public constant DECIMALS = 18;
