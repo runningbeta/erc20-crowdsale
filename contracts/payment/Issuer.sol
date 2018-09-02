@@ -48,9 +48,9 @@ contract Issuer is Ownable {
   function issue(address _beneficiary, uint256 _amount) public onlyOwner {
     require(!issued[_beneficiary], "Already issued to beneficiary.");
     require(_beneficiary != address(0), "Destination address should not be 0x0.");
-    token.transferFrom(benefactor, _beneficiary, _amount);
     issued[_beneficiary] = true;
     issuedCount = issuedCount.add(_amount);
+    token.transferFrom(benefactor, _beneficiary, _amount);
   }
 
 }
