@@ -5,7 +5,7 @@ const { shouldBehaveLikeTokenEscrow } = require('./TokenEscrow.behaviour');
 const Token = artifacts.require('FixedSupplyBurnableToken');
 const TokenEscrow = artifacts.require('TokenEscrow');
 
-contract('TokenEscrow', function ([_, owner, ...otherAccounts]) {
+contract('TokenEscrow', function ([_, owner, ...other]) {
   beforeEach(async function () {
     this.token = await Token.new({ from: owner });
     this.escrow = await TokenEscrow.new(this.token.address, { from: owner });
@@ -15,5 +15,5 @@ contract('TokenEscrow', function ([_, owner, ...otherAccounts]) {
     await (TokenEscrow.new(0x0, { from: owner })).should.be.rejectedWith(EVMRevert);
   });
 
-  shouldBehaveLikeTokenEscrow(owner, otherAccounts);
+  shouldBehaveLikeTokenEscrow(owner, other);
 });

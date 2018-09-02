@@ -11,12 +11,12 @@ const TokenTimelockIndividualEscrow = artifacts.require('TokenTimelockIndividual
 const { shouldBehaveLikeTokenEscrow } = require('./TokenEscrow.behaviour');
 const { shouldBehaveLikeTokenTimelockIndividualEscrow } = require('./TokenTimelockIndividualEscrow.behaviour');
 
-contract('TokenTimelockIndividualEscrow', function ([owner, ...accounts]) {
+contract('TokenTimelockIndividualEscrow', function ([owner, ...other]) {
   beforeEach(async function () {
     this.token = await Token.new({ from: owner });
     this.escrow = await TokenTimelockIndividualEscrow.new(this.token.address, { from: owner });
   });
 
-  shouldBehaveLikeTokenEscrow(owner, accounts);
-  shouldBehaveLikeTokenTimelockIndividualEscrow(owner, accounts);
+  shouldBehaveLikeTokenEscrow(owner, other);
+  shouldBehaveLikeTokenTimelockIndividualEscrow(owner, other);
 });

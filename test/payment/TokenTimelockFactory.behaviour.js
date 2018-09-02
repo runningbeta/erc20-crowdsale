@@ -15,7 +15,7 @@ require('chai')
 
 const TokenTimelock = artifacts.require('TokenTimelock');
 
-function shouldBehaveLikeTokenTimelockFactory (owner, beneficiary, otherAccounts) {
+function shouldBehaveLikeTokenTimelockFactory (owner, beneficiary, other) {
   const amount = ether(17.0);
 
   describe('as a TokenTimelockFactory', function () {

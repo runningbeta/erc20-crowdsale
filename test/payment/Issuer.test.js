@@ -4,7 +4,7 @@ const { shouldBehaveLikeIssuer } = require('./Issuer.behaviour');
 const Token = artifacts.require('FixedSupplyBurnableToken');
 const Issuer = artifacts.require('Issuer');
 
-contract('Issuer', function ([_, benefactor, owner, customer, ...otherAccounts]) {
+contract('Issuer', function ([_, benefactor, owner, alice, ...other]) {
   beforeEach(async function () {
     this.token = await Token.new({ from: benefactor });
     this.issuer = await Issuer.new(benefactor, this.token.address, { from: owner });
@@ -18,5 +18,5 @@ contract('Issuer', function ([_, benefactor, owner, customer, ...otherAccounts])
     await (Issuer.new(benefactor, 0x0, { from: owner })).should.be.rejectedWith(EVMRevert);
   });
 
-  shouldBehaveLikeIssuer(benefactor, owner, customer, otherAccounts);
+  shouldBehaveLikeIssuer(benefactor, owner, alice, other);
 });

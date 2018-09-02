@@ -8,7 +8,7 @@ require('chai')
   .use(require('chai-as-promised'))
   .should();
 
-function shouldBehaveLikeTokenVestingFactory (owner, beneficiary, otherAccounts) {
+function shouldBehaveLikeTokenVestingFactory (owner, beneficiary, other) {
   describe('as a TokenVestingFactory', function () {
     let vestingStart;
     let vestingClif;

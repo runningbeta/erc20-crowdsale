@@ -9,7 +9,7 @@ require('chai')
   .use(require('chai-as-promised'))
   .should();
 
-function shouldBehaveLikeIssuer (benefactor, owner, customer, [customer2, ...otherAccounts]) {
+function shouldBehaveLikeIssuer (benefactor, owner, alice, [bob, ...other]) {
   const amount = ether(420.0);
 
   describe('as an Issuer', function () {
@@ -18,38 +18,38 @@ function shouldBehaveLikeIssuer (benefactor, owner, customer, [customer2, ...oth
     });
 
     it('issue some tokens', async function () {
-      await this.issuer.contract.issue['address,uint256'](customer, amount, { from: owner, gas: 500000 });
+      await this.issuer.contract.issue['address,uint256'](alice, amount, { from: owner, gas: 500000 });
 
       (await this.issuer.issuedCount()).should.be.bignumber.equal(amount);
-      (await this.token.balanceOf(customer)).should.be.bignumber.equal(amount);
+      (await this.token.balanceOf(alice)).should.be.bignumber.equal(amount);
     });
 
     it('issue tokens multiple times', async function () {
-      await this.issuer.contract.issue['address,uint256'](customer, amount, { from: owner, gas: 500000 });
-      await this.issuer.contract.issue['address,uint256'](customer2, amount * 2, { from: owner, gas: 500000 });
+      await this.issuer.contract.issue['address,uint256'](alice, amount, { from: owner, gas: 500000 });
+      await this.issuer.contract.issue['address,uint256'](bob, amount * 2, { from: owner, gas: 500000 });
 
       (await this.issuer.issuedCount()).should.be.bignumber.equal(amount * 3);
 
-      (await this.token.balanceOf(customer)).should.be.bignumber.equal(amount);
-      (await this.token.balanceOf(customer2)).should.be.bignumber.equal(amount * 2);
+      (await this.token.balanceOf(alice)).should.be.bignumber.equal(amount);
+      (await this.token.balanceOf(bob)).should.be.bignumber.equal(amount * 2);
     });
 
     it('only benefactor can issue', async function () {
       await expectThrow(() => this.issuer.contract
-        .issue['address,uint256'](customer, amount * 3, { from: customer, gas: 500000 }),
+        .issue['address,uint256'](alice, amount * 3, { from: alice, gas: 500000 }),
       EVMRevert);
 
       (await this.issuer.issuedCount()).should.be.bignumber.equal(0);
-      (await this.token.balanceOf(customer)).should.be.bignumber.equal(0);
+      (await this.token.balanceOf(alice)).should.be.bignumber.equal(0);
     });
 
     it('fails to issue over allowance', async function () {
       await expectThrow(() => this.issuer.contract
-        .issue['address,uint256'](customer, amount * 5, { from: owner, gas: 500000 }),
+        .issue['address,uint256'](alice, amount * 5, { from: owner, gas: 500000 }),
       EVMRevert);
 
       (await this.issuer.issuedCount()).should.be.bignumber.equal(0);
-      (await this.token.balanceOf(customer)).should.be.bignumber.equal(0);
+      (await this.token.balanceOf(alice)).should.be.bignumber.equal(0);
     });
 
     it('fails to issue to 0x0 address', async function () {
@@ -62,12 +62,12 @@ function shouldBehaveLikeIssuer (benefactor, owner, customer, [customer2, ...oth
     });
 
     it('fails to issue twice to same address', async function () {
-      await this.issuer.contract.issue['address,uint256'](customer, amount, { from: owner, gas: 500000 });
+      await this.issuer.contract.issue['address,uint256'](alice, amount, { from: owner, gas: 500000 });
       await expectThrow(() => this.issuer.contract
-        .issue['address,uint256'](customer, amount, { from: owner, gas: 500000 }), EVMRevert);
+        .issue['address,uint256'](alice, amount, { from: owner, gas: 500000 }), EVMRevert);
 
       (await this.issuer.issuedCount()).should.be.bignumber.equal(amount);
-      (await this.token.balanceOf(customer)).should.be.bignumber.equal(amount);
+      (await this.token.balanceOf(alice)).should.be.bignumber.equal(amount);
     });
   });
 }

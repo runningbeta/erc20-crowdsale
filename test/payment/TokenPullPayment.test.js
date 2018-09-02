@@ -12,7 +12,7 @@ const TokenPullPayment = artifacts.require('TokenPullPaymentMock');
 
 const { shouldBehaveLikeTokenPullPayment } = require('./TokenPullPayment.behaviour');
 
-contract('TokenPullPayment', function ([_, owner, payer, payee1, payee2]) {
+contract('TokenPullPayment', function ([_, owner, payer, alice, bob]) {
   const amount = ether(17.0);
 
   beforeEach(async function () {
@@ -21,5 +21,5 @@ contract('TokenPullPayment', function ([_, owner, payer, payee1, payee2]) {
     await this.token.transfer(this.contract.address, amount, { from: owner });
   });
 
-  shouldBehaveLikeTokenPullPayment(owner, payer, payee1, payee2);
+  shouldBehaveLikeTokenPullPayment(owner, payer, alice, bob);
 });

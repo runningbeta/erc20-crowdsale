@@ -15,7 +15,7 @@ require('chai')
 const Token = artifacts.require('FixedSupplyBurnableToken');
 const TokenTimelockEscrowMock = artifacts.require('TokenTimelockEscrowMock');
 
-contract('TokenTimelockEscrow', function ([owner, ...otherAccounts]) {
+contract('TokenTimelockEscrow', function ([owner, ...other]) {
   let now;
   let releaseTime;
 
@@ -38,7 +38,7 @@ contract('TokenTimelockEscrow', function ([owner, ...otherAccounts]) {
 
   context('before release time', function () {
     const amount = ether(23.0);
-    const payee = otherAccounts[1];
+    const payee = other[1];
 
     it('reverts on withdrawals', async function () {
       await this.token.approve(this.escrow.address, amount, { from: owner });
@@ -54,6 +54,6 @@ contract('TokenTimelockEscrow', function ([owner, ...otherAccounts]) {
       await increaseTimeTo(releaseTime + 1);
     });
 
-    shouldBehaveLikeTokenEscrow(owner, otherAccounts);
+    shouldBehaveLikeTokenEscrow(owner, other);
   });
 });
