@@ -109,7 +109,8 @@ contract('Token Generation Event', function ([
   it('should distribute start node tokens (8%)', async function () {
     await this.distributor
       .depositAndLock(nodeFund, this.totalSupply.div(100).mul(8), this.sixMonthsTime, { from: owner });
-    console.log('Nodes - 6m 8% Timelock: ', await this.timelockFactory.beneficiaryInstantiations(nodeFund, 0));
+    const instatiations = await this.timelockFactory.beneficiaryInstantiations(nodeFund, 0);
+    console.log('Nodes - 6m 8% Timelock: ', instatiations);
 
     (await this.token.allowance(benefactor, this.distributor.address))
       .should.be.bignumber.equal(this.totalSupply.div(100).mul(40));
@@ -118,7 +119,8 @@ contract('Token Generation Event', function ([
   it('should distribute developer tokens (2.5%)', async function () {
     await this.distributor
       .depositAndLock(developers, this.totalSupply.div(1000).mul(25), this.twoYearTime, { from: owner });
-    console.log('Developers - 2yr 2.5% Timelock: ', await this.timelockFactory.beneficiaryInstantiations(developers, 0));
+    const instatiations = await this.timelockFactory.beneficiaryInstantiations(developers, 0);
+    console.log('Developers - 2yr 2.5% Timelock: ', instatiations);
 
     (await this.token.allowance(benefactor, this.distributor.address))
       .should.be.bignumber.equal(this.totalSupply.div(1000).mul(375));
@@ -127,7 +129,8 @@ contract('Token Generation Event', function ([
   it('should distribute advisor tokens (2.5%)', async function () {
     await this.distributor
       .depositAndLock(advisors, this.totalSupply.div(1000).mul(25), this.twoYearTime, { from: owner });
-    console.log('Advisors - 2yr 2.5% Timelock: ', await this.timelockFactory.beneficiaryInstantiations(advisors, 0));
+    const instatiations = await this.timelockFactory.beneficiaryInstantiations(advisors, 0);
+    console.log('Advisors - 2yr 2.5% Timelock: ', instatiations);
 
     (await this.token.allowance(benefactor, this.distributor.address))
       .should.be.bignumber.equal(this.totalSupply.div(1000).mul(350));
