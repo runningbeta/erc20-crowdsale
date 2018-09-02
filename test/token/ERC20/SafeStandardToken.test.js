@@ -1,5 +1,5 @@
-const { EVMRevert } = require('../helpers/EVMRevert');
-const { ether } = require('../helpers/ether');
+const { EVMRevert } = require('../../helpers/EVMRevert');
+const { ether } = require('../../helpers/ether');
 
 const BigNumber = web3.BigNumber;
 const Token = artifacts.require('SafeStandardTokenMock');
