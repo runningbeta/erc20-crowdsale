@@ -64,7 +64,7 @@ const shouldBehaveLikeTokenEscrow = (owner, [alice, bob]) => {
       it('can increase escrow allowance', async function () {
         await this.token.increaseApproval(this.escrow.address, amount, { from: owner });
         const doubleAmount = amount.mul(2);
-        this.escrow.deposit(alice, doubleAmount, { from: owner });
+        await this.escrow.deposit(alice, doubleAmount, { from: owner });
 
         (await this.token.balanceOf(this.escrow.address))
           .should.be.bignumber.equal(doubleAmount);
