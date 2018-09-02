@@ -10,7 +10,7 @@ require('chai')
   .use(require('chai-as-promised'))
   .should();
 
-function shouldBehaveLikeTokenTimelockIndividualEscrow (owner, other) {
+const shouldBehaveLikeTokenTimelockIndividualEscrow = (owner, other) => {
   let now;
   let vestingTime;
 
@@ -29,19 +29,24 @@ function shouldBehaveLikeTokenTimelockIndividualEscrow (owner, other) {
     it('can depositAndLock', async function () {
       await this.escrow.depositAndLock(alice, amount, vestingTime, { from: owner });
 
-      (await this.token.balanceOf(this.escrow.address)).should.bignumber.equal(amount);
-      (await this.escrow.depositsOf(alice)).should.bignumber.equal(amount);
+      (await this.token.balanceOf(this.escrow.address))
+        .should.bignumber.equal(amount);
+      (await this.escrow.depositsOf(alice))
+        .should.bignumber.equal(amount);
     });
 
     it('fails to depositAndLock twice to same address', async function () {
       await this.escrow.depositAndLock(alice, amount, vestingTime, { from: owner });
 
-      (await this.token.balanceOf(this.escrow.address)).should.bignumber.equal(amount);
-      (await this.escrow.depositsOf(alice)).should.bignumber.equal(amount);
+      (await this.token.balanceOf(this.escrow.address))
+        .should.bignumber.equal(amount);
+      (await this.escrow.depositsOf(alice))
+        .should.bignumber.equal(amount);
 
       await (this.escrow.depositAndLock(alice, amount, vestingTime + duration.days(2), { from: owner }))
         .should.be.rejectedWith(EVMRevert);
-      (await this.escrow.depositsOf(alice)).should.bignumber.equal(amount);
+      (await this.escrow.depositsOf(alice))
+        .should.bignumber.equal(amount);
     });
 
     describe('Deposit then Lock', function () {
@@ -58,7 +63,8 @@ function shouldBehaveLikeTokenTimelockIndividualEscrow (owner, other) {
       });
 
       it('vesting time must be in the future', async function () {
-        await (this.escrow.lock(bob, now, { from: owner })).should.be.rejectedWith(EVMRevert);
+        await (this.escrow.lock(bob, now, { from: owner }))
+          .should.be.rejectedWith(EVMRevert);
       });
 
       it('fails to lock a locked address', async function () {
@@ -80,7 +86,8 @@ function shouldBehaveLikeTokenTimelockIndividualEscrow (owner, other) {
       it('fails to withdraw', async function () {
         await (this.escrow.withdraw(alice, { from: owner }))
           .should.be.rejectedWith(EVMRevert);
-        (await this.token.balanceOf(alice)).should.be.bignumber.equal(0);
+        (await this.token.balanceOf(alice))
+          .should.be.bignumber.equal(0);
       });
     });
 
@@ -92,7 +99,8 @@ function shouldBehaveLikeTokenTimelockIndividualEscrow (owner, other) {
 
       it('can withdraw', async function () {
         await this.escrow.withdraw(alice, { from: owner });
-        (await this.token.balanceOf(alice)).should.be.bignumber.equal(amount);
+        (await this.token.balanceOf(alice))
+          .should.be.bignumber.equal(amount);
       });
     });
   });

@@ -11,11 +11,13 @@ contract('Issuer', function ([_, benefactor, owner, alice, ...other]) {
   });
 
   it('fails if benefactor is zero address', async function () {
-    await (Issuer.new(0x0, this.token.address, { from: owner })).should.be.rejectedWith(EVMRevert);
+    await (Issuer.new(0x0, this.token.address, { from: owner }))
+      .should.be.rejectedWith(EVMRevert);
   });
 
   it('fails if token is zero address', async function () {
-    await (Issuer.new(benefactor, 0x0, { from: owner })).should.be.rejectedWith(EVMRevert);
+    await (Issuer.new(benefactor, 0x0, { from: owner }))
+      .should.be.rejectedWith(EVMRevert);
   });
 
   shouldBehaveLikeIssuer(benefactor, owner, alice, other);

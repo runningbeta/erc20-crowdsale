@@ -12,7 +12,8 @@ contract('TokenEscrow', function ([_, owner, ...other]) {
   });
 
   it('fails if benefactor is zero address', async function () {
-    await (TokenEscrow.new(0x0, { from: owner })).should.be.rejectedWith(EVMRevert);
+    await (TokenEscrow.new(0x0, { from: owner }))
+      .should.be.rejectedWith(EVMRevert);
   });
 
   shouldBehaveLikeTokenEscrow(owner, other);
