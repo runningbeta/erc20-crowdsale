@@ -52,9 +52,6 @@ contract TokenDistributor is HasNoEther, Finalizable {
   // Amount of wei raised
   uint256 public weiRaised;
 
-  // Allowance that is given to crowdsale contract after it is created
-  uint256 public crowdsaleAllowance;
-
   // Crowdsale that is created after the presale distribution is finalized
   SampleAllowanceCrowdsale public crowdsale;
 
@@ -354,10 +351,10 @@ contract TokenDistributor is HasNoEther, Finalizable {
       closingTime,
       withdrawTime
     );
-    crowdsaleAllowance = token.allowance(benefactor, this);
-    token.transferFrom(benefactor, this, crowdsaleAllowance);
-    token.approve(crowdsale, crowdsaleAllowance);
-    emit CrowdsaleInstantiated(msg.sender, crowdsale, crowdsaleAllowance);
+    uint256 allowance = token.allowance(benefactor, this);
+    token.transferFrom(benefactor, this, allowance);
+    token.approve(crowdsale, allowance);
+    emit CrowdsaleInstantiated(msg.sender, crowdsale, allowance);
   }
 
 }
