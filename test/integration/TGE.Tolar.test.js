@@ -1,3 +1,4 @@
+const { latestTime } = require('../helpers/latestTime');
 const { duration } = require('../helpers/increaseTime');
 const { advanceBlock } = require('../helpers/advanceToBlock');
 const { ether } = require('../helpers/ether');
@@ -34,9 +35,10 @@ contract('TokenDistributor', function ([
   before(async function () {
     (await advanceBlock()); // get blocks in sync with now
 
-    this.openingTime = moment('2018-09-15T14:00:00+00:00').unix();
-    this.closingTime = moment('2018-09-20T14:00:00+00:00').unix();
-    this.withdrawTime = moment('2018-09-27T00:00:00+00:00').unix();
+    this.now = (await latestTime());
+    this.openingTime = this.now + duration.days(10);
+    this.closingTime = this.openingTime + duration.days(5);
+    this.withdrawTime = this.closingTime + duration.days(5);
 
     this.bonusTime = this.closingTime + duration.days(30);
 
