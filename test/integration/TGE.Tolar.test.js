@@ -1,9 +1,5 @@
-const { inLogs, notInLogs } = require('../helpers/expectEvent');
-const { expectThrow } = require('../helpers/expectThrow');
-const { duration, increaseTimeTo } = require('../helpers/increaseTime');
+const { duration } = require('../helpers/increaseTime');
 const { advanceBlock } = require('../helpers/advanceToBlock');
-const { latestTime } = require('../helpers/latestTime');
-const { EVMRevert } = require('../helpers/EVMRevert');
 const { ether } = require('../helpers/ether');
 
 const moment = require('moment');
