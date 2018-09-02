@@ -1,7 +1,8 @@
-const { latestTime } = require('../helpers/latestTime');
-const { duration } = require('../helpers/increaseTime');
-const { advanceBlock } = require('../helpers/advanceToBlock');
-const { ether } = require('../helpers/ether');
+const { latestTime } = require('./helpers/latestTime');
+const { duration } = require('./helpers/increaseTime');
+const { advanceBlock } = require('./helpers/advanceToBlock');
+const { ether } = require('./helpers/ether');
+const { EVMRevert } = require('./helpers/EVMRevert');
 
 const BigNumber = web3.BigNumber;
 
@@ -13,8 +14,9 @@ require('chai')
 const Token = artifacts.require('FixedSupplyBurnableToken');
 const TokenDistributor = artifacts.require('TokenDistributor');
 const TokenTimelockFactory = artifacts.require('TokenTimelockFactoryImpl');
+const Crowdsale = artifacts.require('SampleAllowanceCrowdsale');
 
-contract('TokenDistributor', function ([
+contract('Token Generation Event', function ([
   benefactor,
   owner,
   founder1,
@@ -46,12 +48,15 @@ contract('TokenDistributor', function ([
     this.threeYearTime = this.closingTime + duration.years(3);
   });
 
-  it('create Tolar token', async function () {
+  it('should create ERC20 token contract', async function () {
     this.token = await Token.new({ from: benefactor });
     this.totalSupply = await this.token.totalSupply();
+
+    (await this.token.balanceOf(benefactor))
+      .should.be.bignumber.equal(this.totalSupply);
   });
 
-  it('create token distributor', async function () {
+  it('should create distributor contract', async function () {
     this.distributor = await TokenDistributor.new(
       benefactor,
       rate,
@@ -65,14 +70,18 @@ contract('TokenDistributor', function ([
       { from: owner }
     );
     await this.token.approve(this.distributor.address, this.totalSupply, { from: benefactor });
+    (await this.token.allowance(benefactor, this.distributor.address))
+      .should.be.bignumber.equal(this.totalSupply);
   });
 
-  it('set Token Timelock Factory', async function () {
+  it('should init TokenTimelockFactory', async function () {
     this.timelockFactory = await TokenTimelockFactory.new({ from: owner });
     await this.distributor.setTokenTimelockFactory(this.timelockFactory.address, { from: owner });
+    (await this.distributor.timelockFactory())
+      .should.be.equal(this.timelockFactory.address);
   });
 
-  it('distribute dev fund tokens (32%)', async function () {
+  it('should distribute dev fund tokens (32%)', async function () {
     await this.distributor
       .depositAndLock(devFund, this.totalSupply.div(100).mul(5), this.oneYearTime, { from: owner });
     await this.distributor
@@ -87,7 +96,7 @@ contract('TokenDistributor', function ([
       .should.be.bignumber.equal(this.totalSupply.div(100).mul(68));
   });
 
-  it('distribute founder tokens (2 * 10%)', async function () {
+  it('should distribute founder tokens (2 * 10%)', async function () {
     await this.distributor.depositAndLock(founder1, this.totalSupply.div(10), this.twoYearTime, { from: owner });
     await this.distributor.depositAndLock(founder2, this.totalSupply.div(10), this.twoYearTime, { from: owner });
     console.log('Founder 1 - 2yr 10% Timelock: ', await this.timelockFactory.beneficiaryInstantiations(founder1, 0));
@@ -97,7 +106,7 @@ contract('TokenDistributor', function ([
       .should.be.bignumber.equal(this.totalSupply.div(100).mul(48));
   });
 
-  it('distribute start node tokens (8%)', async function () {
+  it('should distribute start node tokens (8%)', async function () {
     await this.distributor
       .depositAndLock(nodeFund, this.totalSupply.div(100).mul(8), this.sixMonthsTime, { from: owner });
     console.log('Nodes - 6m 8% Timelock: ', await this.timelockFactory.beneficiaryInstantiations(nodeFund, 0));
@@ -106,23 +115,53 @@ contract('TokenDistributor', function ([
       .should.be.bignumber.equal(this.totalSupply.div(100).mul(40));
   });
 
-  it('distribute developer tokens (2.5%)', async function () {
+  it('should distribute developer tokens (2.5%)', async function () {
     await this.distributor
       .depositAndLock(developers, this.totalSupply.div(1000).mul(25), this.twoYearTime, { from: owner });
-    console.log('Developers - 2yr 2.5% Timelock: ',
-      await this.timelockFactory.beneficiaryInstantiations(developers, 0));
+    console.log('Developers - 2yr 2.5% Timelock: ', await this.timelockFactory.beneficiaryInstantiations(developers, 0));
 
     (await this.token.allowance(benefactor, this.distributor.address))
       .should.be.bignumber.equal(this.totalSupply.div(1000).mul(375));
   });
 
-  it('distribute advisor tokens (2.5%)', async function () {
+  it('should distribute advisor tokens (2.5%)', async function () {
     await this.distributor
       .depositAndLock(advisors, this.totalSupply.div(1000).mul(25), this.twoYearTime, { from: owner });
-    console.log('Advisors - 2yr 2.5% Timelock: ',
-      await this.timelockFactory.beneficiaryInstantiations(advisors, 0));
+    console.log('Advisors - 2yr 2.5% Timelock: ', await this.timelockFactory.beneficiaryInstantiations(advisors, 0));
 
     (await this.token.allowance(benefactor, this.distributor.address))
       .should.be.bignumber.equal(this.totalSupply.div(1000).mul(350));
+  });
+
+  it('should be able to finalize', async function () {
+    await this.distributor.finalize({ from: owner });
+
+    (await this.distributor.isFinalized())
+      .should.be.equal(true);
+  });
+
+  describe('after Finalization', function () {
+    it('should create crowdsale', async function () {
+      const crowdsaleAddr = await this.distributor.crowdsale();
+      this.crowdsale = await Crowdsale.at(crowdsaleAddr);
+
+      (await this.token.allowance(this.distributor.address, this.crowdsale.address))
+        .should.be.bignumber.equal(this.totalSupply.div(1000).mul(350));
+
+      (await this.token.allowance(benefactor, this.distributor.address))
+        .should.be.bignumber.equal(0);
+
+      (await this.crowdsale.cap())
+        .should.be.bignumber.equal(cap);
+
+      (await this.crowdsale.tokenWallet())
+        .should.be.bignumber.equal(this.distributor.address);
+    });
+
+    it('should disable deposits', async function () {
+      await this.distributor
+        .depositAndLock(advisors, this.totalSupply.div(1000).mul(25), this.twoYearTime, { from: owner })
+        .should.be.rejectedWith(EVMRevert);
+    });
   });
 });

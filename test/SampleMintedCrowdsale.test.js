@@ -31,12 +31,12 @@ contract('Token', function ([
     this.token = await Token.new({ from: owner });
   });
 
-  it(`total suply is ${INITIAL_SUPPLY}`, async function () {
+  it(`should have a total suply of ${INITIAL_SUPPLY}`, async function () {
     (await this.token.totalSupply())
       .should.be.bignumber.equal(INITIAL_SUPPLY);
   });
 
-  it('refuses ether', async function () {
+  it('should refuse ether', async function () {
     await (this.token.send(ether(1), { from: owner }))
       .should.be.rejectedWith(EVMRevert);
   });
