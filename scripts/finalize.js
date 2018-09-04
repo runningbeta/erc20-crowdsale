@@ -1,5 +1,5 @@
 const minimist = require('minimist');
-var inquirer = require('inquirer');
+const inquirer = require('inquirer');
 
 const Finalizable = artifacts.require('Finalizable');
 
@@ -7,7 +7,7 @@ const Finalizable = artifacts.require('Finalizable');
  * Script that can be used to finalize Finalizable contracts
  *
  * Run this script by passing additional arguments:
- *   truffle exec ./scripts/finalize.js --contract 0xbd2e0bd56dea31e24082bf88fd0ad88ff27ef95c
+ *   truffle exec ./scripts/finalize.js --contract 0xbd2e0bd...
  * @param callback required callback
  */
 module.exports = async function (callback) {

@@ -7,7 +7,7 @@ const TokenDistributor = artifacts.require('TokenDistributor');
  * Script that can be used to read public params from TokenDistributor contract
  *
  * Run this script by passing additional arguments:
- *   truffle exec ./scripts/read-distributor.js --contract 0xbd2e0bd56dea31e24082bf88fd0ad88ff27ef95c
+ *   truffle exec ./scripts/read-distributor.js --contract 0xbd2e0bd...
  * @param callback required callback
  */
 module.exports = async function (callback) {

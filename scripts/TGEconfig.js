@@ -23,7 +23,7 @@ module.exports = {
   closingTime,
 
   withdrawTime,
-  bonusTime: closingTime + duration.days(30),
+  bonusTime: closingTime + duration.weeks(12),
 
   escrow: [
     // founders 20%

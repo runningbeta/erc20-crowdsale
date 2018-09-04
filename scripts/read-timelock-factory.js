@@ -9,7 +9,7 @@ const Token = artifacts.require('ERC20');
  * Script that can be used to read public params from TokenDistributor contract
  *
  * Run this script by passing additional arguments:
- *   truffle exec ./scripts/read-timelock-factory.js --contract 0xbd2e0bd56dea31e24082bf88fd0ad88ff27ef95c --creator 0xf39129ff022ae447ffd82be514432669dc97bda3
+ *   truffle exec ./scripts/read-timelock-factory.js --contract 0xbd2e0bd... --creator 0x5aeda56...
  * @param callback required callback
  */
 module.exports = async function (callback) {

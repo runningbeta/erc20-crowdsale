@@ -7,7 +7,7 @@ const TokenDistributor = artifacts.require('TokenDistributor');
 
 /**
  * Run this script by passing additional arguments
- * truffle exec ./scripts/presale.js --distributor 0xbd2e0bd56dea31e24082bf88fd0ad88ff27ef95c --data ./scripts/presale-sample.csv
+ * truffle exec ./scripts/presale.js --distributor 0xbd2e0bd... --data ./scripts/presale-sample.csv
  * @param callback required callback
  */
 module.exports = async function (callback) {
