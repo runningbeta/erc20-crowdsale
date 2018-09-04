@@ -4,8 +4,7 @@ require('babel-register');
 require('babel-polyfill');
 require('dotenv').config();
 
-const Web3 = require('web3');
-const web3 = new Web3();
+const { utils } = require('web3');
 
 const HDWalletProvider = require('truffle-hdwallet-provider');
 
@@ -42,19 +41,18 @@ module.exports = {
       provider: () => infuraProvider('rinkeby'),
       network_id: 4, // eslint-disable-line camelcase
       gas: 4700000,
-      gasPrice: web3.utils.toWei('50', 'gwei'),
+      gasPrice: utils.toWei('50', 'gwei'),
     },
     ropsten: {
       provider: () => infuraProvider('ropsten'),
       network_id: 3, // eslint-disable-line camelcase
-      gas: 4700000,
-      gasPrice: web3.utils.toWei('20', 'gwei'),
+      gasPrice: utils.toWei('20', 'gwei'),
     },
     mainnet: {
       provider: () => infuraProvider('mainnet'),
       network_id: 1, // eslint-disable-line camelcase
       gas: 4712388,
-      gasPrice: web3.utils.toWei('10', 'gwei'),
+      gasPrice: utils.toWei('10', 'gwei'),
     },
   },
   solc: {
