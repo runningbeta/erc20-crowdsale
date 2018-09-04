@@ -1,7 +1,7 @@
 const fs = require('fs');
 const csv = require('csvtojson');
 const minimist = require('minimist');
-const promisify = require('./promisify');
+const { promisify } = require('util');
 const { utils } = require('web3');
 
 const TokenDistributor = artifacts.require('TokenDistributor');
@@ -39,8 +39,9 @@ module.exports = async function (callback) {
 
         // this transactions seems to need 50% more gas than estimated
         // const options = { gas: Math.floor(estimatedGas * 1.5) };
-        const options = {};
-        await distributor.contract.depositPresale['address,uint256,uint256'](sale.address, sale.tokens, sale.wei, options);
+        const accounts = await promisify(web3.eth.getAccounts)();
+        const options = { from: accounts[0] };
+        await promisify(distributor.contract.depositPresale['address,uint256,uint256'])(sale.address, sale.tokens, sale.wei, options);
         await distributor.depositBonus(sale.address, sale.bonus);
 
         // Log Presale invesment

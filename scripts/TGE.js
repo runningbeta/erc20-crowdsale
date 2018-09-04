@@ -1,6 +1,6 @@
 const minimist = require('minimist');
 const moment = require('moment');
-const promisify = require('./promisify');
+const { promisify } = require('util');
 
 const TokenDistributor = artifacts.require('TokenDistributor');
 const TokenTimelockFactory = artifacts.require('TokenTimelockFactoryImpl');
@@ -12,7 +12,8 @@ module.exports = async function (callback) {
     console.log('TGE script');
     console.log('----------');
 
-    const owner = await promisify(cb => web3.eth.getAccounts(cb));
+    const accounts = await promisify(web3.eth.getAccounts)();
+    const owner = accounts[0];
     console.log(`Using owner: ${owner}`);
 
     const args = minimist(process.argv.slice(2), { string: 'wallet' });
