@@ -47,8 +47,10 @@ module.exports = async function (callback) {
         console.log('  - Amount: ' + eventObj.args.amount);
       }
     });
+
+    callback();
   } catch (e) {
     console.error('Read error!');
-    console.error(e);
+    callback(e);
   }
 };

@@ -37,8 +37,10 @@ module.exports = async function (callback) {
       console.log('Logs emmited:');
       console.log(logs);
     }
+
+    callback();
   } catch (e) {
     console.error('Finalization error!');
-    console.error(e);
+    callback(e);
   }
 };

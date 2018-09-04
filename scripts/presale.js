@@ -1,6 +1,7 @@
 const fs = require('fs');
 const csv = require('csvtojson');
 const minimist = require('minimist');
+const promisify = require('./promisify');
 const { utils } = require('web3');
 
 const TokenDistributor = artifacts.require('TokenDistributor');
@@ -21,8 +22,6 @@ module.exports = async function (callback) {
     console.log(`Using distributor contract: ${distAddress}`);
     console.log(`Reading presale data from: ${fileName}`);
 
-    const [owner] = web3.eth.accounts;
-
     const csvFs = await fs.createReadStream(fileName);
     const presale = await csv({ eol: '\n' }).fromStream(csvFs);
 
@@ -34,14 +33,15 @@ module.exports = async function (callback) {
       for (let j = 0; j < presale.length; j++) {
         const sale = presale[j];
 
-        const estimatedGas = await distributor.contract.depositPresale['address,uint256,uint256']
-          .estimateGas(sale.address, sale.tokens, sale.wei, { from: owner });
+        // TODO: not working!
+        // const estimatedGas = await promisify(cb => distributor.contract.depositPresale['address,uint256,uint256']
+        //   .estimateGas(sale.address, sale.tokens, sale.wei, cb));
+
         // this transactions seems to need 50% more gas than estimated
-        await distributor.contract.depositPresale['address,uint256,uint256'](
-          sale.address, sale.tokens, sale.wei,
-          { from: owner, gas: Math.floor(estimatedGas * 1.5) }
-        );
-        await distributor.depositBonus(sale.address, sale.bonus, { from: owner });
+        // const options = { gas: Math.floor(estimatedGas * 1.5) };
+        const options = {};
+        await distributor.contract.depositPresale['address,uint256,uint256'](sale.address, sale.tokens, sale.wei, options);
+        await distributor.depositBonus(sale.address, sale.bonus);
 
         // Log Presale invesment
         console.log(`Presale #${j} | ${sale.address}`);
@@ -51,7 +51,8 @@ module.exports = async function (callback) {
         console.log(`  - Invested: ${totalETH} | Bought: ${totalTOL} | Bonus: ${totalBonus}\n`);
       }
     }
+    callback();
   } catch (e) {
-    console.error(e);
+    callback(e);
   }
 };

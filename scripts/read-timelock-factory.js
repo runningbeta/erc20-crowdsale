@@ -40,8 +40,10 @@ module.exports = async function (callback) {
       const releaseTime = await timelock.releaseTime();
       console.log(`  - Release time: ${releaseTime} or ${moment.unix(releaseTime)}`);
     }
+
+    callback();
   } catch (e) {
     console.error('Read error!');
-    console.error(e);
+    callback(e);
   }
 };

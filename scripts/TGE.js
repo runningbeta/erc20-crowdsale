@@ -75,11 +75,12 @@ module.exports = async function (callback) {
         console.log(`Deposit ${escrow.amount}% for ${escrow.id} and lock until ${moment.unix(escrow.duration)
           .format('dddd, MMMM Do YYYY, h:mm:ss a')}`);
         const receipt = await distributor.depositAndLock(escrow.address, escrowAmount, escrow.duration);
-        console.log(`Locked ${escrowAmount.div(1e+18).toFormat()}TOL tokens at address ${receipt
-          .logs[0].args.instantiation}\n`);
+        const timelockAddr = receipt.logs[0].args.instantiation;
+        console.log(`Locked ${escrowAmount.div(1e+18).toFormat()} TOL tokens at: ${timelockAddr}\n`);
       }
     }
+    callback();
   } catch (e) {
-    console.error(e);
+    callback(e);
   }
 };

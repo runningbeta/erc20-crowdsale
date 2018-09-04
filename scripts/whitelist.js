@@ -13,7 +13,6 @@ const TokenDistributor = artifacts.require('TokenDistributor');
  */
 module.exports = async function (callback) {
   try {
-    console.log(web3.eth.accounts);
     const args = minimist(process.argv.slice(2), { string: 'distributor' });
     const distAddress = args.distributor; // address of the distributor contract
     const fileName = args.data; // path to the CSV file
@@ -37,10 +36,11 @@ module.exports = async function (callback) {
         addresses.push(presale[j].address);
       }
 
-      const [owner] = web3.eth.accounts;
-      await setGroupCap(distributor, owner, addresses, cap);
+      await setGroupCap(distributor, addresses, cap);
     }
+
+    callback();
   } catch (e) {
-    console.error(e);
+    callback(e);
   }
 };

@@ -68,8 +68,10 @@ module.exports = async function (callback) {
 
     const vestingFactory = await contract.vestingFactory();
     console.log(`Vesting Factory contract: ${vestingFactory}`);
+
+    callback();
   } catch (e) {
     console.error('Read error!');
-    console.error(e);
+    callback(e);
   }
 };
