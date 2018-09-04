@@ -1,4 +1,5 @@
 const minimist = require('minimist');
+var inquirer = require('inquirer');
 
 const Finalizable = artifacts.require('Finalizable');
 
@@ -26,11 +27,16 @@ module.exports = async function (callback) {
       return;
     }
 
-    console.log('Finalizing contract...');
-    const { logs } = await contract.finalize();
-    console.log('Finalization success!');
-    console.log('Logs emmited:');
-    console.log(logs);
+    const message = `Please confirm that you want to finalize ${address} contract. This action is irrevocable!`;
+    const answers = await inquirer.prompt([{ type: 'confirm', name: 'confirmed', message }]);
+
+    if (answers.confirmed) {
+      console.log('Finalizing contract...');
+      const { logs } = await contract.finalize();
+      console.log('Finalization success!');
+      console.log('Logs emmited:');
+      console.log(logs);
+    }
   } catch (e) {
     console.error('Finalization error!');
     console.error(e);
