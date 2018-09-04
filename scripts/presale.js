@@ -1,6 +1,7 @@
 const fs = require('fs');
 const csv = require('csvtojson');
 const minimist = require('minimist');
+const { utils } = require('web3');
 
 const TokenDistributor = artifacts.require('TokenDistributor');
 
@@ -11,20 +12,19 @@ const TokenDistributor = artifacts.require('TokenDistributor');
  */
 module.exports = async function (callback) {
   try {
+    console.log('Presale script');
+    console.log('--------------');
+
     const args = minimist(process.argv.slice(2), { string: 'distributor' });
     const distAddress = args.distributor; // address of the distributor contract
     const fileName = args.data; // path to the CSV file
-    console.log(`Using distributor: ${distAddress}`);
+    console.log(`Using distributor contract: ${distAddress}`);
     console.log(`Reading presale data from: ${fileName}`);
 
     const [owner] = web3.eth.accounts;
-    const BigNumber = web3.BigNumber;
 
     const csvFs = await fs.createReadStream(fileName);
     const presale = await csv({ eol: '\n' }).fromStream(csvFs);
-
-    console.log('Presale script');
-    console.log('-----------------');
 
     const distributor = await TokenDistributor.at(distAddress);
 
@@ -33,13 +33,6 @@ module.exports = async function (callback) {
 
       for (let j = 0; j < presale.length; j++) {
         const sale = presale[j];
-        const ethValue = new BigNumber(sale.wei).div(10 ** 18);
-        const tolValue = new BigNumber(sale.tokens).div(10 ** 18);
-        const bonus = new BigNumber(sale.bonus).div(10 ** 18);
-
-        console.log(`Presale #${j} | ${sale.address}`);
-        console.log(`  ${ethValue.toString(10)} ETH | ${tolValue.toString(10)} TOL | Bonus: ${bonus
-          .toString(10)} TOL\n`);
 
         const estimatedGas = await distributor.contract.depositPresale['address,uint256,uint256']
           .estimateGas(sale.address, sale.tokens, sale.wei, { from: owner });
@@ -49,6 +42,13 @@ module.exports = async function (callback) {
           { from: owner, gas: Math.floor(estimatedGas * 1.5) }
         );
         await distributor.depositBonus(sale.address, sale.bonus, { from: owner });
+
+        // Log Presale invesment
+        console.log(`Presale #${j} | ${sale.address}`);
+        const totalETH = `${utils.fromWei(sale.wei)} ETH`;
+        const totalTOL = `${utils.fromWei(sale.tokens)} TOL`;
+        const totalBonus = `${utils.fromWei(sale.bonus)} TOL`;
+        console.log(`  - Invested: ${totalETH} | Bought: ${totalTOL} | Bonus: ${totalBonus}\n`);
       }
     }
   } catch (e) {
