@@ -25,7 +25,6 @@ module.exports = async function (callback) {
     const distributor = await TokenDistributor.at(distAddress);
 
     if (distributor) {
-
       console.log(`Issue presale tokens... [${presale.length}]\n`);
 
       for (let j = 0; j < presale.length; j++) {
@@ -49,6 +48,6 @@ module.exports = async function (callback) {
       }
     }
   } catch (e) {
-    console.log(e);
+    console.error(e);
   }
 };

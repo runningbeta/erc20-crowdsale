@@ -1,4 +1,5 @@
 const moment = require('moment');
+const { utils } = require('web3');
 
 const duration = {
   seconds: function (val) { return val; },
@@ -16,7 +17,7 @@ const withdrawTime = moment('2018-09-27T14:00:00+00:00').unix();
 module.exports = {
   token: 'FixedSupplyBurnableToken',
   rate: 6894,
-  cap: 45000 * (10 ** 18),
+  cap: utils.toWei('45000', 'ether'),
 
   openingTime,
   closingTime,

@@ -1,6 +1,4 @@
 const moment = require('moment');
-const fs = require('fs');
-const csv = require('csvtojson');
 
 const TokenDistributor = artifacts.require('TokenDistributor');
 const TokenTimelockFactory = artifacts.require('TokenTimelockFactoryImpl');
@@ -11,9 +9,6 @@ module.exports = async function (callback) {
   try {
     const [owner, wallet] = web3.eth.accounts;
     const BigNumber = web3.BigNumber;
-
-    const csvFs = await fs.createReadStream('./scripts/presale.csv');
-    const presale = await csv().fromStream(csvFs);
 
     console.log('TGE script');
     console.log('-----------------');
@@ -69,30 +64,8 @@ module.exports = async function (callback) {
         console.log(`Locked ${escrowAmount.div(1e+18).toFormat()}TOL tokens at address ${receipt
           .logs[0].args.instantiation}\n`);
       }
-
-      console.log(`Issue presale tokens... [${presale.length}]\n`);
-
-      for (let j = 0; j < presale.length; j++) {
-        const sale = presale[j];
-        const ethValue = new BigNumber(sale.wei).div(10 ** 18);
-        const tolValue = new BigNumber(sale.tokens).div(10 ** 18);
-        const bonus = new BigNumber(sale.bonus).div(10 ** 18);
-
-        console.log(`Presale #${j} | ${sale.address}`);
-        console.log(`  ${ethValue.toString(10)} ETH | ${tolValue.toString(10)} TOL | Bonus: ${bonus
-          .toString(10)} TOL\n`);
-
-        const estimatedGas = await distributor.contract.depositPresale['address,uint256,uint256']
-          .estimateGas(sale.address, sale.tokens, sale.wei, { from: owner });
-        // this transactions seems to need 50% more gas than estimated
-        await distributor.contract.depositPresale['address,uint256,uint256'](
-          sale.address, sale.tokens, sale.wei,
-          { from: owner, gas: Math.floor(estimatedGas * 1.5) }
-        );
-        await distributor.depositBonus(sale.address, sale.bonus, { from: owner });
-      }
     }
   } catch (e) {
-    console.log(e);
+    console.error(e);
   }
 };
