@@ -1,18 +1,22 @@
 const fs = require('fs');
 const csv = require('csvtojson');
+const minimist = require('minimist');
 
 const TokenDistributor = artifacts.require('TokenDistributor');
 
 /**
  * Run this script by passing additional arguments
- * truffle exec .\scripts\presale.js 0xbd2e0bd56dea31e24082bf88fd0ad88ff27ef95c .\scripts\presale-sample.csv
+ * truffle exec ./scripts/presale.js --distributor 0xbd2e0bd56dea31e24082bf88fd0ad88ff27ef95c --data ./scripts/presale-sample.csv
  * @param callback required callback
  */
 module.exports = async function (callback) {
-  const distAddress = process.argv[4]; // address of the distributor contract
-  const fileName = process.argv[5]; // path to the CSV file
-
   try {
+    const args = minimist(process.argv.slice(2), { string: 'distributor' });
+    const distAddress = args.distributor; // address of the distributor contract
+    const fileName = args.data; // path to the CSV file
+    console.log(`Using distributor: ${distAddress}`);
+    console.log(`Reading presale data from: ${fileName}`);
+
     const [owner] = web3.eth.accounts;
     const BigNumber = web3.BigNumber;
 
