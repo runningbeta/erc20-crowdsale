@@ -2,6 +2,7 @@ const minimist = require('minimist');
 const fs = require('fs');
 const csv = require('csvtojson');
 const { utils } = require('web3');
+const { logScript } = require('./util/logs');
 const setGroupCap = require('./setGroupCap');
 
 const TokenDistributor = artifacts.require('TokenDistributor');
@@ -13,27 +14,25 @@ const TokenDistributor = artifacts.require('TokenDistributor');
  */
 module.exports = async function (callback) {
   try {
-    console.log('Whitelist script');
-    console.log('-----------------');
+    logScript('Whitelist csv script');
 
     const args = minimist(process.argv.slice(2), { string: 'distributor' });
     const distAddress = args.distributor; // address of the distributor contract
     const fileName = args.data; // path to the CSV file
     const columnName = args.column || 'address'; // column name
-    console.log(`Using distributor: ${distAddress}`);
-    console.log(`Reading presale data from: ${fileName}`);
+    console.log(`Reading csv data from: ${fileName}`);
 
     const csvFs = await fs.createReadStream(fileName);
-    const presale = await csv({ eol: '\n' }).fromStream(csvFs);
+    const data = await csv({ eol: '\n' }).fromStream(csvFs);
 
     const distributor = await TokenDistributor.at(distAddress);
 
     if (distributor) {
-      console.log(`Whitelist accounts... [${presale.length}]\n`);
+      console.log(`Whitelist accounts... [${data.length}]`);
 
       const addresses = [];
-      for (let j = 0; j < presale.length; j++) {
-        addresses.push(presale[j][columnName]);
+      for (let j = 0; j < data.length; j++) {
+        addresses.push(data[j][columnName]);
       }
 
       const cap = utils.toWei('10', 'ether');

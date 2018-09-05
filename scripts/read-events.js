@@ -1,4 +1,5 @@
 const minimist = require('minimist');
+const { logScript } = require('./util/logs');
 
 /**
  * Script that can be used to read all events from a contract
@@ -9,8 +10,7 @@ const minimist = require('minimist');
  */
 module.exports = async function (callback) {
   try {
-    console.log('Read Events script');
-    console.log('----------------------------');
+    logScript('Read Events script');
 
     const args = minimist(process.argv.slice(2), { string: 'contract' });
     console.log(`Using contract: ${args.contract}`);

@@ -1,5 +1,6 @@
 const minimist = require('minimist');
 const moment = require('moment');
+const { logScript } = require('./util/logs');
 
 const TokenDistributor = artifacts.require('TokenDistributor');
 
@@ -12,8 +13,7 @@ const TokenDistributor = artifacts.require('TokenDistributor');
  */
 module.exports = async function (callback) {
   try {
-    console.log('Read TokeDistributor script');
-    console.log('---------------------------');
+    logScript('Read TokeDistributor script');
 
     const args = minimist(process.argv.slice(2), { string: 'contract' });
     const address = args.contract;

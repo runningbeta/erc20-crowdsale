@@ -1,5 +1,6 @@
 const minimist = require('minimist');
 const inquirer = require('inquirer');
+const { logScript, logTx } = require('./util/logs');
 
 const Finalizable = artifacts.require('Finalizable');
 
@@ -12,8 +13,7 @@ const Finalizable = artifacts.require('Finalizable');
  */
 module.exports = async function (callback) {
   try {
-    console.log('Finalization script');
-    console.log('-------------------');
+    logScript('Finalization script');
 
     const args = minimist(process.argv.slice(2), { string: 'contract' });
     const address = args.contract;
@@ -32,10 +32,8 @@ module.exports = async function (callback) {
 
     if (answers.confirmed) {
       console.log('Finalizing contract...');
-      const { logs } = await contract.finalize();
+      await contract.finalize().then(logTx);
       console.log('Finalization success!');
-      console.log('Logs emmited:');
-      console.log(logs);
     }
 
     callback();

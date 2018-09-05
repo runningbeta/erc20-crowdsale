@@ -3,6 +3,7 @@ const csv = require('csvtojson');
 const minimist = require('minimist');
 const { promisify } = require('util');
 const { utils } = require('web3');
+const { logScript, logTx } = require('./util/logs');
 
 const TokenDistributor = artifacts.require('TokenDistributor');
 
@@ -13,8 +14,7 @@ const TokenDistributor = artifacts.require('TokenDistributor');
  */
 module.exports = async function (callback) {
   try {
-    console.log('Presale script');
-    console.log('--------------');
+    logScript('Presale script');
 
     const args = minimist(process.argv.slice(2), { string: 'distributor' });
     const distAddress = args.distributor; // address of the distributor contract
@@ -38,8 +38,10 @@ module.exports = async function (callback) {
 
         const data = distributor.contract.depositPresale['address,uint256,uint256']
           .getData(sale.address, sale.tokens, sale.wei, options);
-        await distributor.sendTransaction({ from: accounts[0], value: 0, data });
-        await distributor.depositBonus(sale.address, sale.bonus);
+        await distributor.sendTransaction({ from: accounts[0], value: 0, data })
+          .then(logTx);
+        await distributor.depositBonus(sale.address, sale.bonus)
+          .then(logTx);
 
         // Log Presale invesment
         console.log(`Presale #${j} | ${sale.address}`);

@@ -1,16 +1,15 @@
 const minimist = require('minimist');
 const moment = require('moment');
 const { promisify } = require('util');
+const { logScript, logTx } = require('./util/logs');
+const config = require('./config');
 
 const TokenDistributor = artifacts.require('TokenDistributor');
 const Token = artifacts.require('ERC20');
 
-const config = require('./config');
-
 module.exports = async function (callback) {
   try {
-    console.log('Distribute team tokens');
-    console.log('----------------------');
+    logScript('Distribute team tokens');
 
     const accounts = await promisify(web3.eth.getAccounts)();
     console.log(`Using account: ${accounts[0]}`);
@@ -31,9 +30,10 @@ module.exports = async function (callback) {
     for (let i = 0; i < config.escrow.length; i++) {
       const escrow = config.escrow[i];
       const escrowAmount = totalSupply.mul(escrow.amount);
-      console.log(`Deposit ${escrow.amount}% for ${escrow.id} and lock until ${moment.unix(escrow.duration)
-        .format('dddd, MMMM Do YYYY, h:mm:ss a')}`);
-      const receipt = await distributor.depositAndLock(escrow.address, escrowAmount, escrow.duration);
+      // eslint-disable-next-line
+      console.log(`[TokenDistributor] Deposit ${escrow.amount}% for ${escrow.id} and lock until ${moment.unix(escrow.duration)}`);
+      const receipt = await distributor.depositAndLock(escrow.address, escrowAmount, escrow.duration)
+        .log(logTx);
       const timelockAddr = receipt.logs[0].args.instantiation;
       console.log(`Locked ${escrowAmount.div(1e+18).toFormat()} TOL tokens at: ${timelockAddr}\n`);
     }

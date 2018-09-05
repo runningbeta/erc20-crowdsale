@@ -1,5 +1,6 @@
 const minimist = require('minimist');
 const moment = require('moment');
+const { logScript } = require('./util/logs');
 
 const TokenTimelockEscrow = artifacts.require('TokenTimelockEscrow');
 
@@ -12,8 +13,7 @@ const TokenTimelockEscrow = artifacts.require('TokenTimelockEscrow');
  */
 module.exports = async function (callback) {
   try {
-    console.log('Read TimelockEscrow script');
-    console.log('----------------------------');
+    logScript('Read TimelockEscrow script');
 
     const args = minimist(process.argv.slice(2), { string: 'contract', boolean: 'raw' });
     console.log(`Using contract: ${args.contract}`);
