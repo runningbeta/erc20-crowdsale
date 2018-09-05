@@ -30,6 +30,9 @@ module.exports = async function (callback) {
     if (distributor) {
       console.log(`Issue presale tokens... [${presale.length}]\n`);
 
+      const accounts = await promisify(web3.eth.getAccounts)();
+      const options = { from: accounts[0] };
+
       for (let j = 0; j < presale.length; j++) {
         const sale = presale[j];
 
@@ -39,9 +42,9 @@ module.exports = async function (callback) {
 
         // this transactions seems to need 50% more gas than estimated
         // const options = { gas: Math.floor(estimatedGas * 1.5) };
-        const accounts = await promisify(web3.eth.getAccounts)();
-        const options = { from: accounts[0] };
-        await promisify(distributor.contract.depositPresale['address,uint256,uint256'])(sale.address, sale.tokens, sale.wei, options);
+        const data = distributor.contract.depositPresale['address,uint256,uint256']
+          .getData(sale.address, sale.tokens, sale.wei, options);
+        await distributor.sendTransaction({ from: accounts[0], value: 0, data });
         await distributor.depositBonus(sale.address, sale.bonus);
 
         // Log Presale invesment
