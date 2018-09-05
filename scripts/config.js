@@ -86,7 +86,7 @@ module.exports = {
     },
     // beta
     {
-      id: 'running.beta',
+      id: 'runningbeta',
       address: '0x0F4F2Ac550A1b4e2280d04c21cEa7EBD822934b5',
       amount: 0.00189585,
       duration: closingTime + duration.days(180),

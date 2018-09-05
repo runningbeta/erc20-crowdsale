@@ -1,16 +1,15 @@
 const minimist = require('minimist');
-const moment = require('moment');
 const { promisify } = require('util');
 
 const TokenDistributor = artifacts.require('TokenDistributor');
 const TokenTimelockFactory = artifacts.require('TokenTimelockFactoryImpl');
 
-const config = require('./TGEconfig');
+const config = require('./config');
 
 module.exports = async function (callback) {
   try {
-    console.log('TGE script');
-    console.log('----------');
+    console.log('Deploy script');
+    console.log('-------------');
 
     const accounts = await promisify(web3.eth.getAccounts)();
     const owner = accounts[0];
@@ -66,20 +65,9 @@ module.exports = async function (callback) {
       console.log('Approving distributor for 100% funds...');
       const balanceOfBenefactor = await token.balanceOf(owner);
       await token.approve(distributor.address, balanceOfBenefactor);
-      console.log(`Disributor approved for ${balanceOfBenefactor}TOL.\n`);
-
-      console.log('Locking tokens into escrow...\n');
-      const totalSupply = await token.totalSupply();
-      for (let i = 0; i < config.escrow.length; i++) {
-        const escrow = config.escrow[i];
-        const escrowAmount = totalSupply.mul(escrow.amount);
-        console.log(`Deposit ${escrow.amount}% for ${escrow.id} and lock until ${moment.unix(escrow.duration)
-          .format('dddd, MMMM Do YYYY, h:mm:ss a')}`);
-        const receipt = await distributor.depositAndLock(escrow.address, escrowAmount, escrow.duration);
-        const timelockAddr = receipt.logs[0].args.instantiation;
-        console.log(`Locked ${escrowAmount.div(1e+18).toFormat()} TOL tokens at: ${timelockAddr}\n`);
-      }
+      console.log(`Distributor approved for ${balanceOfBenefactor} TOL.\n`);
     }
+
     callback();
   } catch (e) {
     callback(e);
