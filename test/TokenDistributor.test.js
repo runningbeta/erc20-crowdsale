@@ -199,6 +199,8 @@ contract('TokenDistributor', function ([_, benefactor, owner, alice, wallet, ...
         await this.token.approve(this.distributor.address, amount, { from: benefactor });
         await this.distributor.contract
           .depositPresale['address,uint256,uint256'](alice, amount, weiAmount, { from: owner, gas: 500000 });
+        (await this.distributor.weiRaised())
+          .should.be.bignumber.equal(weiAmount);
       });
 
       it('fail to deposit bonus tokens above allowance', async function () {

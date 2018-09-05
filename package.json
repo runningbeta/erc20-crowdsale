@@ -55,6 +55,7 @@
     "openzeppelin-solidity": "^1.12.0"
   },
   "devDependencies": {
+    "axios": "^0.18.0",
     "babel-polyfill": "^6.26.0",
     "babel-preset-es2015": "^6.24.1",
     "babel-preset-stage-2": "^6.24.1",

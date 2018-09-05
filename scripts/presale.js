@@ -36,12 +36,6 @@ module.exports = async function (callback) {
       for (let j = 0; j < presale.length; j++) {
         const sale = presale[j];
 
-        // TODO: not working!
-        // const estimatedGas = await promisify(cb => distributor.contract.depositPresale['address,uint256,uint256']
-        //   .estimateGas(sale.address, sale.tokens, sale.wei, cb));
-
-        // this transactions seems to need 50% more gas than estimated
-        // const options = { gas: Math.floor(estimatedGas * 1.5) };
         const data = distributor.contract.depositPresale['address,uint256,uint256']
           .getData(sale.address, sale.tokens, sale.wei, options);
         await distributor.sendTransaction({ from: accounts[0], value: 0, data });
